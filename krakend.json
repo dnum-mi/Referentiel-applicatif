@@ -1,0 +1,54 @@
+{
+  "version": 3,
+  "name": "krakend",
+  "extra_config": {
+    "github_com/devopsfaith/krakend-cors": {
+      "allow_origins": ["http://localhost:8080"],
+      "allow_methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "allow_headers": ["Authorization", "Content-Type", "X-Requested-With"],
+      "expose_headers": ["Content-Length"],
+      "max_age": "86400",
+      "allow_credentials": true
+    },
+    "security/jwt": {
+      "alg": "RS256",
+      "jwk_url": "http://localhost:8082/realms/referentiel-applications/protocol/openid-connect/certs",
+      "audience": ["referentiel-applications"],
+      "roles_key_is_nested": true,
+      "roles_key": "realm_access.roles",
+      "cache": true
+    },
+    "auth/validator": {
+      "alg": "RS256",
+      "jwk_url": "http://localhost:8082/realms/referentiel-applications/protocol/openid-connect/certs",
+      "cache": true,
+      "propagate_claims": true,
+      "user_headers": [
+        {
+          "claim": "sub",
+          "header": "X-User-Id"
+        },
+        {
+          "claim": "email",
+          "header": "X-User-Email"
+        }
+      ]
+    }
+  },
+  "endpoints": [
+    {
+      "endpoint": "api/v2/users",
+      "method": "POST",
+      "backend": [
+        {
+          "host": ["http://backend:3500"],
+          "url_pattern": "api/v2/users",
+          "method": "POST" 
+        }
+      ],
+      "extra_config": {
+        "auth/oidc": {}
+      }
+    }
+  ]
+}
