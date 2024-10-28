@@ -47,6 +47,11 @@ const authenticatedQuickLinksDefault: QuickLink[] = [
   //   icon: 'ri-add-circle-line',
   // },
   {
+    label: 'Rechercher une application',
+    to: { name: routeNames.SEARCHAPP },
+    // icon: '',
+  },
+  {
     label: 'Déconnexion',
     to: { name: routeNames.LOGOUT },
     icon: 'ri-logout-box-r-line',
