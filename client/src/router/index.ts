@@ -1,13 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { routeNames } from './route-names'
 
-const GlobalSearch = () => import('@/views/GlobalSearch.vue')
 
 const routes = [
   {
     name: routeNames.SEARCHAPP,
     path: '/recherche-application',
-    component: GlobalSearch,
+    component:  () => import('@/views/GlobalSearch.vue'),
     meta: { requiresAuth: true }
   },
   {
@@ -18,7 +17,7 @@ const routes = [
   {
     name: routeNames.SIGNIN,
     path: '/se-connecter',
-    component: () => import('@/views/login.vue'),
+    component: () => import('@/views/Login.vue'),
     meta: {
       skipAuth: true,
     },
