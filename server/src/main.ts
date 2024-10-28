@@ -11,17 +11,11 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   app.setGlobalPrefix('api/v2');
 
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+
+
   app.enableCors({
-    origin: [
-      'http://localhost:5173',
-      'http://localhost:3500',
-      'http://localhost:8082',
-      'http://localhost:8080',
-      'https://api-referentiel-applications.apps.app1.numerique-interieur.com',
-      'https://referentiel-applications.apps.app1.numerique-interieur.com',
-      'http://integ-api-referentiel-applications.d284.dev.forge.minint.fr',
-      'http://integ-referentiel-applications.d284.dev.forge.minint.fr',
-    ],
+    origin: allowedOrigins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
