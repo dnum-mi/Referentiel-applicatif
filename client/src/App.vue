@@ -13,6 +13,18 @@ const logoText = ['Ministère', 'de l’intérieur']
 const serviceDescription = 'Une application pour les réunir toutes'
 const isLoggedIn = computed(() => authStore.isAuthenticated)
 const serviceTitle = 'Référentiel des Applications'
+const homeTo = '/applications'
+const operatorTo = '/applications'
+const ecosystemLinks = [
+  { label: 'Grist', href: 'https://grist.numerique.gouv.fr/' },
+  { label: 'Cadre de cohérence technique', href: 'https://cct.sg.minint.fr/accueil/Accueil.html' },
+  { label: 'Code source', href: 'http://github.com/dnum-mi/referentiel-applications' },
+  { label: 'Api du referenciel', href: `${import.meta.env.VITE_RDA_API_URL}` }
+]
+const mandatoryLinks = [
+  { label: 'Accessibilité : non conforme' },
+  { label: 'Contact', href: 'https://tchap.gouv.fr/#/room/!ydoKqFOXRAQPQYFvqa:agent.interieur.tchap.gouv.fr?via=agent.interieur.tchap.gouv.fr'}
+]
 
 // const AcceptAllCookies = () => {}
 // const RefuseAllCookies = () => {}
@@ -90,47 +102,6 @@ function changeTheme () {
   setScheme(theme.value === 'light' ? 'dark' : 'light')
 }
 
-const beforeMandatoryLinks = [{ label: 'Before', to: '/before' }]
-const afterMandatoryLinks = [
-  { label: 'After', to: '/after' },
-  {
-    label: 'Paramètres d’affichage',
-    button: true,
-    class: 'fr-icon-theme-fill fr-link--icon-left fr-px-2v',
-    to: '/settings',
-    onclick: changeTheme,
-  },
-]
-const a11yCompliance = 'partiellement conforme'
-const legalLink = '/mentions-legales'
-const personalDataLink = '/donnees-personnelles'
-const cookiesLink = '/cookies'
-const a11yComplianceLink = '/a11y-conformite'
-const descText = 'Description'
-const homeLink = '/'
-const licenceText = undefined
-const licenceTo = undefined
-const licenceName = undefined
-const licenceLinkProps = undefined
-const ecosystemLinks = [
-  {
-    label: 'legifrance.gouv.fr',
-    href: 'https://legifrance.gouv.fr',
-  },
-  {
-    label: 'info.gouv.fr',
-    href: 'https://info.gouv.fr',
-  },
-  {
-    label: 'service-public.fr',
-    href: 'https://service-public.fr',
-  },
-  {
-    label: 'data.gouv.fr',
-    href: 'https://data.gouv.fr',
-  },
-]
-
 const {
   offlineReady,
   needRefresh,
@@ -158,21 +129,11 @@ function close () {
   </div>
 
   <DsfrFooter
-    :before-mandatory-links="beforeMandatoryLinks"
-    :after-mandatory-links="afterMandatoryLinks"
-    :a11y-compliance="a11yCompliance"
-    :logo-text="logoText"
-    :legal-link="legalLink"
-    :personal-data-link="personalDataLink"
-    :cookies-link="cookiesLink"
-    :a11y-compliance-link="a11yComplianceLink"
-    :desc-text="descText"
-    :home-link="homeLink"
-    :licence-text="licenceText"
-    :licence-to="licenceTo"
-    :licence-name="licenceName"
-    :licence-link-props="licenceLinkProps"
-    :ecosystem-links="ecosystemLinks"
+    :logo-text
+    :homeTo
+    :ecosystemLinks
+    :mandatoryLinks
+    :operatorTo
   />
 
   <!-- <DsfrConsent>
