@@ -51,16 +51,6 @@ async function doSearch () {
           :secondary="false"
           :tertiary="false"
         />
-        <DsfrButton
-          :disabled="false"
-          :icon-only="false"
-          :icon-right="true"
-          icon="ri-arrow-down-s-line"
-          label="Export excel"
-          :no-outline="false"
-          :secondary="false"
-          :tertiary="false"
-        />
       </div>
     </div>
     <div class="container-search">

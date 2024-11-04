@@ -17,7 +17,8 @@ const Applications = {
 
   getApplicationById: async (id: string): Promise<Application[]> => {
     try {
-      const application = await requests.get<Application[]>('/applications/:id', { id })
+      const application = await requests.get<Application[]>(`/applications/${id}`)
+      console.log(application)
       return application
     }
     catch (error) {
