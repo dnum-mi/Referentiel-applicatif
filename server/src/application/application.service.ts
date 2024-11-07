@@ -1,7 +1,7 @@
 // src/application/application.service.ts
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateApplicationDto } from './dto/create-application.dto';
+import { CreateApplicationDto, CreateExternalReferenceDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
 import { SearchApplicationDto } from './dto/search-application.dto';
 import { GetApplicationDto } from './dto/get-application.dto';
@@ -11,80 +11,32 @@ export class ApplicationService {
   applications: any;
   constructor(private  prisma: PrismaService) {}
 
-  async create(createApplicationDto: CreateApplicationDto, ownerId: string) {
-    try {
-      return await this.prisma.$transaction(async (prisma) => {
-        
-        let metadata = await prisma.metadata.findUnique({
-          where: { id: createApplicationDto.metadataId },
-        });
- 
-      if (!metadata) {
-        metadata = await this.prisma.metadata.create({
-          data: {
-        id: createApplicationDto.metadataId,
-        createdById: ownerId,
-        updatedById: ownerId,
-        DateTime: new Date(),
-      },
+  async createApplication(createApplicationDto: CreateApplicationDto, ownerId: string, externalReferences: CreateExternalReferenceDto[]) {
+    Logger.warn(`Creating application with ownerId: ${ownerId}`);
+
+    // Création de metadata pour l'application
+    const applicationMetadata = await this.prisma.metadata.create({
+        data: {
+            createdById: ownerId,
+            updatedById: ownerId,
+            DateTime: new Date(),
+        },
     });
-  }
-        const lifecycleMetadata = await prisma.metadata.findUnique({
-          where: { id: createApplicationDto.lifecycle.metadataId },
-        });
-        if (!lifecycleMetadata) {
-          throw new NotFoundException('Metadata for lifecycle not found');
-        }
+    const applicationMetadataId = applicationMetadata.id;
 
-        // Vérifier l'existence du parent si parentId est fourni
-        if (createApplicationDto.parentId) {
-          const parentApp = await prisma.application.findUnique({
-            where: { id: createApplicationDto.parentId },
-          });
-          if (!parentApp) {
-            throw new NotFoundException('Parent application not found');
-          }
+    // Création de metadata pour le lifecycle
+    const lifecycleMetadata = await this.prisma.metadata.create({
+        data: {
+            createdById: ownerId,
+            updatedById: ownerId,
+            DateTime: new Date(),
+        },
+    });
+    const lifecycleMetadataId = lifecycleMetadata.id;
 
-          // Vérifier qu'il n'y a pas de cycle dans la hiérarchie
-          let currentParentId = createApplicationDto.parentId;
-          while (currentParentId) {
-            if (currentParentId === ownerId) { // Cette vérification est incorrecte; à adapter selon les besoins
-              throw new BadRequestException('An application cannot be its own parent');
-            }
-            const parent = await prisma.application.findUnique({
-              where: { id: currentParentId },
-              select: { parentId: true },
-            });
-            if (parent && parent.parentId) {
-              currentParentId = parent.parentId;
-            } else {
-              break;
-            }
-          }
-        }
-
-        // Vérifier l'existence des utilisateurs et organisations dans les acteurs
-        for (const acteur of createApplicationDto.acteurs) {
-          const user = await prisma.user.findUnique({
-            where: { keycloakId: acteur.userId },
-          });
-          if (!user) {
-            throw new NotFoundException(`User with id ${acteur.userId} not found`);
-          }
-
-          if (acteur.organizationId) {
-            const organization = await prisma.reference.findUnique({
-              where: { id: acteur.organizationId },
-            });
-            if (!organization) {
-              throw new NotFoundException(`Organization with id ${acteur.organizationId} not found`);
-            }
-          }
-        }
-
-        // Créer l'application avec les relations
-        const application = await prisma.application.create({
-          data: {
+    // Création de l'application principale avec metadata et owner connectés
+    const application = await this.prisma.application.create({
+        data: {
             label: createApplicationDto.label,
             shortname: createApplicationDto.shortname,
             logo: createApplicationDto.logo,
@@ -93,80 +45,75 @@ export class ApplicationService {
             uri: createApplicationDto.uri,
             purposes: createApplicationDto.purposes,
             tags: createApplicationDto.tags,
-            parent: createApplicationDto.parentId
-              ? {
-                  connect: { id: createApplicationDto.parentId },
-                }
-              : undefined,
+            metadata: { connect: { id: applicationMetadataId } }, // Connexion du metadata pour l'application
+            owner: { connect: { keycloakId: ownerId } },          // Connexion du propriétaire
             lifecycle: {
-              create: {
-                status: createApplicationDto.lifecycle.status,
-                firstProductionDate: new Date(createApplicationDto.lifecycle.firstProductionDate),
-                plannedDecommissioningDate: createApplicationDto.lifecycle.plannedDecommissioningDate
-                  ? new Date(createApplicationDto.lifecycle.plannedDecommissioningDate)
-                  : undefined,
-                metadata: {
-                  connect: { id: createApplicationDto.lifecycle.metadataId },
+                create: {
+                    status: createApplicationDto.lifecycle.status,
+                    firstProductionDate: new Date(createApplicationDto.lifecycle.firstProductionDate),
+                    plannedDecommissioningDate: createApplicationDto.lifecycle.plannedDecommissioningDate
+                        ? new Date(createApplicationDto.lifecycle.plannedDecommissioningDate)
+                        : undefined,
+                    metadata: { connect: { id: lifecycleMetadataId } },
                 },
-              },
-            },
-            metadata: {
-              connect: { id: createApplicationDto.metadataId },
             },
             acteurs: {
-              create: createApplicationDto.acteurs.map(acteur => ({
-                role: acteur.role,
-                user: {
-                  connect: { keycloakId: acteur.userId },
-                },
-                organization: acteur.organizationId
-                  ? { connect: { id: acteur.organizationId } }
-                  : undefined,
-              })),
+                create: createApplicationDto.acteurs.map((acteur) => ({
+                    role: acteur.role,
+                    user: {
+                        connect: { keycloakId: acteur.userId }
+                    },
+                    organization: acteur.organizationId
+                        ? { connect: { id: acteur.organizationId } }
+                        : undefined,
+                })),
             },
             compliances: {
-              create: createApplicationDto.compliances.map(compliance => ({
-                type: compliance.type,
-                name: compliance.name,
-                status: compliance.status,
-                validityStart: compliance.validityStart ? new Date(compliance.validityStart) : undefined,
-                validityEnd: compliance.validityEnd ? new Date(compliance.validityEnd) : undefined,
-                scoreValue: compliance.scoreValue,
-                scoreUnit: compliance.scoreUnit,
-                notes: compliance.notes,
-              })),
+                create: createApplicationDto.compliances.map((compliance) => ({
+                    ...compliance,
+                    validityStart: compliance.validityStart ? new Date(compliance.validityStart) : undefined,
+                    validityEnd: compliance.validityEnd ? new Date(compliance.validityEnd) : undefined,
+                })),
             },
-            owner: {
-              connect: { keycloakId: ownerId },
-            },
-          },
-          include: {
-            lifecycle: {
-              include: {
-                metadata: true,
-              },
-            },
+            parent: createApplicationDto.parentId ? { connect: { id: createApplicationDto.parentId } } : undefined,
+        },
+        include: {
+            lifecycle: { include: { metadata: true } },
             metadata: true,
-            parent: true,
-            children: true,
-            acteurs: true,
-            externalReferences: true,
-            compliances: true,
-            environments: true,
             owner: true,
-          },
-        });
+            acteurs: true,
+            compliances: true,
+        },
+    });
 
-        return application;
-      });
-    } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
-        throw error;
-      }
-      throw new BadRequestException('Failed to create application');
-    }
+    // Vérification de l'existence de chaque repositoryId dans externalReferences
+    for (const ref of externalReferences) {
+        const repositoryExists = await this.prisma.externalSource.findUnique({
+            where: { id: ref.repositoryId },
+        });
+        if (!repositoryExists) {
+            throw new NotFoundException(`Le repository avec l'ID ${ref.repositoryId} n'existe pas`);
+        }
+
+
+    // Création des références externes
+    await this.prisma.external.createMany({
+        data: externalReferences.map((ref) => ({
+            repositoryId: ref.repositoryId,
+            value: ref.value,
+            label: ref.label,
+            shortName: ref.shortName,
+            lastUpdateDate: new Date(ref.lastUpdateDate),
+            metadataId: applicationMetadataId,
+            applicationId: application.id,
+        })),
+    });
+
+    return application;
+}
   }
 
+  
   async update(id: string, updateApplicationDto: UpdateApplicationDto) {
     try {
       return await this.prisma.$transaction(async (prisma) => {
@@ -230,7 +177,7 @@ export class ApplicationService {
             }
 
             if (acteur.organizationId) {
-              const organization = await prisma.reference.findUnique({
+              const organization = await prisma.external.findUnique({
                 where: { id: acteur.organizationId },
               });
               if (!organization) {
@@ -321,7 +268,7 @@ export class ApplicationService {
             parent: true,
             children: true,
             acteurs: true,
-            externalReferences: true,
+            external: true,
             compliances: true,
             environments: true,
             owner: true,

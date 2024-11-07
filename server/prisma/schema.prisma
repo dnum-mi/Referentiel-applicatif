@@ -14,7 +14,7 @@ model User {
   keycloakId      String     @id
   email           String     @unique
   organizationId  String?    
-  organization    Reference? @relation("UserOrganization", fields: [organizationId], references: [id])
+  organization    External? @relation("UserOrganization", fields: [organizationId], references: [id])
   createdMetadata Metadata[] @relation("MetadataCreatedBy")
   updatedMetadata Metadata[] @relation("MetadataUpdatedBy")
   ownedMetadata   Metadata[] @relation("MetadataOwnedBy")
@@ -43,7 +43,7 @@ model Application {
   parent                   Application?        @relation("ApplicationParent", fields: [parentId], references: [id])
   children                 Application[]       @relation("ApplicationParent")
   acteurs                  Acteur[]            @relation("ApplicationActeurs")
-  externalReferences       Reference[]         @relation("ApplicationExternalReferences")
+  ExternalSources          External[]         @relation("ApplicationExternalSources")
   compliances              Compliance[]        @relation("ApplicationCompliances")
   environments             Environment[]       @relation("ApplicationEnvironments")
 
@@ -59,41 +59,41 @@ model Acteur {
   userId          String
   user            User         @relation("UserActeurs", fields: [userId], references: [keycloakId])
   organizationId  String?      
-  organization    Reference?   @relation("ActeurOrganization", fields: [organizationId], references: [id])
+  organization    External?   @relation("ActeurOrganization", fields: [organizationId], references: [id])
   applicationId   String?      
   application     Application? @relation("ApplicationActeurs", fields: [applicationId], references: [id])
 
   @@map("acteur")
 }
 
-model Reference {
+model External {
   id              String     @id @default(uuid()) // Changement d'Int à String avec UUID
-  repositoryId    String                 
-  repository      ReferenceRepository @relation("ReferenceRepositoryReferences", fields: [repositoryId], references: [id])
+  externalSourceId    String                 
+  externalSource      ExternalSource @relation("ExternalSourceExternal", fields: [externalSourceId], references: [id])
   value           String
   label           String
   shortName       String
   lastUpdateDate  DateTime
   metadataId      String
-  metadata        Metadata            @relation("ReferenceMetadata", fields: [metadataId], references: [id])
+  metadata        Metadata            @relation("ExternalMetadata", fields: [metadataId], references: [id])
   users           User[]              @relation("UserOrganization")
   acteur          Acteur[]             @relation("ActeurOrganization")
   applicationId   String? // Changement d'Int à String
-  application     Application?        @relation("ApplicationExternalReferences", fields: [applicationId], references: [id])
+  application     Application?        @relation("ApplicationExternalSources", fields: [applicationId], references: [id])
 
-  @@map("reference")
+  @@map("external")
 }
 
-model ReferenceRepository {
+model ExternalSource {
   id             String                      @id @default(uuid())
-  type           ReferenceRepositoryType
+  type           ExternalSourceType
   uri            String
-  valueType      ReferenceRepositoryValueType
+  valueType      ExternalSourceValueType
   metadataId     String
-  metadata       Metadata                 @relation("ReferenceRepositoryMetadata", fields: [metadataId], references: [id])
-  references     Reference[]              @relation("ReferenceRepositoryReferences")
+  metadata       Metadata                @relation("ExternalSourceMetadata", fields: [metadataId], references: [id])
+  externals      External[]              @relation("ExternalSourceExternal")
 
-  @@map("reference_repository")
+  @@map("external_source")
 }
 
 model Compliance {
@@ -136,7 +136,7 @@ model Lifecycle {
 
 model Metadata {
   id            String          @id @default(uuid()) // Changement d'Int à String avec UUID
-  DateTime      DateTime     @default(now())
+  createdAt      DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   createdById   String
   createdBy     User         @relation("MetadataCreatedBy", fields: [createdById], references: [keycloakId])
@@ -144,8 +144,8 @@ model Metadata {
   updatedBy     User         @relation("MetadataUpdatedBy", fields: [updatedById], references: [keycloakId])
   ownerId       String?
   owner         User?        @relation("MetadataOwnedBy", fields: [ownerId], references: [keycloakId])
-  references    Reference[]  @relation("ReferenceMetadata")
-  referencesRepository ReferenceRepository[] @relation("ReferenceRepositoryMetadata")
+  external      External[]  @relation("ExternalMetadata")
+  externalSource ExternalSource[] @relation("ExternalSourceMetadata")
   applications  Application[] @relation("ApplicationMetadata") 
   lifecycle     Lifecycle[]   @relation("LifecycleMetadata")
   compliance    Compliance[] @relation("ComplianceMetadata")
@@ -175,7 +175,7 @@ enum ComplianceStatus {
   not_concerned
 }
 
-enum ReferenceRepositoryType {
+enum ExternalSourceType {
   organization
   application
   regulation
@@ -183,7 +183,7 @@ enum ReferenceRepositoryType {
   population
 }
 
-enum ReferenceRepositoryValueType {
+enum ExternalSourceValueType {
   url
   uri
   identifier

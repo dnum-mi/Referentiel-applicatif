@@ -34,7 +34,7 @@ const enums = {
   ReferenceRepositoryValueType: [
     'URL = "url"',
     'URI = "uri"',
-    'IDENTIFIER = "identifier"',
+    'TYPE = "identifier"',
     'NAME = "name"',
   ],
 };
