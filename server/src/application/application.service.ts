@@ -1,7 +1,7 @@
 // src/application/application.service.ts
 import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateApplicationDto, CreateExternalReferenceDto } from './dto/create-application.dto';
+import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
 import { SearchApplicationDto } from './dto/search-application.dto';
 import { GetApplicationDto } from './dto/get-application.dto';
@@ -11,7 +11,7 @@ export class ApplicationService {
   applications: any;
   constructor(private  prisma: PrismaService) {}
 
-  async createApplication(createApplicationDto: CreateApplicationDto, ownerId: string, externalReferences: CreateExternalReferenceDto[]) {
+  async createApplication(createApplicationDto: CreateApplicationDto, ownerId: string) {
     Logger.warn(`Creating application with ownerId: ${ownerId}`);
 
     // Création de metadata pour l'application
@@ -19,7 +19,7 @@ export class ApplicationService {
         data: {
             createdById: ownerId,
             updatedById: ownerId,
-            DateTime: new Date(),
+            createdAt: new Date(),
         },
     });
     const applicationMetadataId = applicationMetadata.id;
@@ -29,7 +29,7 @@ export class ApplicationService {
         data: {
             createdById: ownerId,
             updatedById: ownerId,
-            DateTime: new Date(),
+            createdAt: new Date(),
         },
     });
     const lifecycleMetadataId = lifecycleMetadata.id;
@@ -85,32 +85,6 @@ export class ApplicationService {
             compliances: true,
         },
     });
-
-    // Vérification de l'existence de chaque repositoryId dans externalReferences
-    for (const ref of externalReferences) {
-        const repositoryExists = await this.prisma.externalSource.findUnique({
-            where: { id: ref.repositoryId },
-        });
-        if (!repositoryExists) {
-            throw new NotFoundException(`Le repository avec l'ID ${ref.repositoryId} n'existe pas`);
-        }
-
-
-    // Création des références externes
-    await this.prisma.external.createMany({
-        data: externalReferences.map((ref) => ({
-            repositoryId: ref.repositoryId,
-            value: ref.value,
-            label: ref.label,
-            shortName: ref.shortName,
-            lastUpdateDate: new Date(ref.lastUpdateDate),
-            metadataId: applicationMetadataId,
-            applicationId: application.id,
-        })),
-    });
-
-    return application;
-}
   }
 
   
@@ -167,25 +141,25 @@ export class ApplicationService {
         }
 
         // Vérifier l'existence des utilisateurs et organisations dans les acteurs si acteurs sont fournis
-        if (updateApplicationDto.acteurs) {
-          for (const acteur of updateApplicationDto.acteurs) {
-            const user = await prisma.user.findUnique({
-              where: { keycloakId: acteur.userId },
-            });
-            if (!user) {
-              throw new NotFoundException(`User with id ${acteur.userId} not found`);
-            }
+        // if (updateApplicationDto.acteurs) {
+        //   for (const acteur of updateApplicationDto.acteurs) {
+        //     const user = await prisma.user.findUnique({
+        //       where: { keycloakId: acteur.userId },
+        //     });
+        //     if (!user) {
+        //       throw new NotFoundException(`User with id ${acteur.userId} not found`);
+        //     }
 
-            if (acteur.organizationId) {
-              const organization = await prisma.external.findUnique({
-                where: { id: acteur.organizationId },
-              });
-              if (!organization) {
-                throw new NotFoundException(`Organization with id ${acteur.organizationId} not found`);
-              }
-            }
-          }
-        }
+        //     if (acteur.organizationId) {
+        //       const organization = await prisma.external.findUnique({
+        //         where: { id: acteur.organizationId },
+        //       });
+        //       if (!organization) {
+        //         throw new NotFoundException(`Organization with id ${acteur.organizationId} not found`);
+        //       }
+        //     }
+        //   }
+        // }
 
         // Mettre à jour l'application avec les nouvelles données
         const updatedApplication = await prisma.application.update({
@@ -268,7 +242,6 @@ export class ApplicationService {
             parent: true,
             children: true,
             acteurs: true,
-            external: true,
             compliances: true,
             environments: true,
             owner: true,

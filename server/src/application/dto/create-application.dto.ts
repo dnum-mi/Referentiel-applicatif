@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { ComplianceStatus, ComplianceType, LifecycleStatus, ExternalSourceType, ExternalSourceValueType } from '../../enum';
+import { ComplianceStatus, ComplianceType, LifecycleStatus} from '../../enum';
 
 export class CreateActeurDto {
   @ApiProperty()
@@ -88,44 +88,7 @@ export class CreateLifecycleDto {
   metadataId?: string;
 }
 
-export class CreateExternalReferenceDto {
-  @ApiProperty()
-  @IsString()
-  repositoryId: string;
 
-  @ApiProperty()
-  @IsEnum(ExternalSourceType)
-  repositoryType: ExternalSourceType;
-
-  @ApiProperty()
-  @IsString()
-  repositoryUri: string;
-
-  @ApiProperty()
-  @IsEnum(ExternalSourceValueType)
-  valueType: ExternalSourceValueType;
-
-  @ApiProperty()
-  @IsString()
-  value: string;
-
-  @ApiProperty()
-  @IsString()
-  label: string;
-
-  @ApiProperty()
-  @IsString()
-  shortName: string;
-
-  @ApiProperty()
-  @IsDateString()
-  lastUpdateDate: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  metadataId?: string;
-}
 
 export class CreateApplicationDto {
   @ApiProperty()
@@ -189,12 +152,6 @@ export class CreateApplicationDto {
   @ValidateNested({ each: true })
   @Type(() => CreateComplianceDto)
   compliances: CreateComplianceDto[];
-
-  @ApiProperty()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateExternalReferenceDto)
-  externalReferences: CreateExternalReferenceDto[];
 
   @ApiProperty()
   @IsString()

@@ -40,7 +40,7 @@ async function doSearch () {
   <div>
     <div>
       <!-- Export buttons -->
-      <div class="button-group fr-mb-2w">
+      <!-- <div class="button-group fr-mb-2w">
         <DsfrButton
           :disabled="false"
           :icon-only="false"
@@ -51,7 +51,7 @@ async function doSearch () {
           :secondary="false"
           :tertiary="false"
         />
-      </div>
+      </div> -->
     </div>
     <div class="container-search">
       <div class="content-container">

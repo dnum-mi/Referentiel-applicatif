@@ -45,11 +45,6 @@ const unauthenticatedQuickLinks: QuickLink[] = [
     to: { name: routeNames.SIGNIN },
     icon: 'ri-lock-line',
     iconAttrs: { title: 'Se connecter' },
-  },
-  {
-    label: 'S’enregistrer',
-    to: '/signin',
-    icon: 'ri-account-circle-line',
   }
 ]
 const authenticatedQuickLinksDefault: QuickLink[] = [

@@ -1,7 +1,7 @@
 // src/application/application.controller.ts
-import { Controller, Post, Body, Patch, Param, Request, Logger, Get, Query, HttpException, HttpStatus, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, Request, Logger, Get, Query, NotFoundException } from '@nestjs/common';
 import { ApplicationService } from './application.service';
-import { CreateApplicationDto, CreateExternalReferenceDto } from './dto/create-application.dto';
+import { CreateApplicationDto, } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { SearchApplicationDto } from './dto/search-application.dto';
@@ -19,7 +19,6 @@ export class ApplicationController {
   @ApiResponse({ status: 404, description: 'Metadata ou parent non trouvé.' })
   async create(
       @Body() createApplicationDto: CreateApplicationDto,
-      @Body('externalReferences') reference: CreateExternalReferenceDto[],
       @Request() req
   ) {
       Logger.warn("Creating application...");
@@ -34,7 +33,7 @@ export class ApplicationController {
       Logger.log({ ownerId });
   
       // Appel au service avec externalReferences inclus
-      return this.applicationService.createApplication(createApplicationDto, ownerId, reference || []);
+      return this.applicationService.createApplication(createApplicationDto, ownerId);
   }
   
   
