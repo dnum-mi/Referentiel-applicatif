@@ -292,7 +292,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-.pnpm
 
 ### Node Patch ###
 # Serverless Webpack directories
@@ -352,6 +351,4 @@ $RECYCLE.BIN/
 .eslintrc-auto-import.json
 auto-imports.d.ts
 
-
-.mongo-dev/
 *.pnpm-store/

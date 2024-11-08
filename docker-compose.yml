@@ -39,9 +39,9 @@ services:
     ports:
       - "3500:3500"
     volumes:
-      - .:/app
+      - ./server:/app
     working_dir: /app
-    entrypoint: sh -c "sleep 10 && npm install && npm run start:dev"
+    entrypoint: sh -c "sleep 10 && npm install -g pnpm && pnpm install && pnpm run start:dev"
     networks:
       - my-network
 
@@ -49,25 +49,51 @@ services:
     image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
     environment:
-      DB_VENDOR: h2
-      KEYCLOAK_AUTH_SERVER_URL: http://localhost:8082
-      KEYCLOAK_REALM: referentiel-applications
-      KEYCLOAK_CLIENT_ID: referentiel-applications-api
-      KEYCLOAK_CLIENT_SECRET: HbOh6jTkUiOLMB8H8KUZs048KMRQ7y9g
+      DB_VENDOR: postgres
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KEYCLOAK_IMPORT: /realm.json
+      # Fixer la clé secrète
+      KEYCLOAK_CLIENT_SECRET: xrSK3UlEQcHhqmUXyhlKMKg0fEQPfQBI
     ports:
       - "8082:8080"
     volumes:
       - ./temp/realm.json:/realm.json
+      - keycloak_data:/opt/keycloak/data
     entrypoint: ["/opt/keycloak/bin/kc.sh"]
     command: ["start-dev"]
+    depends_on:
+      - postgres
+    networks:
+      - my-network
+
+  client:
+    image: node:22
+    container_name: vue_client
+    working_dir: /app
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install -g pnpm && pnpm install && pnpm dev"
+    environment:
+      VITE_KEYCLOAK_AUTH_SERVER_URL: http://localhost:8082
+      VITE_KEYCLOAK_REALM: referentiel-applications
+      VITE_KEYCLOAK_CLIENT_ID: referentiel-applications
+      VITE_KEYCLOAK_CLIENT_SECRET: xrSK3UlEQcHhqmUXyhlKMKg0fEQPfQBI
+    depends_on:
+      - backend
     networks:
       - my-network
 
 volumes:
   postgres_data:
+  keycloak_data:
 
 networks:
   my-network:

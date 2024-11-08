@@ -10,6 +10,7 @@ Fournir un point de vérité pour répertorier, catégoriser et gérer les méta
 - [NestJS](https://nestjs.com/)
 - [TypeScript](https://www.typescriptlang.org/)
 - [PostgreSQL](https://www.postgresql.org/)
+- [Prisma](https://www.prisma.io/)
 
 ## Installation
 
@@ -23,7 +24,7 @@ Liste des outils utilisés par le projet à installer :
 
 1. **Installer les dépendances**
     ```bash
-    npm install
+    pnpm install
     ```
 
 2. **Configurer les variables d'environnement**
@@ -31,19 +32,17 @@ Liste des outils utilisés par le projet à installer :
     cp .env.example .env
     # Modifier le fichier .env selon vos besoins
     ```
-
 ### Démarrage de l'API
 > L'API sera accessible a l'adresse [http://localhost:3500](http://localhost:3500/)
 
-> Le swagger de l'API sera accessible a l'adresse [http://localhost:3500/api/v1]()
+> Le swagger de l'API sera accessible a l'adresse [http://localhost:3500/api/v2]()
 ```bash
-  npm run docker:start
+  pnpm run docker:start
 ```
 
 ### Arret de l'API
 ```bash
-  npm run docker:stop
+  pnpm run docker:stop
 ```
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-

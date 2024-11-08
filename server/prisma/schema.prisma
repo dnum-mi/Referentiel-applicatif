@@ -1,0 +1,191 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions", "fullTextSearch"]
+  binaryTargets   = ["native", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [uuid_ossp(map: "uuid-ossp")]
+}
+
+model User {
+  keycloakId      String     @id
+  email           String     @unique
+  organizationId  String?    
+  organization    External? @relation("UserOrganization", fields: [organizationId], references: [id])
+  createdMetadata Metadata[] @relation("MetadataCreatedBy")
+  updatedMetadata Metadata[] @relation("MetadataUpdatedBy")
+  ownedMetadata   Metadata[] @relation("MetadataOwnedBy")
+  acteur          Acteur[]    @relation("UserActeurs")
+  applications    Application[] @relation("UserApplications")
+
+
+  @@map("user")
+}
+
+model Application {
+  id                       String     @id @default(uuid())
+  label                    String
+  shortname                String
+  logo                     String
+  description              String
+  url                      String
+  uri                      String
+  purposes                 String[]
+  tags                     String[]
+  lifecycleId              String // Changement d'Int à String
+  lifecycle                Lifecycle           @relation("LifecycleApplications", fields: [lifecycleId], references: [id])
+  metadataId               String // Changement d'Int à String
+  metadata                 Metadata            @relation("ApplicationMetadata", fields: [metadataId], references: [id])
+  parentId                 String? // Changement d'Int à String 
+  parent                   Application?        @relation("ApplicationParent", fields: [parentId], references: [id])
+  children                 Application[]       @relation("ApplicationParent")
+  acteurs                  Acteur[]            @relation("ApplicationActeurs")
+  ExternalSources          External[]         @relation("ApplicationExternalSources")
+  compliances              Compliance[]        @relation("ApplicationCompliances")
+  environments             Environment[]       @relation("ApplicationEnvironments")
+
+  ownerId                  String
+  owner                    User                @relation("UserApplications", fields: [ownerId], references: [keycloakId])
+
+  @@map("application")
+}
+
+model Acteur {
+  id              String       @id @default(uuid())
+  role            String
+  userId          String
+  user            User         @relation("UserActeurs", fields: [userId], references: [keycloakId])
+  organizationId  String?      
+  organization    External?   @relation("ActeurOrganization", fields: [organizationId], references: [id])
+  applicationId   String?      
+  application     Application? @relation("ApplicationActeurs", fields: [applicationId], references: [id])
+
+  @@map("acteur")
+}
+
+model External {
+  id              String     @id @default(uuid()) // Changement d'Int à String avec UUID
+  externalSourceId    String                 
+  externalSource      ExternalSource @relation("ExternalSourceExternal", fields: [externalSourceId], references: [id])
+  value           String
+  label           String
+  shortName       String
+  lastUpdateDate  DateTime
+  metadataId      String
+  metadata        Metadata            @relation("ExternalMetadata", fields: [metadataId], references: [id])
+  users           User[]              @relation("UserOrganization")
+  acteur          Acteur[]             @relation("ActeurOrganization")
+  applicationId   String? // Changement d'Int à String
+  application     Application?        @relation("ApplicationExternalSources", fields: [applicationId], references: [id])
+
+  @@map("external")
+}
+
+model ExternalSource {
+  id             String                      @id @default(uuid())
+  type           ExternalSourceType
+  uri            String
+  valueType      ExternalSourceValueType
+  metadataId     String
+  metadata       Metadata                @relation("ExternalSourceMetadata", fields: [metadataId], references: [id])
+  externals      External[]              @relation("ExternalSourceExternal")
+
+  @@map("external_source")
+}
+
+model Compliance {
+  id              String                 @id @default(uuid()) // Changement d'Int à String avec UUID
+  type            ComplianceType
+  name            String
+  status          ComplianceStatus
+  validityStart   DateTime?
+  validityEnd     DateTime?
+  scoreValue      String?
+  scoreUnit       String?
+  notes           String?
+  metadataId      String?
+  metadata        Metadata?            @relation("ComplianceMetadata", fields: [metadataId], references: [id])
+  applicationId   String? // Changement d'Int à String
+  application     Application?        @relation("ApplicationCompliances", fields: [applicationId], references: [id])
+
+  @@map("compliance")
+}
+
+model Environment {
+  id             String         @id @default(uuid()) // Changement d'Int à String avec UUID
+  applicationId  String
+  application    Application @relation("ApplicationEnvironments", fields: [applicationId], references: [id])
+
+  @@map("environment")
+}
+
+model Lifecycle {
+  id                          String              @id @default(uuid()) // Changement d'Int à String avec UUID
+  status                      LifecycleStatus
+  firstProductionDate         DateTime
+  plannedDecommissioningDate  DateTime?
+  metadataId                  String
+  metadata                    Metadata          @relation("LifecycleMetadata", fields: [metadataId], references: [id])
+  applications                Application[]     @relation("LifecycleApplications")
+
+  @@map("lifecycle")
+}
+
+model Metadata {
+  id            String          @id @default(uuid()) // Changement d'Int à String avec UUID
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  createdById   String
+  createdBy     User         @relation("MetadataCreatedBy", fields: [createdById], references: [keycloakId])
+  updatedById   String
+  updatedBy     User         @relation("MetadataUpdatedBy", fields: [updatedById], references: [keycloakId])
+  ownerId       String?
+  owner         User?        @relation("MetadataOwnedBy", fields: [ownerId], references: [keycloakId])
+  external      External[]  @relation("ExternalMetadata")
+  externalSource ExternalSource[] @relation("ExternalSourceMetadata")
+  applications  Application[] @relation("ApplicationMetadata") 
+  lifecycle     Lifecycle[]   @relation("LifecycleMetadata")
+  compliance    Compliance[] @relation("ComplianceMetadata")
+
+  @@map("metadata")
+}
+
+enum LifecycleStatus {
+  under_construction
+  in_production
+  decommissioned
+}
+
+enum ComplianceType {
+  regulation
+  standard
+  policy
+  contractual
+  security
+  privacy
+}
+
+enum ComplianceStatus {
+  compliant
+  non_compliant
+  partially_compliant
+  not_concerned
+}
+
+enum ExternalSourceType {
+  organization
+  application
+  regulation
+  financial
+  population
+}
+
+enum ExternalSourceValueType {
+  url
+  uri
+  identifier
+  name
+}
