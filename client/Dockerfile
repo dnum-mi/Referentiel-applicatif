@@ -5,13 +5,13 @@ FROM node:18
 WORKDIR /app
 
 # Copier les fichiers package.json et pnpm-lock.yaml (ou package-lock.json)
-COPY client/package.json client/pnpm-lock.yaml ./
+COPY ./package.json ./pnpm-lock.yaml ./
 
 # Installer les dépendances
 RUN npm install -g pnpm && pnpm install
 
 # Copier le reste des fichiers de l'application
-COPY client/ ./
+COPY . .
 
 # Exposer le port utilisé par Vite
 EXPOSE 5173

@@ -7,6 +7,7 @@ WORKDIR /app
 COPY . .
 
 # Install application dependencies
+RUN npm install -g pnpm
 RUN pnpm install
 RUN npx prisma generate
 
@@ -16,7 +17,5 @@ ENV PORT=3500
 # Build app
 RUN pnpm run build
 
-EXPOSE 3500
-
 # Start the NestJS application
-CMD [ "npm", "run", "start:prod" ]
+CMD ["node" , "dist/src/main.js"]
