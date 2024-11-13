@@ -17,12 +17,14 @@ import { ApplicationController } from './application/application.controller';
 import { UserController } from './user/user.controller';
 import { ApplicationService } from './application/application.service';
 import { UserService } from './user/user.service';
+import { ExternalSourceModule } from './external-source/external-source.module';
 @Module({
   imports: [
     PrismaModule,
     AuthModule,
     UserModule,
     ApplicationModule,
+    ExternalSourceModule,
     // KeycloakConnectModule.register({
     //   authServerUrl: process.env.KEYCLOAK_AUTH_SERVER_URL,
     //   realm: process.env.KEYCLOAK_REALM,
