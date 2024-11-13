@@ -1,5 +1,5 @@
 // src/application/application.controller.ts
-import { Controller, Post, Body, Patch, Param, Request, Logger, Get, Query, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, Request, Logger, Get, Query, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ApplicationService } from './application.service';
 import { CreateApplicationDto, } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
@@ -10,7 +10,7 @@ import { GetApplicationDto } from './dto/get-application.dto';
 @ApiTags('applications')
 @Controller('applications')
 export class ApplicationController {
-  applicationsService: any;
+  applicationsService: ApplicationService;
   constructor(private readonly applicationService: ApplicationService) {}
 
   @Post()
@@ -22,18 +22,14 @@ export class ApplicationController {
       @Request() req
   ) {
       Logger.warn("Creating application...");
-  
-      // // Ajoutez cette vérification
-      // if (!req.user || !req.user.keycloakId) {
-      //     Logger.error('User ou keycloakId manquant dans la requête');
-      //     throw new UnauthorizedException('Authentification de l’utilisateur requise');
-      // }
-  
-      const ownerId = "f15d1c13-8198-4ca5-a180-94656e20d568";
-      Logger.log({ ownerId });
-  
-      // Appel au service avec externalReferences inclus
-      return this.applicationService.createApplication(createApplicationDto, ownerId);
+      const ownerId = req.user ? req.user.keycloakId : "f15d1c13-8198-4ca5-a180-94656e20d568";
+
+      if (!ownerId) {
+          throw new UnauthorizedException('Authentification de l’utilisateur requise');
+      }
+
+      const newApplication = await this.applicationService.createApplication(createApplicationDto, ownerId);
+      return { status: 201, message: "Application créée avec succès", data: newApplication };
   }
   
   

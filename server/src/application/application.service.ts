@@ -11,82 +11,115 @@ export class ApplicationService {
   applications: any;
   constructor(private  prisma: PrismaService) {}
 
-  async createApplication(createApplicationDto: CreateApplicationDto, ownerId: string) {
-    Logger.warn(`Creating application with ownerId: ${ownerId}`);
-
-    // Création de metadata pour l'application
-    const applicationMetadata = await this.prisma.metadata.create({
+  
+  async  createApplication(createApplicationDto, ownerId) {
+      const BASE_URL_APPLICATION = process.env.BASE_URL_APPLICATION;
+      const BASE_URL_API = process.env.BASE_URL_API;
+  
+      Logger.warn(`Creating application with ownerId: ${ownerId}`);
+  
+      for (const actor of createApplicationDto.actors) {
+        if (actor.organizationId) {
+          const organizationExists = await this.prisma.external.findUnique({
+            where: { id: actor.organizationId },
+          });
+          if (!organizationExists) {
+            throw new Error(`Organization with id ${actor.organizationId} does not exist.`);
+          }
+        }
+      }
+  
+      const applicationMetadata = await this.prisma.metadata.create({
         data: {
             createdById: ownerId,
             updatedById: ownerId,
             createdAt: new Date(),
         },
-    });
-    const applicationMetadataId = applicationMetadata.id;
-
-    // Création de metadata pour le lifecycle
-    const lifecycleMetadata = await this.prisma.metadata.create({
-        data: {
-            createdById: ownerId,
-            updatedById: ownerId,
-            createdAt: new Date(),
-        },
-    });
-    const lifecycleMetadataId = lifecycleMetadata.id;
-
-    // Création de l'application principale avec metadata et owner connectés
-    const application = await this.prisma.application.create({
-        data: {
-            label: createApplicationDto.label,
-            shortname: createApplicationDto.shortname,
-            logo: createApplicationDto.logo,
-            description: createApplicationDto.description,
-            url: createApplicationDto.url,
-            uri: createApplicationDto.uri,
-            purposes: createApplicationDto.purposes,
-            tags: createApplicationDto.tags,
-            metadata: { connect: { id: applicationMetadataId } }, // Connexion du metadata pour l'application
-            owner: { connect: { keycloakId: ownerId } },          // Connexion du propriétaire
-            lifecycle: {
-                create: {
-                    status: createApplicationDto.lifecycle.status,
-                    firstProductionDate: new Date(createApplicationDto.lifecycle.firstProductionDate),
-                    plannedDecommissioningDate: createApplicationDto.lifecycle.plannedDecommissioningDate
-                        ? new Date(createApplicationDto.lifecycle.plannedDecommissioningDate)
-                        : undefined,
-                    metadata: { connect: { id: lifecycleMetadataId } },
-                },
-            },
-            acteurs: {
-                create: createApplicationDto.acteurs.map((acteur) => ({
-                    role: acteur.role,
-                    user: {
-                        connect: { keycloakId: acteur.userId }
-                    },
-                    organization: acteur.organizationId
-                        ? { connect: { id: acteur.organizationId } }
-                        : undefined,
-                })),
-            },
-            compliances: {
-                create: createApplicationDto.compliances.map((compliance) => ({
-                    ...compliance,
-                    validityStart: compliance.validityStart ? new Date(compliance.validityStart) : undefined,
-                    validityEnd: compliance.validityEnd ? new Date(compliance.validityEnd) : undefined,
-                })),
-            },
-            parent: createApplicationDto.parentId ? { connect: { id: createApplicationDto.parentId } } : undefined,
-        },
-        include: {
-            lifecycle: { include: { metadata: true } },
-            metadata: true,
-            owner: true,
-            acteurs: true,
-            compliances: true,
-        },
-    });
+      });
+  
+      const externalsData = createApplicationDto.externals.map((externalDto) => ({
+        externalSourceId: externalDto.externalSourceId,
+        value: externalDto.value,
+        label: externalDto.label,
+        shortName: externalDto.shortName,
+        lastSourceUpdate: new Date(externalDto.lastSourceUpdate),
+        metadata: { connect: { id: applicationMetadata.id } },
+      }));
+  
+      const lifecycleMetadata = await this.prisma.metadata.create({
+          data: {
+              createdById: ownerId,
+              updatedById: ownerId,
+              createdAt: new Date(),
+          },
+      });
+  
+      // Crée l'application sans les champs url et uri
+      const application = await this.prisma.application.create({
+          data: {
+              label: createApplicationDto.label,
+              shortName: createApplicationDto.shortname,
+              logo: createApplicationDto.logo,
+              description: createApplicationDto.description,
+              url: createApplicationDto.url || BASE_URL_APPLICATION, // Utilisation de BASE_URL_APPLICATION par défaut
+              uri: createApplicationDto.uri || BASE_URL_API, // Utilisation de BASE_URL_API par défaut
+              purposes: createApplicationDto.purposes,
+              tags: createApplicationDto.tags,
+              metadata: { connect: { id: applicationMetadata.id } },
+              lifecycle: {
+                  create: {
+                      status: createApplicationDto.lifecycle.status,
+                      firstProductionDate: new Date(createApplicationDto.lifecycle.firstProductionDate),
+                      plannedDecommissioningDate: createApplicationDto.lifecycle.plannedDecommissioningDate
+                          ? new Date(createApplicationDto.lifecycle.plannedDecommissioningDate)
+                          : undefined,
+                      metadata: { connect: { id: lifecycleMetadata.id } },
+                  },
+              },
+              actors: {
+                  create: createApplicationDto.actors.map((actor) => ({
+                      role: actor.role,
+                      user: { connect: { keycloakId: actor.userId } },
+                      organization: actor.organizationId
+                          ? { connect: { id: actor.organizationId } }
+                          : undefined,
+                  })),
+              },
+              compliances: {
+                  create: createApplicationDto.compliances.map((compliance) => ({
+                      ...compliance,
+                      validityStart: compliance.validityStart ? new Date(compliance.validityStart) : undefined,
+                      validityEnd: compliance.validityEnd ? new Date(compliance.validityEnd) : undefined,
+                  })),
+              },
+              parent: createApplicationDto.parentId ? { connect: { id: createApplicationDto.parentId } } : undefined,
+          },
+          include: {
+              lifecycle: { include: { metadata: true } },
+              metadata: true,
+              actors: true,
+              compliances: true,
+          },
+      });
+  
+      // Mise à jour des champs url et uri avec l'ID de l'application
+      const applicationId = application.id;
+      const updatedApplication = await this.prisma.application.update({
+          where: { id: applicationId },
+          data: {
+              url: `${BASE_URL_APPLICATION}/${applicationId}`,
+              uri: `${BASE_URL_API}/${applicationId}`,
+          },
+          include: {
+              lifecycle: { include: { metadata: true } },
+              metadata: true,
+              actors: true,
+              compliances: true,
+          },
+      });
+  
+      return updatedApplication;
   }
-
   
   async update(id: string, updateApplicationDto: UpdateApplicationDto) {
     try {
@@ -140,37 +173,13 @@ export class ApplicationService {
           }
         }
 
-        // Vérifier l'existence des utilisateurs et organisations dans les acteurs si acteurs sont fournis
-        // if (updateApplicationDto.acteurs) {
-        //   for (const acteur of updateApplicationDto.acteurs) {
-        //     const user = await prisma.user.findUnique({
-        //       where: { keycloakId: acteur.userId },
-        //     });
-        //     if (!user) {
-        //       throw new NotFoundException(`User with id ${acteur.userId} not found`);
-        //     }
-
-        //     if (acteur.organizationId) {
-        //       const organization = await prisma.external.findUnique({
-        //         where: { id: acteur.organizationId },
-        //       });
-        //       if (!organization) {
-        //         throw new NotFoundException(`Organization with id ${acteur.organizationId} not found`);
-        //       }
-        //     }
-        //   }
-        // }
-
-        // Mettre à jour l'application avec les nouvelles données
         const updatedApplication = await prisma.application.update({
           where: { id },
           data: {
             label: updateApplicationDto.label,
-            shortname: updateApplicationDto.shortname,
+            shortName: updateApplicationDto.shortname,
             logo: updateApplicationDto.logo,
             description: updateApplicationDto.description,
-            url: updateApplicationDto.url,
-            uri: updateApplicationDto.uri,
             purposes: updateApplicationDto.purposes,
             tags: updateApplicationDto.tags,
             parent: updateApplicationDto.parentId
@@ -201,17 +210,16 @@ export class ApplicationService {
                   },
                 }
               : undefined,
-            acteurs: updateApplicationDto.acteurs
+            actors: updateApplicationDto.actors
               ? {
-                  // Pour simplifier, on peut déconnecter et recréer les acteurs
                   deleteMany: {},
-                  create: updateApplicationDto.acteurs.map(acteur => ({
-                    role: acteur.role,
+                  create: updateApplicationDto.actors.map(actor => ({
+                    role: actor.role,
                     user: {
-                      connect: { keycloakId: acteur.userId },
+                      connect: { keycloakId: actor.userId },
                     },
-                    organization: acteur.organizationId
-                      ? { connect: { id: acteur.organizationId } }
+                    organization: actor.organizationId
+                      ? { connect: { id: actor.organizationId } }
                       : undefined,
                   })),
                 }
@@ -240,11 +248,9 @@ export class ApplicationService {
             },
             metadata: true,
             parent: true,
-            children: true,
-            acteurs: true,
+            childrens: true,
+            actors: true,
             compliances: true,
-            environments: true,
-            owner: true,
           },
         });
 
@@ -277,8 +283,7 @@ export class ApplicationService {
       where: { id },
       include: {
         lifecycle: true,
-        owner: true,
-        acteurs: true,
+        actors: true,
       },
     });
 
@@ -289,7 +294,7 @@ export class ApplicationService {
     const applicationDto: GetApplicationDto = {
       id: application.id,
       label: application.label,
-      shortname: application.shortname,
+      shortname: application.shortName,
       logo: application.logo,
       description: application.description,
       url: application.url,

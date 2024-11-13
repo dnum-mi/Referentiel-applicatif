@@ -1,3 +1,4 @@
+import { CreateExternalDto } from './../../external/dto/create-external.dto';
 import { 
   IsString, 
   IsOptional, 
@@ -11,7 +12,7 @@ import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { ComplianceStatus, ComplianceType, LifecycleStatus} from '../../enum';
 
-export class CreateActeurDto {
+export class CreateActorDto {
   @ApiProperty()
   @IsString()
   role: string;
@@ -88,8 +89,6 @@ export class CreateLifecycleDto {
   metadataId?: string;
 }
 
-
-
 export class CreateApplicationDto {
   @ApiProperty()
   @IsString()
@@ -111,14 +110,6 @@ export class CreateApplicationDto {
   @ApiProperty()
   @IsString()
   description: string;
-
-  @ApiProperty()
-  @IsString()
-  url: string;
-
-  @ApiProperty()
-  @IsString()
-  uri: string;
 
   @ApiProperty()
   @IsArray()
@@ -143,9 +134,9 @@ export class CreateApplicationDto {
   @ApiProperty()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateActeurDto)
+  @Type(() => CreateActorDto)
   @ArrayMinSize(1)
-  acteurs: CreateActeurDto[];
+  actors: CreateActorDto[];
 
   @ApiProperty()
   @IsArray()
@@ -153,7 +144,10 @@ export class CreateApplicationDto {
   @Type(() => CreateComplianceDto)
   compliances: CreateComplianceDto[];
 
-  @ApiProperty()
-  @IsString()
-  ownerId: string;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateExternalDto)
+  externals: CreateExternalDto[];
 }
+
+
