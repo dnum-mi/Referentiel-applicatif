@@ -15,11 +15,10 @@ model User {
   email           String     @unique
   organizationId  String?    
   organization    External? @relation("UserOrganization", fields: [organizationId], references: [id])
-  createdMetadata Metadata[] @relation("MetadataCreatedBy")
-  updatedMetadata Metadata[] @relation("MetadataUpdatedBy")
-  ownedMetadata   Metadata[] @relation("MetadataOwnedBy")
-  acteur          Acteur[]    @relation("UserActeurs")
-  applications    Application[] @relation("UserApplications")
+  createdSet Metadata[] @relation("MetadataCreatedBy")
+  updatedSet Metadata[] @relation("MetadataUpdatedBy")
+  dataOwners   Metadata[] @relation("MetadataDataOwnerBy")
+  actors          Actor[]    @relation("UserActors")
 
 
   @@map("user")
@@ -28,7 +27,7 @@ model User {
 model Application {
   id                       String     @id @default(uuid())
   label                    String
-  shortname                String
+  shortName                String
   logo                     String
   description              String
   url                      String
@@ -41,29 +40,25 @@ model Application {
   metadata                 Metadata            @relation("ApplicationMetadata", fields: [metadataId], references: [id])
   parentId                 String? // Changement d'Int à String 
   parent                   Application?        @relation("ApplicationParent", fields: [parentId], references: [id])
-  children                 Application[]       @relation("ApplicationParent")
-  acteurs                  Acteur[]            @relation("ApplicationActeurs")
+  childrens                 Application[]       @relation("ApplicationParent")
+  actors                   Actor[]            @relation("ApplicationActors")
   ExternalSources          External[]         @relation("ApplicationExternalSources")
   compliances              Compliance[]        @relation("ApplicationCompliances")
-  environments             Environment[]       @relation("ApplicationEnvironments")
-
-  ownerId                  String
-  owner                    User                @relation("UserApplications", fields: [ownerId], references: [keycloakId])
 
   @@map("application")
 }
 
-model Acteur {
+model Actor {
   id              String       @id @default(uuid())
   role            String
   userId          String
-  user            User         @relation("UserActeurs", fields: [userId], references: [keycloakId])
+  user            User         @relation("UserActors", fields: [userId], references: [keycloakId])
   organizationId  String?      
-  organization    External?   @relation("ActeurOrganization", fields: [organizationId], references: [id])
+  organization    External?   @relation("ActorOrganization", fields: [organizationId], references: [id])
   applicationId   String?      
-  application     Application? @relation("ApplicationActeurs", fields: [applicationId], references: [id])
+  application     Application? @relation("ApplicationActors", fields: [applicationId], references: [id])
 
-  @@map("acteur")
+  @@map("actor")
 }
 
 model External {
@@ -73,11 +68,11 @@ model External {
   value           String
   label           String
   shortName       String
-  lastUpdateDate  DateTime
+  lastSourceUpdate  DateTime
   metadataId      String
-  metadata        Metadata            @relation("ExternalMetadata", fields: [metadataId], references: [id])
+  metadata        Metadata            @relation("ExternalsMetadata", fields: [metadataId], references: [id])
   users           User[]              @relation("UserOrganization")
-  acteur          Acteur[]             @relation("ActeurOrganization")
+  actor           Actor[]             @relation("ActorOrganization")
   applicationId   String? // Changement d'Int à String
   application     Application?        @relation("ApplicationExternalSources", fields: [applicationId], references: [id])
 
@@ -90,14 +85,14 @@ model ExternalSource {
   uri            String
   valueType      ExternalSourceValueType
   metadataId     String
-  metadata       Metadata                @relation("ExternalSourceMetadata", fields: [metadataId], references: [id])
+  metadata       Metadata                @relation("ExternalSourcesMetadata", fields: [metadataId], references: [id])
   externals      External[]              @relation("ExternalSourceExternal")
 
   @@map("external_source")
 }
 
 model Compliance {
-  id              String                 @id @default(uuid()) // Changement d'Int à String avec UUID
+  id              String                 @id @default(uuid())
   type            ComplianceType
   name            String
   status          ComplianceStatus
@@ -108,18 +103,10 @@ model Compliance {
   notes           String?
   metadataId      String?
   metadata        Metadata?            @relation("ComplianceMetadata", fields: [metadataId], references: [id])
-  applicationId   String? // Changement d'Int à String
+  applicationId   String? 
   application     Application?        @relation("ApplicationCompliances", fields: [applicationId], references: [id])
 
   @@map("compliance")
-}
-
-model Environment {
-  id             String         @id @default(uuid()) // Changement d'Int à String avec UUID
-  applicationId  String
-  application    Application @relation("ApplicationEnvironments", fields: [applicationId], references: [id])
-
-  @@map("environment")
 }
 
 model Lifecycle {
@@ -142,10 +129,10 @@ model Metadata {
   createdBy     User         @relation("MetadataCreatedBy", fields: [createdById], references: [keycloakId])
   updatedById   String
   updatedBy     User         @relation("MetadataUpdatedBy", fields: [updatedById], references: [keycloakId])
-  ownerId       String?
-  owner         User?        @relation("MetadataOwnedBy", fields: [ownerId], references: [keycloakId])
-  external      External[]  @relation("ExternalMetadata")
-  externalSource ExternalSource[] @relation("ExternalSourceMetadata")
+  dataOwnerId       String?
+  dataOwner         User?        @relation("MetadataDataOwnerBy", fields: [dataOwnerId], references: [keycloakId])
+  externals      External[]  @relation("ExternalsMetadata")
+  externalSources ExternalSource[] @relation("ExternalSourcesMetadata")
   applications  Application[] @relation("ApplicationMetadata") 
   lifecycle     Lifecycle[]   @relation("LifecycleMetadata")
   compliance    Compliance[] @relation("ComplianceMetadata")
