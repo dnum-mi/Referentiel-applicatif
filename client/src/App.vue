@@ -1,111 +1,81 @@
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/authStore'
-import { useRegisterSW } from 'virtual:pwa-register/vue'
-import { computed, ref, watch } from 'vue'
-import useToaster from './composables/use-toaster' // Assurez-vous d'importer `watch`
-import router from './router' // Assurez-vous que ce composable est correctement importé
-import { routeNames } from './router/route-names'
+import { useRegisterSW } from 'virtual:pwa-register/vue';
+import { ref } from 'vue';
+import useToaster from './composables/use-toaster'; // Assurez-vous d'importer `watch`
+import { routeNames } from './router/route-names';
+import { authentication } from './services/authentication';
 
-const toaster = useToaster()
-const authStore = useAuthStore()
+const authenticated = ref(false);
+authentication.init({ onLoad: 'check-sso' }).then((answer) => (authenticated.value = answer));
 
-const logoText = ['Ministère', 'de l’intérieur']
-const serviceDescription = 'Une application pour les réunir toutes'
-const isLoggedIn = computed(() => authStore.isAuthenticated)
-const serviceTitle = 'Référentiel des Applications'
-const homeTo = '/applications'
-const operatorTo = '/applications'
+const toaster = useToaster();
+
+const logoText = ['Ministère', 'de l’intérieur'];
+const serviceDescription = 'Une application pour les réunir toutes';
+const serviceTitle = 'Référentiel des Applications';
+const homeTo = '/applications';
+const operatorTo = '/applications';
 const ecosystemLinks = [
   { label: 'Grist', href: 'https://grist.numerique.gouv.fr/' },
   { label: 'CCT', href: 'https://cct.sg.minint.fr/accueil/Accueil.html' },
   { label: 'Code source', href: 'http://github.com/dnum-mi/referentiel-applications' },
-  { label: 'Api du referenciel', href: `${import.meta.env.VITE_RDA_API_URL}` }
-]
+  { label: 'Api du referenciel', href: `${import.meta.env.VITE_RDA_API_URL}` },
+];
 const mandatoryLinks = [
   { label: 'Accessibilité : non conforme' },
-  { label: 'Contact', href: 'https://tchap.gouv.fr/#/room/!ydoKqFOXRAQPQYFvqa:agent.interieur.tchap.gouv.fr?via=agent.interieur.tchap.gouv.fr'}
-]
-
-// const AcceptAllCookies = () => {}
-// const RefuseAllCookies = () => {}
-// const CustomizeCookies = () => {}
+  {
+    label: 'Contact',
+    href: 'https://tchap.gouv.fr/#/room/!ydoKqFOXRAQPQYFvqa:agent.interieur.tchap.gouv.fr?via=agent.interieur.tchap.gouv.fr',
+  },
+];
 
 interface QuickLink {
-  label: string
-  to: { name: string } | string
-  icon?: string
-  iconAttrs?: Record<string, string>
+  label: string;
+  to: { name: string } | string;
+  icon?: string;
+  iconAttrs?: Record<string, string>;
 }
 
-const quickLinks = ref<QuickLink[]>([])
+const unauthenticatedQuickLinks = ref([]);
 
-const unauthenticatedQuickLinks: QuickLink[] = [
-  {
-    label: 'Se connecter',
-    to: { name: routeNames.SIGNIN },
-    icon: 'ri-lock-line',
-    iconAttrs: { title: 'Se connecter' },
-  }
-]
-const authenticatedQuickLinksDefault: QuickLink[] = [
-  // {
-  //   label: 'Créer une application',
-  //   to: { name: routeNames.CREATEAPP },
-  //   icon: 'ri-add-circle-line',
-  // },
+authentication.createLoginUrl({ redirectUri: window.location.href }).then((loginUrlLink) => {
+  unauthenticatedQuickLinks.value = [
+    {
+      label: 'Se connecter',
+      to: loginUrlLink, // URL temporaire
+      icon: 'ri-lock-line',
+      iconAttrs: { title: 'Se connecter' },
+    },
+  ];
+  console.log(loginUrlLink);
+});
+
+const authenticatedQuickLinks: QuickLink[] = [
   {
     label: 'Rechercher une application',
     to: { name: routeNames.SEARCHAPP },
-    // icon: '',
   },
   {
     label: 'Déconnexion',
-    to: { name: routeNames.LOGOUT },
+    to: authentication.createLogoutUrl(),
     icon: 'ri-logout-box-r-line',
     iconAttrs: { title: 'Déconnexion' },
   },
-]
+];
 
-// Correction de la fonction `watch` :
-watch(
-  [isLoggedIn, () => router.currentRoute.value],
-  async ([loggedIn, currentRoute]) => {
-    await router.isReady()
+const searchQuery = ref('');
 
-    if (loggedIn) {
-      quickLinks.value = [
-        ...authenticatedQuickLinksDefault,
-      ]
-    }
-    else {
-      const isCurrentRoute = ({ to }: QuickLink) => {
-        if (typeof to === 'string') {
-          return to !== currentRoute.path
-        }
-        return to.name !== currentRoute.name
-      }
-      quickLinks.value = unauthenticatedQuickLinks.filter(isCurrentRoute)
-    }
-  }
-)
+const { setScheme, theme } = useScheme();
 
-const searchQuery = ref('')
-
-const { setScheme, theme } = useScheme()
-
-function changeTheme () {
-  setScheme(theme.value === 'light' ? 'dark' : 'light')
+function changeTheme() {
+  setScheme(theme.value === 'light' ? 'dark' : 'light');
 }
 
-const {
-  offlineReady,
-  needRefresh,
-  updateServiceWorker,
-} = useRegisterSW()
+const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW();
 
-function close () {
-  offlineReady.value = false
-  needRefresh.value = false
+function close() {
+  offlineReady.value = false;
+  needRefresh.value = false;
 }
 </script>
 
@@ -115,7 +85,7 @@ function close () {
     :service-description="serviceDescription"
     :service-title="serviceTitle"
     :logo-text="logoText"
-    :quick-links="quickLinks"
+    :quick-links="authenticated ? authenticatedQuickLinks : unauthenticatedQuickLinks"
     show-beta
   />
 
@@ -123,13 +93,7 @@ function close () {
     <router-view />
   </div>
 
-  <DsfrFooter
-    :logo-text
-    :homeTo
-    :ecosystemLinks
-    :mandatoryLinks
-    :operatorTo
-  />
+  <DsfrFooter :logo-text :homeTo :ecosystemLinks :mandatoryLinks :operatorTo />
 
   <!-- <DsfrConsent>
     <p>
@@ -141,15 +105,7 @@ function close () {
     </p>
   </DsfrConsent> -->
 
-  <ReloadPrompt
-    :offline-ready="offlineReady"
-    :need-refresh="needRefresh"
-    @close="close"
-    @update-service-worker="updateServiceWorker"
-  />
+  <ReloadPrompt :offline-ready="offlineReady" :need-refresh="needRefresh" @close="close" @update-service-worker="updateServiceWorker" />
 
-  <AppToaster
-    :messages="toaster.messages"
-    @close-message="toaster.removeMessage($event)"
-  />
+  <AppToaster :messages="toaster.messages" @close-message="toaster.removeMessage($event)" />
 </template>

@@ -42,7 +42,7 @@
       "id": "121eb849-302e-4873-ae89-ec38a52e3b53",
       "clientId": "referentiel-applications",
       "enabled": true,
-      "secret": "xrSK3UlEQcHhqmUXyhlKMKg0fEQPfQBI",
+      "publicClient": true,
       "redirectUris": ["http://localhost:3500/*", "http://localhost:5173/*"],
       "defaultClientScopes": [
         "web-origins",
@@ -108,7 +108,7 @@
       "authorizationServicesEnabled": false,
       "serviceAccountsEnabled": true,
       "webOrigins": ["http://localhost:5173"],
-      "directAccessGrantsEnabled": true
+      "directAccessGrantsEnabled": false
     }
   ],
   "users": [
@@ -139,7 +139,10 @@
     },
     {
       "id": "f15d1c13-8198-4ca5-a180-94656e20d568",
-      "username": "new-user",
+      "username": "user",
+      "email": "user@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
       "emailVerified": true,
       "enabled": true,
       "createdTimestamp": 1728673414000,
@@ -147,7 +150,14 @@
       "realmRoles": ["user"],
       "clientRoles": {
         "referentiel-applications": ["USER"]
-      }
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ]
     }
   ]
 }
