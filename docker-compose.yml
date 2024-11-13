@@ -5,9 +5,6 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - '5432:5432'
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -25,10 +22,6 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:password@postgres:5432/postgres
       - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3500,http://localhost:8082,http://localhost:8080
-      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8082
-      - KEYCLOAK_REALM=referentiel-applications
-      - KEYCLOAK_CLIENT_ID=referentiel-applications
-      - KEYCLOAK_CLIENT_SECRET=xrSK3UlEQcHhqmUXyhlKMKg0fEQPfQBI
     depends_on:
       - postgres
     ports:
@@ -64,5 +57,9 @@ services:
     depends_on:
       - backend
 
-volumes:
-  postgres_data:
+  krakend:
+    image: devopsfaith/krakend
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./krakend.json:/etc/krakend/krakend.json

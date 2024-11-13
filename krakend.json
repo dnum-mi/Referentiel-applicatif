@@ -37,18 +37,29 @@
   },
   "endpoints": [
     {
-      "endpoint": "api/v2/users",
+      "endpoint": "api/v2/applications",
       "method": "POST",
       "backend": [
         {
           "host": ["http://backend:3500"],
-          "url_pattern": "api/v2/users",
-          "method": "POST" 
+          "url_pattern": "api/v2/applications/search",
+          "method": "POST"
         }
       ],
       "extra_config": {
-        "auth/oidc": {}
+        "auth/validator": {}
       }
+    },
+    {
+      "endpoint": "api/v2/{ressource}/{action}",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "encoding": "no-op",
+          "host": ["http://backend:3500"],
+          "url_pattern": "api/v2/{ressource}/{action}"
+        }
+      ]
     }
   ]
 }
