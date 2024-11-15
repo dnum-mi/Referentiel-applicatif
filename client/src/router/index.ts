@@ -6,21 +6,13 @@ const routes = [
   {
     name: routeNames.SEARCHAPP,
     path: '/recherche-application',
-    component:  () => import('@/views/GlobalSearch.vue'),
+    component: () => import('@/views/GlobalSearch.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/',
     name: 'accueil',
     component: () => import('@/views/AppHome.vue'),
-  },
-  {
-    name: routeNames.SIGNIN,
-    path: '/se-connecter',
-    component: () => import('@/views/Login.vue'),
-    meta: {
-      skipAuth: true,
-    },
   },
   {
     name: routeNames.CREATEAPP,
@@ -34,11 +26,6 @@ const routes = [
     path: '/applications/:id',
     component: () => import('@/views/ApplicationProfile.vue'),
     meta: { requiresAuth: true },
-  },
-  {
-    name: routeNames.LOGOUT,
-    path: '/se-deconnecter',
-    component: () => import('@/views/Logout.vue'),
   },
 ]
 
