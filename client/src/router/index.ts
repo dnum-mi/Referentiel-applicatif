@@ -1,13 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { routeNames } from './route-names'
-
+import { createRouter, createWebHistory } from 'vue-router';
+import { routeNames } from './route-names';
 
 const routes = [
   {
     name: routeNames.SEARCHAPP,
     path: '/recherche-application',
-    component:  () => import('@/views/GlobalSearch.vue'),
-    meta: { requiresAuth: true }
+    component: () => import('@/views/GlobalSearch.vue'),
   },
   {
     path: '/',
@@ -15,47 +13,21 @@ const routes = [
     component: () => import('@/views/AppHome.vue'),
   },
   {
-    name: routeNames.SIGNIN,
-    path: '/se-connecter',
-    component: () => import('@/views/Login.vue'),
-    meta: {
-      skipAuth: true,
-    },
-  },
-  {
     name: routeNames.CREATEAPP,
     path: '/create-application',
     component: () => import('@/views/CreateApplication.vue'),
     props: true,
-    meta: { requiresAuth: true },
   },
   {
     name: routeNames.PROFILEAPP,
     path: '/applications/:id',
     component: () => import('@/views/ApplicationProfile.vue'),
-    meta: { requiresAuth: true },
   },
-  {
-    name: routeNames.LOGOUT,
-    path: '/se-deconnecter',
-    component: () => import('@/views/Logout.vue'),
-  },
-]
+];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env?.BASE_URL || ''),
   routes,
-})
+});
 
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('access_token') !== null
-
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    next({ name: 'se-connecter' })
-  }
-  else {
-    next()
-  }
-})
-
-export default router
+export default router;
