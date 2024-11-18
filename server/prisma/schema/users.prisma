@@ -1,0 +1,31 @@
+
+model User {
+  keycloakId      String     @id
+  email      String @unique 
+  organizationId  String?  
+  organization    External? @relation(fields: [organizationId], references: [id])
+  createdSet Metadata[] @relation("MetadataCreatedBy")
+  updatedSet Metadata[] @relation("MetadataUpdatedBy")
+  applications Application[] @relation("UserApplications")
+  dataOwners   Metadata[] @relation("MetadataDataOwnerBy")
+  actors          Actor[]    @relation("UserActors")
+
+
+ @@map("users")
+}
+
+model Actor {
+id                       String     @id @default(uuid())
+  role            String
+  userId          String
+  user            User         @relation("UserActors", fields: [userId], references: [keycloakId])
+  organizationId  String?      
+  externalOrganization    External?   @relation("ActorOrganization", fields: [organizationId], references: [id])
+  applicationId   String?        
+  application     Application? @relation("ApplicationActors", fields: [applicationId], references: [id])
+
+  @@index([userId])
+  @@index([applicationId])
+  @@map("actors")
+}
+

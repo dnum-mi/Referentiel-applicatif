@@ -22,7 +22,7 @@ export class ApplicationController {
       @Request() req
   ) {
       Logger.warn("Creating application...");
-      const ownerId = req.user ? req.user.keycloakId : "f15d1c13-8198-4ca5-a180-94656e20d568";
+      const ownerId = "f15d1c13-8198-4ca5-a180-94656e20d568";
 
       if (!ownerId) {
           throw new UnauthorizedException('Authentification de l’utilisateur requise');

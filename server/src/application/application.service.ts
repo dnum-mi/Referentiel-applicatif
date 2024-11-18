@@ -53,19 +53,18 @@ export class ApplicationService {
               createdAt: new Date(),
           },
       });
-  
-      // Crée l'application sans les champs url et uri
       const application = await this.prisma.application.create({
           data: {
               label: createApplicationDto.label,
               shortName: createApplicationDto.shortname,
               logo: createApplicationDto.logo,
               description: createApplicationDto.description,
-              url: createApplicationDto.url || BASE_URL_APPLICATION, // Utilisation de BASE_URL_APPLICATION par défaut
-              uri: createApplicationDto.uri || BASE_URL_API, // Utilisation de BASE_URL_API par défaut
+              url: createApplicationDto.url || BASE_URL_APPLICATION,
+              uri: createApplicationDto.uri || BASE_URL_API,
               purposes: createApplicationDto.purposes,
               tags: createApplicationDto.tags,
               metadata: { connect: { id: applicationMetadata.id } },
+              owner: { connect: { keycloakId: ownerId } },
               lifecycle: {
                   create: {
                       status: createApplicationDto.lifecycle.status,
@@ -248,7 +247,7 @@ export class ApplicationService {
             },
             metadata: true,
             parent: true,
-            childrens: true,
+            children: true,
             actors: true,
             compliances: true,
           },

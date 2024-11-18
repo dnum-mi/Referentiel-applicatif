@@ -1,0 +1,29 @@
+model Application {
+  id                       String     @id @default(uuid())
+  label                    String
+  shortName                String
+  logo                     String
+  description              String
+  url                      String
+  uri                      String
+  purposes                 String[]
+  tags                     String[]     
+  lifecycleId              String              
+  lifecycle                Lifecycle           @relation("LifecycleApplications", fields: [lifecycleId], references: [id])
+  metadataId               String              
+  metadata                 Metadata            @relation("ApplicationMetadata", fields: [metadataId], references: [id])
+  parentId                 String?             
+  parent                   Application?        @relation("ApplicationParent", fields: [parentId], references: [id])
+  children                Application[]       @relation("ApplicationParent")
+  actors                   Actor[]            @relation("ApplicationActors")
+  externals      External[]         @relation("ApplicationExternalSources")
+  compliances              Compliance[]        @relation("ApplicationCompliances")
+
+  ownerId                  String              
+  owner                    User                @relation("UserApplications", fields: [ownerId], references: [keycloakId])
+
+  @@index([label])
+  @@index([shortName])
+  @@map("applications")
+}
+
