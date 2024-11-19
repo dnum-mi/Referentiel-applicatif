@@ -21,10 +21,19 @@ read_secret:
   extends:
     - .vault:read_secret
 
-docker-buildapp:
+build-frontend:
   variables:
-    WORKING_DIR: ./
-    DOCKERFILE: ./Dockerfile.app
+    WORKING_DIR: ./client
+    DOCKERFILE: ./client/Dockerfile
+    IMAGE_NAMES: ref-app-front:${CI_COMMIT_SHORT_SHA} ref-app-front:${CI_COMMIT_REF_NAME}
+  stage: docker-buildapp
+  extends:
+    - .kaniko:build-push
+
+build-backend:
+  variables:
+    WORKING_DIR: ./server
+    DOCKERFILE: ./server/Dockerfile
     IMAGE_NAMES: ref-app-back:${CI_COMMIT_SHORT_SHA} ref-app-back:${CI_COMMIT_REF_NAME}
   stage: docker-buildapp
   extends:

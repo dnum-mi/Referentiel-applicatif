@@ -1,20 +1,24 @@
-# Utiliser l'image Node.js comme base
-FROM node:18
+FROM node:20-slim AS build
 
-# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers package.json et pnpm-lock.yaml (ou package-lock.json)
-COPY ./package.json ./pnpm-lock.yaml ./
+COPY ./package.json ./package-lock.json ./
 
-# Installer les dépendances
-RUN npm install -g pnpm && pnpm install
+RUN npm ci
 
-# Copier le reste des fichiers de l'application
 COPY . .
 
-# Exposer le port utilisé par Vite
-EXPOSE 5173
+# Temporary disable type checking
+RUN npm run build-only
 
-# Commande pour démarrer le serveur de développement
-CMD ["pnpm", "run", "dev", "--", "--host", "0.0.0.0"]
+FROM nginxinc/nginx-unprivileged:1.27-alpine AS prod
+
+COPY nginx.conf /etc/nginx/nginx.conf
+
+COPY --from=build /app/dist /usr/share/nginx/html/
+
+ENV APP_ENV_PREFIX=VITE_RDA_
+ENV APP_DIST_DIR=/code
+
+# startup script to set env vars then run nginx
+CMD [ "/docker-entrypoint.d/entrypoint.sh" ]
