@@ -11,8 +11,7 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   app.setGlobalPrefix('api/v2');
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
-
+  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
 
   app.enableCors({
     origin: allowedOrigins,
@@ -26,21 +25,27 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
     .setTitle('API Référentiel Applications')
     .setDescription('API pour la gestion des applications')
     .setVersion('2.0')
-    .addBearerAuth(
+    .addOAuth2(
       {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        in: 'header',
-        name: 'Authorization',
-        description: `Renseignez votre API Token pour accéder à l'API`,
+        type: 'oauth2',
+        description: 'OAuth2 authentication using Keycloak',
+        flows: {
+          authorizationCode: {
+            authorizationUrl: `${process.env.KEYCLOAK_BASE_URL}/realms/referentiel-applications/protocol/openid-connect/auth`,
+            tokenUrl: `${process.env.KEYCLOAK_BASE_URL}/realms/referentiel-applications/protocol/openid-connect/token`,
+            scopes: {
+              openid: 'OpenID scope',
+              profile: 'Profile scope',
+            },
+          },
+        },
       },
-      'token',
+      'oauth2',
     )
-    .addSecurityRequirements('token')
+    .addSecurityRequirements('openid')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/v2', app, document, {
+  SwaggerModule.setup('api/v2/', app, document, {
     explorer: true,
     jsonDocumentUrl: 'swagger/json',
     //customCss: theme.getBuffer(SwaggerThemeNameEnum.DARK),
