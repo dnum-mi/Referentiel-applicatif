@@ -19,7 +19,7 @@ const ecosystemLinks = [
   { label: 'Grist', href: 'https://grist.numerique.gouv.fr/' },
   { label: 'CCT', href: 'https://cct.sg.minint.fr/accueil/Accueil.html' },
   { label: 'Code source', href: 'http://github.com/dnum-mi/referentiel-applications' },
-  { label: 'Api du referenciel', href: `${import.meta.env.VITE_RDA_API_URL}` },
+  { label: 'Api du référentiel', href: `${import.meta.env.VITE_RDA_API_URL}` },
 ];
 const mandatoryLinks = [
   { label: 'Accessibilité : non conforme' },
