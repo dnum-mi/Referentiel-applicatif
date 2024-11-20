@@ -9,7 +9,7 @@ const props = defineProps<{ application: Application }>()
     <h3>Informations générales</h3>
     <p><strong>Identifiant unique :</strong> {{ application.id }}</p>
     <p><strong>Nom court :</strong> {{ application.label }}</p>
-    <p><strong>Nom abrégé :</strong> {{ application.shortname }}</p>
+    <p><strong>Nom abrégé :</strong> {{ application.shortName }}</p>
     <p><strong>Logo :</strong> {{ application.logo }}</p>
   </div>
 </template>

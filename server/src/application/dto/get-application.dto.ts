@@ -8,7 +8,7 @@ export class GetApplicationDto {
     label: string;
   
     @IsString()
-    shortname: string;
+    shortName: string;
   
     @IsString()
     logo: string;

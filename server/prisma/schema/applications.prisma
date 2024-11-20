@@ -16,7 +16,7 @@ model Application {
   parent                   Application?        @relation("ApplicationParent", fields: [parentId], references: [id])
   children                Application[]       @relation("ApplicationParent")
   actors                   Actor[]            @relation("ApplicationActors")
-  externals      External[]         @relation("ApplicationExternalSources")
+  externals      External[]         @relation("ApplicationExternals")
   compliances              Compliance[]        @relation("ApplicationCompliances")
 
   ownerId                  String              

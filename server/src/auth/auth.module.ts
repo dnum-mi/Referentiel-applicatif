@@ -7,14 +7,14 @@ import { AuthController } from './auth.controller';
 
 @Module({
   imports: [
-    PassportModule.register({ defaultStrategy: 'jwt' }),
+    PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'default_secret', // Clé secrète pour signer les tokens
-      signOptions: { expiresIn: '1h' }, // Durée de vie des tokens
+      secret: process.env.JWT_SECRET || 'default_secret',
+      signOptions: { expiresIn: '1h' },
     }),
   ],
-  providers: [AuthService, JwtStrategy], // Enregistrement de JwtStrategy et AuthService
+  providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
-  exports: [JwtModule], // Exportez JwtModule pour l'utiliser ailleurs
+  exports: [JwtModule],
 })
 export class AuthModule {}

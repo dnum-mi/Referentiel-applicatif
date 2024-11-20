@@ -90,6 +90,7 @@ export class CreateLifecycleDto {
 }
 
 export class CreateApplicationDto {
+
   @ApiProperty()
   @IsString()
   label: string;
@@ -100,10 +101,12 @@ export class CreateApplicationDto {
   metadataId?: string;
 
   @ApiProperty()
+  @IsOptional()
   @IsString()
-  shortname: string;
+  shortName: string;
 
   @ApiProperty()
+  @IsOptional()
   @IsString()
   logo: string;
 
@@ -113,13 +116,25 @@ export class CreateApplicationDto {
 
   @ApiProperty()
   @IsArray()
+  @IsOptional()
   @IsString({ each: true })
   purposes: string[];
 
   @ApiProperty()
   @IsArray()
+  @IsOptional()
   @IsString({ each: true })
   tags: string[];
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  uri: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsString()
+  url: string;
 
   @ApiProperty()
   @IsOptional()

@@ -12,112 +12,117 @@ export class ApplicationService {
   constructor(private  prisma: PrismaService) {}
 
   
-  async  createApplication(createApplicationDto, ownerId) {
-      const BASE_URL_APPLICATION = process.env.BASE_URL_APPLICATION;
-      const BASE_URL_API = process.env.BASE_URL_API;
+  async createApplication(createApplicationDto: CreateApplicationDto, ownerId) {
+    const BASE_URL_APPLICATION = process.env.BASE_URL_APPLICATION;
+    const BASE_URL_API = process.env.BASE_URL_API;
   
-      Logger.warn(`Creating application with ownerId: ${ownerId}`);
+    Logger.warn(`Creating application with ownerId: ${ownerId}`);
   
-      for (const actor of createApplicationDto.actors) {
-        if (actor.organizationId) {
-          const organizationExists = await this.prisma.external.findUnique({
-            where: { id: actor.organizationId },
-          });
-          if (!organizationExists) {
-            throw new Error(`Organization with id ${actor.organizationId} does not exist.`);
-          }
-        }
+    for (const actor of createApplicationDto.actors) {
+      const userExists = await this.prisma.user.findUnique({
+        where: { keycloakId: actor.userId },
+      });
+  
+      if (!userExists) {
+        throw new BadRequestException(`User with ID ${actor.userId} does not exist.`);
       }
+    }
   
-      const applicationMetadata = await this.prisma.metadata.create({
-        data: {
-            createdById: ownerId,
-            updatedById: ownerId,
-            createdAt: new Date(),
-        },
-      });
+    // Créer les métadonnées de l'application
+    const applicationMetadata = await this.prisma.metadata.create({
+      data: {
+        createdById: ownerId,
+        updatedById: ownerId,
+        createdAt: new Date(),
+      },
+    });
   
-      const externalsData = createApplicationDto.externals.map((externalDto) => ({
-        externalSourceId: externalDto.externalSourceId,
-        value: externalDto.value,
-        label: externalDto.label,
-        shortName: externalDto.shortName,
-        lastSourceUpdate: new Date(externalDto.lastSourceUpdate),
+    const lifecycleMetadata = await this.prisma.metadata.create({
+      data: {
+        createdById: ownerId,
+        updatedById: ownerId,
+        createdAt: new Date(),
+      },
+    });
+  
+    // Créer l'application
+    const application = await this.prisma.application.create({
+      data: {
+        label: createApplicationDto.label,
+        shortName: createApplicationDto.shortName,
+        logo: createApplicationDto.logo,
+        description: createApplicationDto.description,
+        url: createApplicationDto.url || BASE_URL_APPLICATION,
+        uri: createApplicationDto.uri || BASE_URL_API,
+        purposes: createApplicationDto.purposes,
+        tags: createApplicationDto.tags,
         metadata: { connect: { id: applicationMetadata.id } },
-      }));
+        owner: { connect: { keycloakId: ownerId } },
+        lifecycle: {
+          create: {
+            status: createApplicationDto.lifecycle.status,
+            firstProductionDate: new Date(createApplicationDto.lifecycle.firstProductionDate),
+            plannedDecommissioningDate: createApplicationDto.lifecycle.plannedDecommissioningDate
+              ? new Date(createApplicationDto.lifecycle.plannedDecommissioningDate)
+              : undefined,
+            metadata: { connect: { id: lifecycleMetadata.id } },
+          },
+        },
+        actors: {
+          create: createApplicationDto.actors.map((actor) => ({
+            role: actor.role,
+            user: { connect: { keycloakId: actor.userId } },
+            organization: actor.organizationId
+              ? { connect: { id: actor.organizationId } }
+              : undefined,
+          })),
+        },
+        compliances: {
+          create: createApplicationDto.compliances.map((compliance) => ({
+            ...compliance,
+            validityStart: compliance.validityStart ? new Date(compliance.validityStart) : undefined,
+            validityEnd: compliance.validityEnd ? new Date(compliance.validityEnd) : undefined,
+          })),
+        },
+        externals: {
+          create: createApplicationDto.externals.map((external) => ({
+            externalSource: { connect: { id: external.externalSourceId } }, // Add this line
+            externalSourceId: external.externalSourceId,
+            value: external.value,
+            label: external.label,
+            shortName: external.shortName,
+            lastSourceUpdate: new Date(external.lastSourceUpdate),
+            metadata: { connect: { id: applicationMetadata.id } },
+          })),
+        },
+        parent: createApplicationDto.parentId ? { connect: { id: createApplicationDto.parentId } } : undefined,
+      },
+      include: {
+        lifecycle: { include: { metadata: true } },
+        metadata: true,
+        actors: true,
+        compliances: true,
+        externals: true,
+      },
+    });
   
-      const lifecycleMetadata = await this.prisma.metadata.create({
-          data: {
-              createdById: ownerId,
-              updatedById: ownerId,
-              createdAt: new Date(),
-          },
-      });
-      const application = await this.prisma.application.create({
-          data: {
-              label: createApplicationDto.label,
-              shortName: createApplicationDto.shortname,
-              logo: createApplicationDto.logo,
-              description: createApplicationDto.description,
-              url: createApplicationDto.url || BASE_URL_APPLICATION,
-              uri: createApplicationDto.uri || BASE_URL_API,
-              purposes: createApplicationDto.purposes,
-              tags: createApplicationDto.tags,
-              metadata: { connect: { id: applicationMetadata.id } },
-              owner: { connect: { keycloakId: ownerId } },
-              lifecycle: {
-                  create: {
-                      status: createApplicationDto.lifecycle.status,
-                      firstProductionDate: new Date(createApplicationDto.lifecycle.firstProductionDate),
-                      plannedDecommissioningDate: createApplicationDto.lifecycle.plannedDecommissioningDate
-                          ? new Date(createApplicationDto.lifecycle.plannedDecommissioningDate)
-                          : undefined,
-                      metadata: { connect: { id: lifecycleMetadata.id } },
-                  },
-              },
-              actors: {
-                  create: createApplicationDto.actors.map((actor) => ({
-                      role: actor.role,
-                      user: { connect: { keycloakId: actor.userId } },
-                      organization: actor.organizationId
-                          ? { connect: { id: actor.organizationId } }
-                          : undefined,
-                  })),
-              },
-              compliances: {
-                  create: createApplicationDto.compliances.map((compliance) => ({
-                      ...compliance,
-                      validityStart: compliance.validityStart ? new Date(compliance.validityStart) : undefined,
-                      validityEnd: compliance.validityEnd ? new Date(compliance.validityEnd) : undefined,
-                  })),
-              },
-              parent: createApplicationDto.parentId ? { connect: { id: createApplicationDto.parentId } } : undefined,
-          },
-          include: {
-              lifecycle: { include: { metadata: true } },
-              metadata: true,
-              actors: true,
-              compliances: true,
-          },
-      });
+    // Mise à jour des URL avec l'ID de l'application
+    const applicationId = application.id;
+    const updatedApplication = await this.prisma.application.update({
+      where: { id: applicationId },
+      data: {
+        url: `${BASE_URL_APPLICATION}/${applicationId}`,
+        uri: `${BASE_URL_API}/${applicationId}`,
+      },
+      include: {
+        lifecycle: { include: { metadata: true } },
+        metadata: true,
+        actors: true,
+        compliances: true,
+      },
+    });
   
-      // Mise à jour des champs url et uri avec l'ID de l'application
-      const applicationId = application.id;
-      const updatedApplication = await this.prisma.application.update({
-          where: { id: applicationId },
-          data: {
-              url: `${BASE_URL_APPLICATION}/${applicationId}`,
-              uri: `${BASE_URL_API}/${applicationId}`,
-          },
-          include: {
-              lifecycle: { include: { metadata: true } },
-              metadata: true,
-              actors: true,
-              compliances: true,
-          },
-      });
-  
-      return updatedApplication;
+    return updatedApplication;
   }
   
   async update(id: string, updateApplicationDto: UpdateApplicationDto) {
@@ -176,7 +181,7 @@ export class ApplicationService {
           where: { id },
           data: {
             label: updateApplicationDto.label,
-            shortName: updateApplicationDto.shortname,
+            shortName: updateApplicationDto.shortName,
             logo: updateApplicationDto.logo,
             description: updateApplicationDto.description,
             purposes: updateApplicationDto.purposes,
@@ -293,7 +298,7 @@ export class ApplicationService {
     const applicationDto: GetApplicationDto = {
       id: application.id,
       label: application.label,
-      shortname: application.shortName,
+      shortName: application.shortName,
       logo: application.logo,
       description: application.description,
       url: application.url,
