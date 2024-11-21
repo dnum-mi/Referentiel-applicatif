@@ -18,4 +18,4 @@ ENV PORT=3500
 RUN pnpm run build
 
 # Start the NestJS application
-CMD ["node" , "dist/src/main.js"]
+CMD ["node" , "dist/main.js"]
