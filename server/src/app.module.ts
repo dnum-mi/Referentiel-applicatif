@@ -5,12 +5,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 
-import { KeycloakConnectModule,
-  ResourceGuard,
-  RoleGuard,
-  AuthGuard
-} from 'nest-keycloak-connect';
-import { APP_GUARD } from '@nestjs/core';import { AuthModule } from './auth/auth.module';
+import { KeycloakConnectModule } from 'nest-keycloak-connect';
+import { AuthModule } from './auth/auth.module';
 import { ApplicationModule } from './application/application.module';
 import { UserModule } from './user/user.module';
 import { ApplicationController } from './application/application.controller';

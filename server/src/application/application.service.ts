@@ -86,8 +86,7 @@ export class ApplicationService {
         },
         externals: {
           create: createApplicationDto.externals.map((external) => ({
-            externalSource: { connect: { id: external.externalSourceId } }, // Add this line
-            externalSourceId: external.externalSourceId,
+            externalSource: { connect: { id: external.externalSourceId } }, // Connexion via la relation
             value: external.value,
             label: external.label,
             shortName: external.shortName,
