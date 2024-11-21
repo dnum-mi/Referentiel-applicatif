@@ -352,6 +352,18 @@ $RECYCLE.BIN/
 .eslintrc-auto-import.json
 auto-imports.d.ts
 
+*.pnpm-store/
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# temp directory
+.tmp
 
 .mongo-dev/
-*.pnpm-store/
