@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_PASSWORD: password
     ports:
-      - '5432:5432'
+      - "5432:5432"
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -13,7 +13,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - '8081:80'
+      - "8081:80"
 
   backend:
     build:
@@ -23,10 +23,12 @@ services:
       - DATABASE_URL=postgresql://postgres:password@postgres:5432/postgres
       - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3500,http://localhost:8082,http://localhost:8080
       - KEYCLOAK_BASE_URL=http://localhost:8082
+      # To be deleted
+      - KEYCLOAK_CLIENT_SECRET="client secret"
     depends_on:
       - postgres
     ports:
-      - '3500:3500'
+      - "3500:3500"
     volumes:
       - ./server:/app
 
@@ -53,7 +55,7 @@ services:
       - ./client:/app
       - /app/node_modules
     ports:
-      - '5173:5173'
+      - "5173:5173"
     command: sh -c "npm install -g pnpm && pnpm install && pnpm dev"
     depends_on:
       - backend
@@ -61,6 +63,6 @@ services:
   krakend:
     image: devopsfaith/krakend
     ports:
-      - '8080:8080'
+      - "8080:8080"
     volumes:
       - ./krakend.json:/etc/krakend/krakend.json
