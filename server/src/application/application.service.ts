@@ -69,11 +69,11 @@ export class ApplicationService {
           },
         },
         actors: {
-          create: createApplicationDto.actors.map((actor) => ({
-            role: actor.role,
-            user: { connect: { keycloakId: actor.userId } },
-            organization: actor.organizationId
-              ? { connect: { id: actor.organizationId } }
+          create: createApplicationDto.actors.map((actorDto) => ({
+            role: actorDto.role,
+            user: { connect: { keycloakId: actorDto.userId } },
+            externalOrganization: actorDto.organizationId
+              ? { connect: { id: actorDto.organizationId } }
               : undefined,
           })),
         },

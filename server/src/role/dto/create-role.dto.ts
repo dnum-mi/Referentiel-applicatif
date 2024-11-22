@@ -18,7 +18,7 @@ export class CreateRoleDto {
   })
   @IsOptional()
   @IsString()
-  organizationId?: string; // Facultatif
+  organizationSourceId?: string; // Facultatif
 
   @ApiProperty({
     description: "ID de l'application associée à ce rôle",

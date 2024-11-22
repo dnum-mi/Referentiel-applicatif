@@ -3,7 +3,7 @@ import { Controller, Post, Body, Patch, Param, Request, Logger, Get, Query, NotF
 import { ApplicationService } from './application.service';
 import { CreateApplicationDto, } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { SearchApplicationDto } from './dto/search-application.dto';
 import { GetApplicationDto } from './dto/get-application.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -16,18 +16,17 @@ export class ApplicationController {
   applicationsService: ApplicationService;
   constructor(private readonly applicationService: ApplicationService) {}
 
-  // @UseGuards(AuthGuard('jwt'))
   @Post()
   @ApiOperation({ summary: 'Créer une nouvelle application' })
   @ApiResponse({ status: 201, description: 'Application créée avec succès.' })
   @ApiResponse({ status: 404, description: 'Metadata ou parent non trouvé.' })
   async create(
       @Body() createApplicationDto: CreateApplicationDto,
-      // @GetUser() user: JwtPayload
+      @GetUser() user: JwtPayload
   ) {
-      Logger.warn("Creating application...");
+      Logger.warn("Creating application...", user);
       const ownerId = "f15d1c13-8198-4ca5-a180-94656e20d568";
-      // const ownerId = user.sub;
+      Logger.warn("ownerId", ownerId)
 
       if (!ownerId) {
           throw new UnauthorizedException('Authentification de l’utilisateur requise');

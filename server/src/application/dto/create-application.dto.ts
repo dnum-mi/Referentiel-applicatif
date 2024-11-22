@@ -13,152 +13,154 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ComplianceStatus, ComplianceType, LifecycleStatus} from '../../enum';
 
 export class CreateActorDto {
-  @ApiProperty()
+  @ApiProperty({ example: 'admin', description: 'Role of the actor in the application' })
   @IsString()
   role: string;
-  
-  @ApiProperty()
+
+  @ApiProperty({ example: 'user123', description: 'ID of the user' })
   @IsString()
   userId: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'orgSource123', description: 'ID of the organization source', required: false })
   @IsOptional()
   @IsString()
   organizationId?: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'app789', description: 'ID of the associated application', required: false })
   @IsOptional()
   @IsString()
   applicationId?: string;
 }
 
 export class CreateComplianceDto {
-  @ApiProperty()
+  @ApiProperty({ enum: ComplianceType, description: 'Type of compliance (e.g., regulation, policy)' })
   @IsEnum(ComplianceType)
   type: ComplianceType;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'GDPR', description: 'Name of the compliance' })
   @IsString()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: ComplianceStatus, description: 'Compliance status (e.g., compliant, non_compliant)' })
   @IsEnum(ComplianceStatus)
   status: ComplianceStatus;
 
-  @ApiProperty()
+  @ApiProperty({ example: '2023-01-01', description: 'Start date of validity', required: false })
   @IsOptional()
   @IsDateString()
   validityStart?: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: '2025-01-01', description: 'End date of validity', required: false })
   @IsOptional()
   @IsDateString()
   validityEnd?: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: '85', description: 'Score value (if applicable)', required: false })
   @IsOptional()
   @IsString()
   scoreValue?: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: '%', description: 'Score unit (if applicable)', required: false })
   @IsOptional()
   @IsString()
   scoreUnit?: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'Notes about the compliance', description: 'Additional notes', required: false })
   @IsOptional()
   @IsString()
   notes?: string;
 }
 
 export class CreateLifecycleDto {
-  @ApiProperty()
+  @ApiProperty({ enum: LifecycleStatus, description: 'Status of the lifecycle (e.g., in_production)' })
   @IsEnum(LifecycleStatus)
   status: LifecycleStatus;
- 
-  @ApiProperty()
+
+  @ApiProperty({ example: '2023-11-22', description: 'First production date (ISO 8601)' })
   @IsDateString()
   firstProductionDate: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: '2025-12-31', description: 'Planned decommissioning date (ISO 8601)', required: false })
   @IsOptional()
   @IsDateString()
   plannedDecommissioningDate?: string;
 
+  @ApiProperty({ example: 'metadata123', description: 'Associated metadata ID', required: false })
   @IsOptional()
+  @IsString()
   metadataId?: string;
 }
 
 export class CreateApplicationDto {
-
-  @ApiProperty()
+  @ApiProperty({ example: 'My Application', description: 'Label of the application' })
   @IsString()
   label: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'metadata456', description: 'Metadata ID', required: false })
   @IsOptional()
   @IsString()
   metadataId?: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'short-app-name', description: 'Short name of the application', required: false })
   @IsOptional()
   @IsString()
-  shortName: string;
+  shortName?: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'http://example.com/logo.png', description: 'Logo URL of the application', required: false })
   @IsOptional()
   @IsString()
-  logo: string;
+  logo?: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'An amazing application', description: 'Description of the application' })
   @IsString()
   description: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: [String], example: ['finance', 'HR'], description: 'Purposes of the application', required: false })
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
-  purposes: string[];
+  purposes?: string[];
 
-  @ApiProperty()
+  @ApiProperty({ type: [String], example: ['tag1', 'tag2'], description: 'Tags associated with the application', required: false })
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
-  tags: string[];
+  tags?: string[];
 
-  @ApiProperty()
+  @ApiProperty({ example: 'http://example.com/app', description: 'URI of the application', required: false })
   @IsOptional()
   @IsString()
-  uri: string;
+  uri?: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'http://example.com/dashboard', description: 'URL of the application', required: false })
   @IsOptional()
   @IsString()
-  url: string;
+  url?: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'parentApp123', description: 'Parent application ID', required: false })
   @IsOptional()
   @IsString()
   parentId?: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: CreateLifecycleDto })
   @ValidateNested()
   @Type(() => CreateLifecycleDto)
   lifecycle: CreateLifecycleDto;
 
-  @ApiProperty()
+  @ApiProperty({ type: [CreateActorDto] })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateActorDto)
   @ArrayMinSize(1)
   actors: CreateActorDto[];
 
-  @ApiProperty()
+  @ApiProperty({ type: [CreateComplianceDto] })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateComplianceDto)
   compliances: CreateComplianceDto[];
 
+  @ApiProperty({ type: [CreateExternalDto], description: 'External references associated with the application', required: false })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateExternalDto)
