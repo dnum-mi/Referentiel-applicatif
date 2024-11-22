@@ -1,7 +1,7 @@
 #!/bin/sh
 
 DEFAULT_APP_ENV_PREFIX="VITE_RDA_"
-DEFAULT_APP_DIST_DIR="/code"
+DEFAULT_APP_DIST_DIR="/app"
 
 if [ -z "$APP_ENV_PREFIX" ]; then
     echo "APP_ENV_PREFIX is not set. Setting to default: $DEFAULT_APP_ENV_PREFIX"

@@ -21,7 +21,7 @@ COPY --chown=1001:0 --chmod=775 entrypoint.sh /docker-entrypoint.d/entrypoint.sh
 USER 1001
 
 ENV APP_ENV_PREFIX=VITE_RDA_
-ENV APP_DIST_DIR=/code
+ENV APP_DIST_DIR=/usr/share/nginx/html
 
 # startup script to set env vars then run nginx
 CMD [ "/docker-entrypoint.d/entrypoint.sh" ]
