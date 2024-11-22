@@ -107,7 +107,7 @@
       ],
       "authorizationServicesEnabled": false,
       "serviceAccountsEnabled": true,
-      "webOrigins": ["http://localhost:5173"],
+      "webOrigins": ["+"],
       "directAccessGrantsEnabled": false
     }
   ],
