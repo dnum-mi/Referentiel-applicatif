@@ -145,26 +145,28 @@ export class CreateApplicationDto {
   @ApiProperty({ type: CreateLifecycleDto })
   @ValidateNested()
   @Type(() => CreateLifecycleDto)
-  lifecycle: CreateLifecycleDto;
+  lifecycle: CreateLifecycleDto = {
+    status: LifecycleStatus.IN_PRODUCTION, // Par défaut
+    firstProductionDate: new Date().toISOString(),
+  };
 
-  @ApiProperty({ type: [CreateActorDto] })
+  @ApiProperty({ type: [CreateActorDto], description: 'List of actors associated with the application' })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateActorDto)
-  @ArrayMinSize(1)
-  actors: CreateActorDto[];
+  actors: CreateActorDto[] = []; // Tableau vide par défaut
 
   @ApiProperty({ type: [CreateComplianceDto] })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateComplianceDto)
-  compliances: CreateComplianceDto[];
+  compliances: CreateComplianceDto[] = [];
 
   @ApiProperty({ type: [CreateExternalDto], description: 'External references associated with the application', required: false })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateExternalDto)
-  externals: CreateExternalDto[];
+  externals: CreateExternalDto[] = [];
 }
 
 

@@ -32,7 +32,7 @@ export class ApplicationController {
           throw new UnauthorizedException('Authentification de l’utilisateur requise');
       }
 
-      const newApplication = await this.applicationService.createApplication(createApplicationDto, ownerId);
+      const newApplication = await this.applicationService.createApplication(ownerId, createApplicationDto);
       return { status: 201, message: "Application créée avec succès", data: newApplication };
   }
   
@@ -61,10 +61,10 @@ export class ApplicationController {
   @ApiResponse({ status: 404, description: 'Application, metadata ou parent non trouvé.' })
   async update(
     @Param('id') id: string,
-    @Body() updateApplicationDto: UpdateApplicationDto,
+    @Body() applicationToUpdate: UpdateApplicationDto,
     @Request() req,
   ) {
-    return this.applicationService.update(id, updateApplicationDto);
+    return this.applicationService.updateApplication(id, applicationToUpdate);
   }
 
 

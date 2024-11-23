@@ -4,5 +4,8 @@
   },
   "devDependencies": {
     "prettier": "3.3.3"
+  },
+  "dependencies": {
+    "@nestjs/config": "^3.3.0"
   }
 }

@@ -15,6 +15,7 @@ import { ApplicationService } from './application/application.service';
 import { UserService } from './user/user.service';
 import { ExternalSourceModule } from './external-source/external-source.module';
 import { JwtStrategy } from './auth/jwt.strategy';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     PrismaModule,
@@ -28,6 +29,9 @@ import { JwtStrategy } from './auth/jwt.strategy';
       clientId: process.env.KEYCLOAK_CLIENT_ID,
       secret: process.env.KEYCLOAK_CLIENT_SECRET,
       // Secret key of the client taken from keycloak server
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
   ],
   controllers: [AppController, ApplicationController, UserController],
