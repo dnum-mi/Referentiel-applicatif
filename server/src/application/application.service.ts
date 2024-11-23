@@ -23,25 +23,19 @@ export class ApplicationService {
   
   public async createApplication(ownerId: string, createApplicationDto: CreateApplicationDto) {
     Logger.warn(`Creating application with ownerId: ${ownerId}`);
-    Logger.warn(`AVANT FOR.............`)
     for (const actor of createApplicationDto.actors) {
     
       const userExists = await this.prisma.user.findUnique({
         where: { keycloakId: actor.userId },
       });
-      Logger.warn(`actor`,actor)
+      Logger.warn('actor', JSON.stringify(actor));
       if (!userExists) {
         throw new BadRequestException(`User with ID ${actor.userId} does not exist.`);
       }
     }
-    Logger.warn(`APRES FOR.............`)
-    Logger.warn(`AVANT APPLICATIONMETADATA.............`)
+   
     const applicationMetadata = await this.createApplicationMetadata(ownerId)
-    Logger.warn(`APRES APPLICATION METADATA`)
-    Logger.verbose("application", applicationMetadata)
-
     const application = await this.persistApplication(ownerId, applicationMetadata.id, createApplicationDto)
-    Logger.warn(`APRES APPLICATION`, application)
     const updatedApplication = await this.updateApplicationUrls(application.id)
     return updatedApplication;
   }
@@ -132,10 +126,6 @@ export class ApplicationService {
   }
 
   private async persistApplication(ownerId: string, applicationMetadataId: string, createApplicationDto)  {
-    Logger.warn(`DANS PERSISTAPPLICATION`)
-    Logger.warn(`Actors: ${JSON.stringify(createApplicationDto.actors)}`);
-    Logger.warn(`Compliances: ${JSON.stringify(createApplicationDto.compliances)}`);
-    Logger.warn(`Externals: ${JSON.stringify(createApplicationDto.externals)}`);
     const application = await this.prisma.application.create({
       data: {
         label: createApplicationDto.label,

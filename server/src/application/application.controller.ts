@@ -22,9 +22,9 @@ export class ApplicationController {
   @ApiResponse({ status: 404, description: 'Metadata ou parent non trouvé.' })
   async create(
       @Body() createApplicationDto: CreateApplicationDto,
-      @GetUser() user: JwtPayload
+      @Request() req
   ) {
-      Logger.warn("Creating application...", user);
+    console.log('Headers:', req.headers);
       const ownerId = "f15d1c13-8198-4ca5-a180-94656e20d568";
       Logger.warn("ownerId", ownerId)
 

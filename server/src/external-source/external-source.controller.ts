@@ -16,7 +16,7 @@ export class ExternalSourceController {
     @Body() createExternalSourceDto: CreateExternalSourceDto,
     @Request() req
   ) {
-    const ownerId = req.user ? req.user.keycloakId : 'f15d1c13-8198-4ca5-a180-94656e20d568';
+    const ownerId = 'f15d1c13-8198-4ca5-a180-94656e20d568';
     return this.externalSourceService.createExternalSource(createExternalSourceDto, ownerId);
   }
 }
