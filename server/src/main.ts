@@ -42,7 +42,7 @@ async function bootstrap() {
       },
       'oauth2',
     )
-    .addSecurityRequirements('openid')
+    .addSecurityRequirements('oauth2')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/v2/', app, document, {
