@@ -1,21 +1,29 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
+// src/auth/jwt.strategy.ts
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import * as jwksRsa from 'jwks-rsa';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  private readonly logger = new Logger(JwtStrategy.name);
-
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.KEYCLOAK_CLIENT_SECRET,
+      secretOrKeyProvider: jwksRsa.passportJwtSecret({
+        cache: true,
+        rateLimit: true,
+        jwksRequestsPerMinute: 5,
+        jwksUri: 'http://localhost:8082/realms/referentiel-applications/protocol/openid-connect/certs',
+      }),
+      algorithms: ['RS256'],
     });
   }
 
   async validate(payload: any) {
-    this.logger.debug(`Payload JWT reçu: ${JSON.stringify(payload)}`);
-    return { userId: payload.sub, username: payload.username };
+    console.log('Payload JWT reçu :', payload);
+    // Retournez les informations utilisateur nécessaires
+    return { userId: payload.sub, username: payload.preferred_username };
   }
 }

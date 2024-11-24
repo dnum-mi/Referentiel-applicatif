@@ -1,31 +1,44 @@
-// src/application/application.controller.ts
 import { Controller, Post, Body, Patch, Param, Request, Logger, Get, Query, NotFoundException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApplicationService } from './application.service';
+import { UserService } from '../user/user.service';
 import { CreateApplicationDto, } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { SearchApplicationDto } from './dto/search-application.dto';
 import { GetApplicationDto } from './dto/get-application.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { JwtPayload } from 'src/auth/jwt-payloard.interface';
 import { GetUser } from 'src/auth/get-user.decorator';
 
 @ApiTags('applications')
 @Controller('applications')
 export class ApplicationController {
   applicationsService: ApplicationService;
-  constructor(private readonly applicationService: ApplicationService) {}
+  constructor(
+    private readonly applicationService: ApplicationService,
+    private readonly userService: UserService
+  ) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   @ApiOperation({ summary: 'Créer une nouvelle application' })
   @ApiResponse({ status: 201, description: 'Application créée avec succès.' })
   @ApiResponse({ status: 404, description: 'Metadata ou parent non trouvé.' })
   async create(
       @Body() createApplicationDto: CreateApplicationDto,
-      @Request() req
+      @GetUser() user: any,
   ) {
-    console.log('Headers:', req.headers);
-      const ownerId = "f15d1c13-8198-4ca5-a180-94656e20d568";
+    
+      const ownerId = user.userId;
+      Logger.log(`ownerId: ${ownerId}`);
+      Logger.log(`userService: ${this.userService}`);
+
+    // Récupérer l'utilisateur depuis la base de données
+      const userFromDb = await this.userService.findUserByKeycloakId(ownerId);
+
+    if (!userFromDb) {
+        throw new UnauthorizedException('Utilisateur non trouvé');
+    }
+
       Logger.warn("ownerId", ownerId)
 
       if (!ownerId) {
