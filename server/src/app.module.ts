@@ -14,7 +14,6 @@ import { UserController } from './user/user.controller';
 import { ApplicationService } from './application/application.service';
 import { UserService } from './user/user.service';
 import { ExternalSourceModule } from './external-source/external-source.module';
-import { JwtStrategy } from './auth/jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
@@ -39,7 +38,6 @@ import { ConfigModule } from '@nestjs/config';
     AppService,
     ApplicationService,
     UserService,
-    JwtStrategy,
   ],
 })
 export class AppModule {}

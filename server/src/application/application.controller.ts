@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Patch, Param, Request, Logger, Get, Query, NotFoundException, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, Request, Logger, Get, Query, NotFoundException, UnauthorizedException, UseGuards, Req } from '@nestjs/common';
 import { ApplicationService } from './application.service';
 import { UserService } from '../user/user.service';
 import { CreateApplicationDto, } from './dto/create-application.dto';
@@ -6,8 +6,6 @@ import { UpdateApplicationDto } from './dto/update-application.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { SearchApplicationDto } from './dto/search-application.dto';
 import { GetApplicationDto } from './dto/get-application.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from 'src/auth/get-user.decorator';
 
 @ApiTags('applications')
 @Controller('applications')
@@ -18,21 +16,21 @@ export class ApplicationController {
     private readonly userService: UserService
   ) {}
 
-  @UseGuards(AuthGuard('jwt'))
+
   @Post()
   @ApiOperation({ summary: 'Créer une nouvelle application' })
   @ApiResponse({ status: 201, description: 'Application créée avec succès.' })
   @ApiResponse({ status: 404, description: 'Metadata ou parent non trouvé.' })
   async create(
       @Body() createApplicationDto: CreateApplicationDto,
-      @GetUser() user: any,
-  ) {
-    
-      const ownerId = user.userId;
+      @Request() req
+    ) {
+      
+      const ownerId = req.user.userId;
+  
       Logger.log(`ownerId: ${ownerId}`);
       Logger.log(`userService: ${this.userService}`);
 
-    // Récupérer l'utilisateur depuis la base de données
       const userFromDb = await this.userService.findUserByKeycloakId(ownerId);
 
     if (!userFromDb) {
