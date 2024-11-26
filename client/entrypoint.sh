@@ -14,7 +14,7 @@ fi
 
 echo "Prefix: $APP_ENV_PREFIX"
 echo "Directory: $APP_DIST_DIR"
-ls $APP_DIST_DIR
+ls $APP_DIST_DIR | grep 'assets'
 
 for i in $(env | grep "^$APP_ENV_PREFIX"); do
     key=$(echo "$i" | cut -d '=' -f 1)
