@@ -21,7 +21,7 @@ services:
     command: pnpm run start:dev
     environment:
       - DATABASE_URL=postgresql://postgres:password@postgres:5432/postgres
-      - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3500,http://localhost:8082,http://localhost:8080
+      - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:8080,http://krakend:8080
       - KEYCLOAK_BASE_URL=http://localhost:8082
       # To be deleted
       - KEYCLOAK_CLIENT_SECRET="client secret"

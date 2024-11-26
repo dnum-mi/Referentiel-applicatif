@@ -2,12 +2,18 @@
   "version": 3,
   "name": "krakend",
   "extra_config": {
-    "github_com/devopsfaith/krakend-cors": {
-      "allow_origins": ["http://localhost:8080"],
-      "allow_methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      "allow_headers": ["Authorization", "Content-Type", "X-Requested-With"],
-      "expose_headers": ["Content-Length"],
-      "max_age": "86400",
+    "security/cors": {
+      "allow_origins": ["http://localhost:5173"],
+      "allow_methods": ["GET", "HEAD", "POST", "OPTIONS"],
+      "expose_headers": ["Content-Length", "Content-Type"],
+      "allow_headers": [
+        "Accept-Language",
+        "X-User-Id",
+        "X-User-Email",
+        "Authorization",
+        "Content-Type"
+      ],
+      "max_age": "12h",
       "allow_credentials": true
     },
     "security/jwt": {
@@ -24,18 +30,34 @@
       "cache": true,
       "propagate_claims": true,
       "user_headers": [
-        {
-          "claim": "sub",
-          "header": "X-User-Id"
-        },
-        {
-          "claim": "email",
-          "header": "X-User-Email"
-        }
+        { "claim": "sub", "header": "X-User-Id" },
+        { "claim": "email", "header": "X-User-Email" }
       ]
     }
   },
   "endpoints": [
+    {
+      "endpoint": "api/v2/",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "encoding": "no-op",
+          "host": ["http://backend:3500"],
+          "url_pattern": "api/v2/"
+        }
+      ]
+    },
+    {
+      "endpoint": "api/v2/{ressource}",
+      "output_encoding": "no-op",
+      "backend": [
+        {
+          "encoding": "no-op",
+          "host": ["http://backend:3500"],
+          "url_pattern": "api/v2/{ressource}"
+        }
+      ]
+    },
     {
       "endpoint": "api/v2/applications",
       "method": "POST",
@@ -45,10 +67,20 @@
           "url_pattern": "api/v2/applications/search",
           "method": "POST"
         }
-      ],
-      "extra_config": {
-        "auth/validator": {}
-      }
+      ]
+    },
+    {
+      "endpoint": "api/v2/applications/search",
+      "method": "GET",
+      "input_query_strings": ["*"],
+      "backend": [
+        {
+          "host": ["http://backend:3500"],
+          "url_pattern": "api/v2/applications/search",
+          "method": "GET",
+          "is_collection": true
+        }
+      ]
     },
     {
       "endpoint": "api/v2/{ressource}/{action}",
