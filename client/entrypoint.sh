@@ -14,6 +14,7 @@ fi
 
 echo "Prefix: $APP_ENV_PREFIX"
 echo "Directory: $APP_DIST_DIR"
+ls $APP_DIST_DIR
 
 for i in $(env | grep "^$APP_ENV_PREFIX"); do
     key=$(echo "$i" | cut -d '=' -f 1)
@@ -23,6 +24,8 @@ for i in $(env | grep "^$APP_ENV_PREFIX"); do
 
     find "$APP_DIST_DIR" -type f -exec sed -i 's|'"${key}"'|'"${value}"'|g' {} \;  
 done
+
+echo "Done."
 
 # exec CMD from Dockerfile
 # exec "$@"
