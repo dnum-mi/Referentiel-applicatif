@@ -11,11 +11,13 @@ RUN npm install -g pnpm
 RUN pnpm install
 RUN npx prisma generate
 
-# Expose the port that your NestJS application will run on
+# Define the port that your NestJS application will run on
 ENV PORT=3500
 
 # Build app
 RUN pnpm run build
+
+EXPOSE 3500
 
 # Start the NestJS application
 CMD ["node" , "dist/main.js"]
