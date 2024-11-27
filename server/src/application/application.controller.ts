@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Patch, Param, Request, Logger, Get, Query, NotFoundException, UnauthorizedException, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, Request, Logger, Get, Query, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ApplicationService } from './application.service';
 import { UserService } from '../user/user.service';
 import { CreateApplicationDto, } from './dto/create-application.dto';
@@ -6,6 +6,7 @@ import { UpdateApplicationDto } from './dto/update-application.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { SearchApplicationDto } from './dto/search-application.dto';
 import { GetApplicationDto } from './dto/get-application.dto';
+import * as jose from 'jose'
 
 @ApiTags('applications')
 @Controller('applications')
@@ -16,38 +17,40 @@ export class ApplicationController {
     private readonly userService: UserService
   ) {}
 
-
   @Post()
   @ApiOperation({ summary: 'Créer une nouvelle application' })
   @ApiResponse({ status: 201, description: 'Application créée avec succès.' })
   @ApiResponse({ status: 404, description: 'Metadata ou parent non trouvé.' })
   async create(
-      @Body() createApplicationDto: CreateApplicationDto,
-      @Request() req
-    ) {
-      
-      const ownerId = req.user.userId;
-  
-      Logger.log(`ownerId: ${ownerId}`);
-      Logger.log(`userService: ${this.userService}`);
+    @Body() createApplicationDto: CreateApplicationDto,
+    @Request() req
+  ) {
+    Logger.log('create method called');
 
-      const userFromDb = await this.userService.findUserByKeycloakId(ownerId);
-
-    if (!userFromDb) {
-        throw new UnauthorizedException('Utilisateur non trouvé');
+    const token = req.headers['authorization']?.split(' ')[1];
+    const decodedtoken = jose.decodeJwt(token)
+    if (!token) {
+      throw new UnauthorizedException('Token non fourni');
     }
 
-      Logger.warn("ownerId", ownerId)
+    
+    try {
 
-      if (!ownerId) {
-          throw new UnauthorizedException('Authentification de l’utilisateur requise');
+    const userFromDb = await this.userService.findOrCreateByEmail(<string>decodedtoken.email, <string>decodedtoken.sub);
+      if (!userFromDb) {
+        throw new UnauthorizedException('Utilisateur non trouvé');
       }
-
-      const newApplication = await this.applicationService.createApplication(ownerId, createApplicationDto);
-      return { status: 201, message: "Application créée avec succès", data: newApplication };
+    //TODO : passer en id
+    const newApplication = await this.applicationService.createApplication(userFromDb.keycloakId, createApplicationDto);
+      return {
+        status: 201,
+        message: 'Application créée avec succès',
+        data: newApplication,
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Token invalide ou malformé');
+    }
   }
-  
-  
 
   @Get('search')
   async searchApplications(@Query() searchParams: SearchApplicationDto) {

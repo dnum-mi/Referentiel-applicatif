@@ -5,19 +5,23 @@ import { User } from '@prisma/client';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async createUser(keycloakId: string, email: string): Promise<User> {
-    return this.prisma.user.create({
-      data: {
-        keycloakId,
-        email,
-      },
-    });
-  }
-  
   async findUserByKeycloakId(keycloakId: string): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: { keycloakId },
     });
+  }
+
+  async findOrCreateByEmail(email: string, keycloakId: string, ): Promise<User | null> {
+    return this.prisma.user.upsert({
+      where: {
+        email: email
+      },
+      update: {},
+      create: {
+        email: email,
+        keycloakId: keycloakId
+      },
+    })
   }
  }
 
