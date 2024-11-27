@@ -22,7 +22,10 @@ for i in $(env | grep "^$APP_ENV_PREFIX"); do
 
     echo "Setting $key=$value"
 
-    find "$APP_DIST_DIR" -type f -exec sed -i 's|'"${key}"'|'"${value}"'|g' {} \;  
+    LIST=( $(find "$APP_DIST_DIR" -type f -exec sed -i 's|'"${key}"'|'"${value}"'|g' {} \;) )
+
+    echo "${#LIST[@]} mathes found"
+
 done
 
 echo "Done."
