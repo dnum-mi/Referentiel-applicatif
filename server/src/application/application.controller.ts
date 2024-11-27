@@ -27,28 +27,52 @@ export class ApplicationController {
   ) {
     Logger.log('create method called');
 
-    const token = req.headers['authorization']?.split(' ')[1];
-    const decodedtoken = jose.decodeJwt(token)
-    if (!token) {
-      throw new UnauthorizedException('Token non fourni');
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+      throw new UnauthorizedException('En-tête Authorization manquant');
     }
 
-    
-    try {
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      throw new UnauthorizedException('Token Bearer non fourni');
+    }
 
-    const userFromDb = await this.userService.findOrCreateByEmail(<string>decodedtoken.email, <string>decodedtoken.sub);
+    let decodedToken;
+    try {
+      decodedToken = jose.decodeJwt(token);
+    } catch (error) {
+      Logger.error('Erreur lors du décodage du JWT :', error);
+      throw new UnauthorizedException('JWT invalide ou malformé');
+    }
+
+
+    if (!decodedToken.email || !decodedToken.sub) {
+      throw new UnauthorizedException('JWT manquant de claims requis (email ou sub)');
+    }
+
+    try {
+      const userFromDb = await this.userService.findOrCreateByEmail(
+        <string>decodedToken.email,
+        <string>decodedToken.sub
+      );
+
       if (!userFromDb) {
         throw new UnauthorizedException('Utilisateur non trouvé');
       }
-    //TODO : passer en id
-    const newApplication = await this.applicationService.createApplication(userFromDb.keycloakId, createApplicationDto);
+
+      const newApplication = await this.applicationService.createApplication(
+        userFromDb.keycloakId,
+        createApplicationDto
+      );
+
       return {
         status: 201,
         message: 'Application créée avec succès',
         data: newApplication,
       };
     } catch (error) {
-      throw new UnauthorizedException('Token invalide ou malformé');
+      Logger.error('Erreur lors de la création de l\'application :', error);
+      throw new UnauthorizedException('Échec de la création de l\'application');
     }
   }
 
