@@ -64,10 +64,11 @@
       "backend": [
         {
           "host": ["http://backend:3500"],
-          "url_pattern": "api/v2/applications/search",
+          "url_pattern": "api/v2/applications",
           "method": "POST"
         }
-      ]
+      ],
+      "output_encoding": "no-op"
     },
     {
       "endpoint": "api/v2/applications/search",
