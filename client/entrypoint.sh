@@ -21,11 +21,10 @@ for i in $(env | grep "^$APP_ENV_PREFIX"); do
     value=$(echo "$i" | cut -d '=' -f 2-)
 
     echo "Setting $key=$value"
+    FILE_COUNT=$(grep $key -rnl $APP_DIST_DIR | wc -l)
+    echo "Found $FILE_COUNT files with matching key"
 
-    LIST=( $(find "$APP_DIST_DIR" -type f -exec sed -i 's|'"${key}"'|'"${value}"'|g' {} \;) )
-
-    echo "${#LIST[@]} mathes found"
-
+    find "$APP_DIST_DIR" -type f -exec sed -i 's|'"${key}"'|'"${value}"'|g' {} \;  
 done
 
 echo "Done."
