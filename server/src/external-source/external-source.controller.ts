@@ -1,22 +1,44 @@
-import { Controller, Post, Body, Request } from '@nestjs/common';
+import { Controller, Post, Body, Request, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { ExternalSourceService } from './external-source.service';
 import { CreateExternalSourceDto } from './dto/create-external-source.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AuthUtils } from '../utils/auth.utils';
 
 @ApiTags('external-sources')
 @Controller('external-sources')
 export class ExternalSourceController {
+  private authUtils: AuthUtils;
   constructor(private readonly externalSourceService: ExternalSourceService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Créer un nouvel enregistrement dans la table ExternalSource avec metadata' })
-  @ApiResponse({ status: 201, description: 'ExternalSource créé avec succès.' })
-  @ApiResponse({ status: 400, description: 'Paramètres incorrects.' })
-  async createExternalSource(
+  @ApiOperation({ summary: 'Créer une nouvelle source externe' })
+  @ApiResponse({ status: 201, description: 'Source externe créée avec succès.' })
+  @ApiResponse({ status: 404, description: 'Utilisateur ou autres ressources non trouvées.' })
+  public async createExternalSource(
     @Body() createExternalSourceDto: CreateExternalSourceDto,
-    @Request() req
+    @Request() req,
   ) {
-    const ownerId = 'f15d1c13-8198-4ca5-a180-94656e20d568';
-    return this.externalSourceService.createExternalSource(createExternalSourceDto, ownerId);
+    Logger.log('createExternalSource method called');
+  
+    try {
+      const decodedToken = this.authUtils.getDecodedToken(req);
+      const userFromDb = await this.authUtils.findOrCreateUser(decodedToken);
+      const newExternalSource = await this.externalSourceService.createExternalSource(
+        createExternalSourceDto,
+        userFromDb.keycloakId,
+      );
+  
+      return {
+        status: 201,
+        message: 'Source externe créée avec succès',
+        data: newExternalSource,
+      };
+    } catch (error) {
+      Logger.error('Erreur lors de la création de la source externe', error);
+  
+      throw new InternalServerErrorException(
+        'Erreur interne lors de la création de la source externe.',
+      );
+    }
   }
 }

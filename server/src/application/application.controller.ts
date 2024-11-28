@@ -9,7 +9,6 @@ import {
   Get,
   Query,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ApplicationService } from './application.service';
 import { UserService } from '../user/user.service';
@@ -18,12 +17,13 @@ import { UpdateApplicationDto } from './dto/update-application.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { SearchApplicationDto } from './dto/search-application.dto';
 import { GetApplicationDto } from './dto/get-application.dto';
-import * as jose from 'jose';
+import { AuthUtils } from '../utils/auth.utils';
 
 @ApiTags('applications')
 @Controller('applications')
 export class ApplicationController {
   applicationsService: ApplicationService;
+  private authUtils: AuthUtils;
 
   constructor(
     private readonly applicationService: ApplicationService,
@@ -40,8 +40,8 @@ export class ApplicationController {
   ) {
     Logger.log('create method called');
 
-    const decodedToken = this.getDecodedToken(req);
-    const userFromDb = await this.findOrCreateUser(decodedToken);
+    const decodedToken = this.authUtils.getDecodedToken(req);
+    const userFromDb = await this.authUtils.findOrCreateUser(decodedToken);
 
     const newApplication = await this.applicationService.createApplication(
       userFromDb.keycloakId,
@@ -81,48 +81,5 @@ export class ApplicationController {
     @Request() req,
   ) {
     return this.applicationService.updateApplication(id, applicationToUpdate);
-  }
-
-
-  private getDecodedToken(req: any): any {
-    const authHeader = req.headers['authorization'];
-    if (!authHeader) {
-      throw new UnauthorizedException('En-tête Authorization manquant');
-    }
-
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-      throw new UnauthorizedException('Token Bearer non fourni');
-    }
-
-    try {
-      return jose.decodeJwt(token);
-    } catch (error) {
-      Logger.error('Erreur lors du décodage du JWT :', error);
-      throw new UnauthorizedException('JWT invalide ou malformé');
-    }
-  }
-
-
-  private async findOrCreateUser(decodedToken: any) {
-    if (!decodedToken.email || !decodedToken.sub) {
-      throw new UnauthorizedException('JWT manquant de claims requis (email ou sub)');
-    }
-
-    try {
-      const user = await this.userService.findOrCreateByEmail(
-        <string>decodedToken.email,
-        <string>decodedToken.sub,
-      );
-
-      if (!user) {
-        throw new UnauthorizedException('Utilisateur non trouvé');
-      }
-
-      return user;
-    } catch (error) {
-      Logger.error('Erreur lors de la récupération/création de l\'utilisateur :', error);
-      throw new UnauthorizedException('Échec lors de la gestion de l\'utilisateur');
-    }
   }
 }
