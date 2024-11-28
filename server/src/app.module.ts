@@ -5,7 +5,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 
-import { AuthModule } from './auth/auth.module';
 import { ApplicationModule } from './application/application.module';
 import { UserModule } from './user/user.module';
 import { ApplicationController } from './application/application.controller';
@@ -18,7 +17,6 @@ import { ExternalModule } from './external/external.module';
 @Module({
   imports: [
     PrismaModule,
-    AuthModule,
     UserModule,
     ApplicationModule,
     ExternalSourceModule,

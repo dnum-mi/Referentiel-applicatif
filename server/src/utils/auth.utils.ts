@@ -6,29 +6,17 @@ export class AuthUtils {
   constructor(private readonly userService: UserService) {}
 
   public getDecodedToken(req: any): any {
+    console.log(req)
     const authHeader = req.headers['authorization'];
-    if (!authHeader) {
-      throw new UnauthorizedException('En-tête Authorization manquant');
-    }
-
     const token = authHeader.split(' ')[1];
-    if (!token) {
-      throw new UnauthorizedException('Token Bearer non fourni');
-    }
-
     try {
       return jose.decodeJwt(token);
     } catch (error) {
       Logger.error('Erreur lors du décodage du JWT :', error);
-      throw new UnauthorizedException('JWT invalide ou malformé');
     }
   }
 
   public async findOrCreateUser(decodedToken: any): Promise<any> {
-    if (!decodedToken.email || !decodedToken.sub) {
-      throw new UnauthorizedException('JWT manquant de claims requis (email ou sub)');
-    }
-
     try {
       const user = await this.userService.findOrCreateByEmail(
         <string>decodedToken.email,
@@ -41,4 +29,4 @@ export class AuthUtils {
       throw new UnauthorizedException('Échec lors de la gestion de l\'utilisateur');
     }
   }
-}
+} 
