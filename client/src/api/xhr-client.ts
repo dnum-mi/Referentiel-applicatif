@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from 'axios';
 
-axios.defaults.baseURL = `${import.meta.env.VITE_RDA_API_URL ?? 'http://localhost:3500/api/'}`;
+axios.defaults.baseURL = `${import.meta.env.VITE_RDA_API_URL ?? "VITE_RDA_API_URL"}`;
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common.Accept = 'application/json';
 axios.defaults.headers.common['Content-Type'] = 'application/json';
@@ -9,7 +9,7 @@ axios.defaults.timeout = 10000;
 export async function getUserInfo(accessToken: string): Promise<any> {
   try {
     const response = await axios.get(
-      `${import.meta.env.VITE_KEYCLOAK_AUTH_SERVER_URL}/realms/${import.meta.env.VITE_KEYCLOAK_REALM}/protocol/openid-connect/userinfo`,
+      `${import.meta.env.VITE_RDA_KEYCLOAK_AUTH_SERVER_URL ?? "VITE_RDA_KEYCLOAK_AUTH_SERVER_URL"}/realms/${import.meta.env.VITE_RDA_KEYCLOAK_REALM ?? "VITE_RDA_KEYCLOAK_REALM"}/protocol/openid-connect/userinfo`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
