@@ -2,28 +2,26 @@ import type { Application } from "@/models/Application";
 import requests from "./xhr-client";
 
 const Applications = {
-  getAllApplicationBySearch: async (label: string): Promise<Application[]> => {
+  async getAllApplicationBySearch (label: string): Promise<Application[]> {
     try {
-      // Utilisation du xhr-client pour faire la requête GET avec paramètres
-      const applications = await requests.get<Application[]>("/applications/search", { label });
-
-      return applications; // Retourne les données des applications
-    } catch (error) {
-      console.error("Erreur lors de la récupération des applications:", error);
-      throw error; // Gestion de l'erreur
+      return await requests.get<Application[]>('/applications/search', { params: { label } })
+    }
+    catch (error) {
+      console.error('Erreur lors de la recherche d\'applications :', error)
+      throw error
     }
   },
 
-  getApplicationById: async (id: string): Promise<Application[]> => {
+  // Récupérer toutes les applications
+  async getAllApplications (): Promise<Application[]> {
     try {
-      const application = await requests.get<Application[]>(`/applications/${id}`);
-      console.log(application);
-      return application;
-    } catch (error) {
-      console.error("erreur lors de la récupération de l'application", error);
-      throw error;
+      return await requests.get<Application[]>('/applications')
     }
-  },
-};
+    catch (error) {
+      console.error('Erreur lors de la récupération de toutes les applications :', error)
+      throw error
+    }
+  }
+}
 
 export default Applications;
