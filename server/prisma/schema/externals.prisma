@@ -17,9 +17,9 @@ model External {
 }
 
 model ExternalSource {
- id                       String     @id @default(uuid())
-  type           ExternalSourceType @unique
-  uri            String
+ id                       String         @id @default(uuid())
+  type           ExternalSourceType  
+  uri            String                 @unique
   valueType      ExternalSourceValueType
   metadataId     String                  
   metadata       Metadata                @relation("ExternalSourcesMetadata", fields: [metadataId], references: [id])
