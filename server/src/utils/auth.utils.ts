@@ -35,10 +35,6 @@ export class AuthUtils {
         <string>decodedToken.sub,
       );
 
-      if (!user) {
-        throw new UnauthorizedException('Utilisateur non trouvé');
-      }
-
       return user;
     } catch (error) {
       Logger.error('Erreur lors de la récupération/création de l\'utilisateur :', error);
