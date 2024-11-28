@@ -27,7 +27,6 @@ export class ApplicationController {
 
   constructor(
     private readonly applicationService: ApplicationService,
-    private readonly userService: UserService,
   ) {}
 
   @Post()

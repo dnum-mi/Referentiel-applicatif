@@ -35,10 +35,6 @@ export class ExternalSourceController {
       };
     } catch (error) {
       Logger.error('Erreur lors de la création de la source externe', error);
-  
-      throw new InternalServerErrorException(
-        'Erreur interne lors de la création de la source externe.',
-      );
     }
   }
 }

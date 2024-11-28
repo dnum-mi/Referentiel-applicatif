@@ -14,6 +14,7 @@ import { ApplicationService } from './application/application.service';
 import { UserService } from './user/user.service';
 import { ExternalSourceModule } from './external-source/external-source.module';
 import { ConfigModule } from '@nestjs/config';
+import { ExternalModule } from './external/external.module';
 @Module({
   imports: [
     PrismaModule,
@@ -24,6 +25,7 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ExternalModule,
   ],
   controllers: [AppController, ApplicationController, UserController],
   providers: [
