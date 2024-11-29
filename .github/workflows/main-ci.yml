@@ -22,3 +22,13 @@ jobs:
     with:
       image: ghcr.io/dnum-mi/referentiel-applications/frontend
       context: ./client
+
+  test-format:
+    name: Test Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Prettier check
+        run: |
+          npm ci
+          npm run format-check
