@@ -3,7 +3,11 @@ import { PartialType } from '@nestjs/mapped-types';
 import { CreateApplicationDto } from './create-application.dto';
 import { IsOptional, IsString, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreateLifecycleDto, CreateActorDto, CreateComplianceDto } from './create-application.dto';
+import {
+  CreateLifecycleDto,
+  CreateActorDto,
+  CreateComplianceDto,
+} from './create-application.dto';
 
 export class UpdateApplicationDto extends PartialType(CreateApplicationDto) {
   @IsOptional()
@@ -23,7 +27,7 @@ export class UpdateApplicationDto extends PartialType(CreateApplicationDto) {
   uri: string;
 
   @IsString()
-  url: string; 
+  url: string;
 
   @IsOptional()
   @IsArray()

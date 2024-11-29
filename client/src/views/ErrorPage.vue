@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 const buttons = [
   {
-    label: 'Page d\'accueil',
-    name: '/recherche-application'
+    label: "Page d'accueil",
+    name: "/recherche-application",
   },
-
-]
+];
 </script>
 
 <template>

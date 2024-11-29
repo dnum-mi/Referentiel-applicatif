@@ -1,31 +1,31 @@
 <script setup lang="ts">
-import { useRegisterSW } from 'virtual:pwa-register/vue';
-import { ref } from 'vue';
-import useToaster from './composables/use-toaster'; // Assurez-vous d'importer `watch`
-import { routeNames } from './router/route-names';
-import { authentication } from './services/authentication';
+import { useRegisterSW } from "virtual:pwa-register/vue";
+import { ref } from "vue";
+import useToaster from "./composables/use-toaster"; // Assurez-vous d'importer `watch`
+import { routeNames } from "./router/route-names";
+import { authentication } from "./services/authentication";
 
 const authenticated = ref(false);
-authentication.init({ onLoad: 'check-sso' }).then((answer) => (authenticated.value = answer));
+authentication.init({ onLoad: "check-sso" }).then((answer) => (authenticated.value = answer));
 
 const toaster = useToaster();
 
-const logoText = ['Ministère', 'de l’intérieur'];
-const serviceDescription = 'Une application pour les réunir toutes';
-const serviceTitle = 'Référentiel des Applications';
-const homeTo = '/applications';
-const operatorTo = '/applications';
+const logoText = ["Ministère", "de l’intérieur"];
+const serviceDescription = "Une application pour les réunir toutes";
+const serviceTitle = "Référentiel des Applications";
+const homeTo = "/applications";
+const operatorTo = "/applications";
 const ecosystemLinks = [
-  { label: 'Grist', href: 'https://grist.numerique.gouv.fr/' },
-  { label: 'CCT', href: 'https://cct.sg.minint.fr/accueil/Accueil.html' },
-  { label: 'Code source', href: 'http://github.com/dnum-mi/referentiel-applications' },
-  { label: 'Api du référentiel', href: `${import.meta.env.VITE_RDA_API_URL}` },
+  { label: "Grist", href: "https://grist.numerique.gouv.fr/" },
+  { label: "CCT", href: "https://cct.sg.minint.fr/accueil/Accueil.html" },
+  { label: "Code source", href: "http://github.com/dnum-mi/referentiel-applications" },
+  { label: "Api du référentiel", href: `${import.meta.env.VITE_RDA_API_URL}` },
 ];
 const mandatoryLinks = [
-  { label: 'Accessibilité : non conforme' },
+  { label: "Accessibilité : non conforme" },
   {
-    label: 'Contact',
-    href: 'https://tchap.gouv.fr/#/room/!ydoKqFOXRAQPQYFvqa:agent.interieur.tchap.gouv.fr?via=agent.interieur.tchap.gouv.fr',
+    label: "Contact",
+    href: "https://tchap.gouv.fr/#/room/!ydoKqFOXRAQPQYFvqa:agent.interieur.tchap.gouv.fr?via=agent.interieur.tchap.gouv.fr",
   },
 ];
 
@@ -41,10 +41,10 @@ const unauthenticatedQuickLinks = ref([]);
 authentication.createLoginUrl({ redirectUri: window.location.href }).then((loginUrlLink) => {
   unauthenticatedQuickLinks.value = [
     {
-      label: 'Se connecter',
+      label: "Se connecter",
       to: loginUrlLink, // URL temporaire
-      icon: 'ri-lock-line',
-      iconAttrs: { title: 'Se connecter' },
+      icon: "ri-lock-line",
+      iconAttrs: { title: "Se connecter" },
     },
   ];
   console.log(loginUrlLink);
@@ -52,23 +52,23 @@ authentication.createLoginUrl({ redirectUri: window.location.href }).then((login
 
 const authenticatedQuickLinks: QuickLink[] = [
   {
-    label: 'Rechercher une application',
+    label: "Rechercher une application",
     to: { name: routeNames.SEARCHAPP },
   },
   {
-    label: 'Déconnexion',
+    label: "Déconnexion",
     to: authentication.createLogoutUrl(),
-    icon: 'ri-logout-box-r-line',
-    iconAttrs: { title: 'Déconnexion' },
+    icon: "ri-logout-box-r-line",
+    iconAttrs: { title: "Déconnexion" },
   },
 ];
 
-const searchQuery = ref('');
+const searchQuery = ref("");
 
 const { setScheme, theme } = useScheme();
 
 function changeTheme() {
-  setScheme(theme.value === 'light' ? 'dark' : 'light');
+  setScheme(theme.value === "light" ? "dark" : "light");
 }
 
 const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW();

@@ -1,9 +1,9 @@
-import axios, { type AxiosResponse } from 'axios';
+import axios, { type AxiosResponse } from "axios";
 
 axios.defaults.baseURL = `${import.meta.env.VITE_RDA_API_URL ?? "VITE_RDA_API_URL"}`;
 axios.defaults.withCredentials = true;
-axios.defaults.headers.common.Accept = 'application/json';
-axios.defaults.headers.common['Content-Type'] = 'application/json';
+axios.defaults.headers.common.Accept = "application/json";
+axios.defaults.headers.common["Content-Type"] = "application/json";
 axios.defaults.timeout = 10000;
 
 export async function getUserInfo(accessToken: string): Promise<any> {
@@ -18,7 +18,7 @@ export async function getUserInfo(accessToken: string): Promise<any> {
     );
     return response.data;
   } catch (error: any) {
-    console.error('Erreur lors de la récupération des informations utilisateur:', error.response?.data || error.message);
+    console.error("Erreur lors de la récupération des informations utilisateur:", error.response?.data || error.message);
     throw error;
   }
 }

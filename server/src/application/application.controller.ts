@@ -36,8 +36,11 @@ export class ApplicationController {
     @Body() createApplicationDto: CreateApplicationDto,
     @Request() req,
   ) {
-    const decodedToken = AuthUtils.getDecodedToken(req)
-    const userFromDb = await AuthUtils.findOrCreateUser(decodedToken, this.userService);
+    const decodedToken = AuthUtils.getDecodedToken(req);
+    const userFromDb = await AuthUtils.findOrCreateUser(
+      decodedToken,
+      this.userService,
+    );
 
     const newApplication = await this.applicationService.createApplication(
       userFromDb.keycloakId,
@@ -57,7 +60,9 @@ export class ApplicationController {
   }
 
   @Get(':id')
-  async getApplicationById(@Param('id') id: string): Promise<GetApplicationDto> {
+  async getApplicationById(
+    @Param('id') id: string,
+  ): Promise<GetApplicationDto> {
     try {
       const application = await this.applicationService.getApplicationById(id);
       return application;
@@ -68,8 +73,14 @@ export class ApplicationController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Mettre à jour une application existante' })
-  @ApiResponse({ status: 200, description: 'Application mise à jour avec succès.' })
-  @ApiResponse({ status: 404, description: 'Application, metadata ou parent non trouvé.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Application mise à jour avec succès.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Application, metadata ou parent non trouvé.',
+  })
   async update(
     @Param('id') id: string,
     @Body() applicationToUpdate: UpdateApplicationDto,

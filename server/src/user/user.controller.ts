@@ -5,5 +5,4 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
 }

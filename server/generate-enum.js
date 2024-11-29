@@ -47,7 +47,12 @@ export enum ${enumName} {
 }
 `.trim();
 
-  const filePath = path.join(process.cwd(), 'src', 'enums', `${enumName.toLowerCase()}.enum.ts`);
+  const filePath = path.join(
+    process.cwd(),
+    'src',
+    'enums',
+    `${enumName.toLowerCase()}.enum.ts`,
+  );
 
   await fs.writeFile(filePath, enumContent);
   console.log(`Generated ${filePath}`);
@@ -60,6 +65,6 @@ const generateEnums = async () => {
   }
 };
 
-generateEnums().catch(err => {
+generateEnums().catch((err) => {
   console.error('Error generating enums:', err);
 });

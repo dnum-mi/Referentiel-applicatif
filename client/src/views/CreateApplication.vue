@@ -1,17 +1,17 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const type = 'text'
-const label = 'Label champ de saisie'
-const placeholder = 'Yo'
-const modelValue = ref('')
-const modelValue2 = ref('')
-const validMessage1 = 'Message de validation'
-const errorMessage1 = 'Message d’erreur'
-const errorMessage2 = 'Message d’erreur 2'
-const hint = 'Texte d’indice du champ'
-const id = ''
-const readonly = ''
+const type = "text";
+const label = "Label champ de saisie";
+const placeholder = "Yo";
+const modelValue = ref("");
+const modelValue2 = ref("");
+const validMessage1 = "Message de validation";
+const errorMessage1 = "Message d’erreur";
+const errorMessage2 = "Message d’erreur 2";
+const hint = "Texte d’indice du champ";
+const id = "";
+const readonly = "";
 </script>
 
 <template>
@@ -62,9 +62,7 @@ const readonly = ''
 
         <h2>4. Avec plusieurs champs de saisie</h2>
 
-        <DsfrInputGroup
-          valid-message="Tout va bien pour ces deux champs"
-        >
+        <DsfrInputGroup valid-message="Tout va bien pour ces deux champs">
           <p>
             <DsfrInput
               :id="id"
@@ -137,9 +135,7 @@ const readonly = ''
 
         <h2>4. Avec plusieurs champs de saisie</h2>
 
-        <DsfrInputGroup
-          valid-message="Tout va bien pour ces deux champs"
-        >
+        <DsfrInputGroup valid-message="Tout va bien pour ces deux champs">
           <p>
             <DsfrInput
               :id="id"

@@ -6,7 +6,10 @@ import { CreateExternalSourceDto } from './dto/create-external-source.dto';
 export class ExternalSourceService {
   constructor(private prisma: PrismaService) {}
 
-  async createExternalSource(createExternalSourceDto: CreateExternalSourceDto, ownerId: string) {
+  async createExternalSource(
+    createExternalSourceDto: CreateExternalSourceDto,
+    ownerId: string,
+  ) {
     // Crée d'abord un enregistrement `metadata` pour `ExternalSource`
     const metadata = await this.prisma.metadata.create({
       data: {

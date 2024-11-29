@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Application } from '@/models/Application'
+import type { Application } from "@/models/Application";
 
-const props = defineProps<{ application: Application }>()
+const props = defineProps<{ application: Application }>();
 </script>
 
 <template>

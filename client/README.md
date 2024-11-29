@@ -19,8 +19,8 @@ TypeScript ne sait pas gérer les informations de type pour les imports dans les
 Si le plugin TypeScript ne vous semble pas assez performant, Volar a aussi implémenté un [mode Take Over](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) qui est plus performant. Vous pouvez l’activer en suivant les étapes suivantes :
 
 1. Désactiver l’extension TypeScript incluse
-    1) Lancer `Extensions: Show Built-in Extensions` depuis la palette de commandes VSCode
-    2) Trouver `TypeScript and JavaScript Language Features`, cliquer avec le bouton droit et sélectionner `Disable (Workspace)`
+   1. Lancer `Extensions: Show Built-in Extensions` depuis la palette de commandes VSCode
+   2. Trouver `TypeScript and JavaScript Language Features`, cliquer avec le bouton droit et sélectionner `Disable (Workspace)`
 2. Recharger la fenêtre VSCode en lançant `Developer: Reload Window` depuis la palette de commandes.
 
 ## Installer les dépendances
