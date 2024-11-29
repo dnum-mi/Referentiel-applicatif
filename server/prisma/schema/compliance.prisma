@@ -1,0 +1,33 @@
+model Compliance {
+  id                       String     @id @default(uuid())
+  type            ComplianceType
+  name            String
+  status          ComplianceStatus
+  validityStart   DateTime?
+  validityEnd     DateTime?
+  scoreValue      String?
+  scoreUnit       String?
+  notes           String?
+  metadataId      String?         
+  metadata        Metadata?       @relation("ComplianceMetadata", fields: [metadataId], references: [id])
+  applicationId   String?         
+  application     Application?    @relation("ApplicationCompliances", fields: [applicationId], references: [id])
+
+  @@map("compliances")
+}
+
+enum ComplianceType {
+  regulation
+  standard
+  policy
+  contractual
+  security
+  privacy
+}
+
+enum ComplianceStatus {
+  compliant
+  non_compliant
+  partially_compliant
+  not_concerned
+}
