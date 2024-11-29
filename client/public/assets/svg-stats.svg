@@ -1,0 +1,7 @@
+<svg fill="none" width="100px" height="100px" viewBox="0 0 24 24" id="stats" data-name="Line Color" xmlns="http://www.w3.org/2000/svg" class="icon line-color">
+  <!-- Contour principal en bleu DSFR -->
+  <rect id="primary" x="3" y="3" width="18" height="18" rx="1" style="stroke: #000091; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></rect>
+  
+  <!-- Barres internes en rouge DSFR -->
+  <path id="secondary" d="M12,17V11M8,17V15m8,2V7" style="stroke: #E1000F; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></path>
+</svg>
