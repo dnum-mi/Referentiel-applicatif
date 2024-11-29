@@ -15,5 +15,4 @@ export class CreateExternalSourceDto {
   @ApiProperty()
   @IsEnum(ExternalSourceValueType)
   valueType: ExternalSourceValueType;
-
 }

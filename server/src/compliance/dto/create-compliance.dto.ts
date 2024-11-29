@@ -1,7 +1,7 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ComplianceType } from '../../enums/compliancetype.enum';
-import { ComplianceStatus } from '../../enums/compliancestatus.enum' // Importer les énumérations
+import { ComplianceStatus } from '../../enums/compliancestatus.enum'; // Importer les énumérations
 
 export class CreateComplianceDto {
   @ApiProperty({ description: 'Le type de conformité', enum: ComplianceType })

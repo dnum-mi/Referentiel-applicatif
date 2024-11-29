@@ -26,5 +26,4 @@ export class CreateExternalDto {
   @IsDateString()
   @IsNotEmpty()
   lastSourceUpdate: string;
-
 }

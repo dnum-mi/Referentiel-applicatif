@@ -24,7 +24,10 @@ export class AuthUtils {
       );
       return user;
     } catch (error) {
-      Logger.error('Erreur lors de la récupération/création de l\'utilisateur :', error);
+      Logger.error(
+        "Erreur lors de la récupération/création de l'utilisateur :",
+        error,
+      );
     }
   }
 }

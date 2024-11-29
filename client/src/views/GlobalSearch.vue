@@ -1,38 +1,36 @@
 <script setup lang="ts">
-import type { Application } from '@/models/Application'
-import Applications from '@/api/application'
-import { ref } from 'vue'
+import type { Application } from "@/models/Application";
+import Applications from "@/api/application";
+import { ref } from "vue";
 
 // État de la recherche et pagination
-const searchTerm = ref<string>('')
-const searchResults = ref<Application[]>([])
+const searchTerm = ref<string>("");
+const searchResults = ref<Application[]>([]);
 
-const isLoading = ref(false)
-const errorMessage = ref('')
+const isLoading = ref(false);
+const errorMessage = ref("");
 
-let debounceTimeout: NodeJS.Timeout
+let debounceTimeout: NodeJS.Timeout;
 
-async function doSearch () {
-  clearTimeout(debounceTimeout)
+async function doSearch() {
+  clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(async () => {
     if (!searchTerm.value) {
-      searchResults.value = []
-      return
+      searchResults.value = [];
+      return;
     }
-    isLoading.value = true
-    errorMessage.value = ''
+    isLoading.value = true;
+    errorMessage.value = "";
     try {
-      const response = await Applications.getAllApplicationBySearch(searchTerm.value)
-      searchResults.value = response
+      const response = await Applications.getAllApplicationBySearch(searchTerm.value);
+      searchResults.value = response;
+    } catch (error) {
+      errorMessage.value = "Une erreur est survenue lors de la recherche. Veuillez réessayer.";
+      console.error("Error during search:", error);
+    } finally {
+      isLoading.value = false;
     }
-    catch (error) {
-      errorMessage.value = 'Une erreur est survenue lors de la recherche. Veuillez réessayer.'
-      console.error('Error during search:', error)
-    }
-    finally {
-      isLoading.value = false
-    }
-  }, 300)
+  }, 300);
 }
 </script>
 
@@ -72,16 +70,8 @@ async function doSearch () {
       </div>
       <div>
         <div class="container-tiles">
-          <div
-            v-if="searchResults.length && !isLoading"
-            class="tiles-container"
-          >
-            <DsfrTile
-              v-for="app in searchResults"
-              :key="app.id"
-              :title="app.label"
-              :to="{ name: 'application', params: { id: app.id } }"
-            />
+          <div v-if="searchResults.length && !isLoading" class="tiles-container">
+            <DsfrTile v-for="app in searchResults" :key="app.id" :title="app.label" :to="{ name: 'application', params: { id: app.id } }" />
           </div>
         </div>
       </div>

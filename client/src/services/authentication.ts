@@ -1,4 +1,4 @@
-import Keycloak from 'keycloak-js';
+import Keycloak from "keycloak-js";
 
 export const authentication = new Keycloak({
   url: import.meta.env.VITE_RDA_KEYCLOAK_AUTH_SERVER_URL ?? "VITE_RDA_KEYCLOAK_AUTH_SERVER_URL",

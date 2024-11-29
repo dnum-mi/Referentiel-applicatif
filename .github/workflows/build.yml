@@ -3,14 +3,14 @@ name: Build
 on:
   workflow_call:
     inputs:
-      image: 
+      image:
         required: true
         type: string
       context:
         required: true
         type: string
     outputs:
-      image_tag: 
+      image_tag:
         value: ${{ jobs.build.outputs.image_tag }}
 jobs:
   build:

@@ -1,32 +1,20 @@
 <script lang="ts" setup>
-import type { Message } from '../composables/use-toaster'
+import type { Message } from "../composables/use-toaster";
 
-defineProps<{ messages: Message[] }>()
+defineProps<{ messages: Message[] }>();
 
 const emit = defineEmits<{
-  closeMessage: [id: string]
-}>()
+  closeMessage: [id: string];
+}>();
 
-const close = (id: string) => emit('closeMessage', id)
+const close = (id: string) => emit("closeMessage", id);
 </script>
 
 <template>
   <div class="toaster-container">
-    <TransitionGroup
-      mode="out-in"
-      name="list"
-      tag="div"
-      class="toasters"
-    >
-      <template
-        v-for="message in messages"
-        :key="message.id"
-      >
-        <DsfrAlert
-          class="app-alert"
-          v-bind="message"
-          @close="close(message.id as string)"
-        />
+    <TransitionGroup mode="out-in" name="list" tag="div" class="toasters">
+      <template v-for="message in messages" :key="message.id">
+        <DsfrAlert class="app-alert" v-bind="message" @close="close(message.id as string)" />
       </template>
     </TransitionGroup>
   </div>

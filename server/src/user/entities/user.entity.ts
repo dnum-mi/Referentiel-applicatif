@@ -1,4 +1,4 @@
 export class User {
-    keycloakId: string;
-    email: string;
+  keycloakId: string;
+  email: string;
 }

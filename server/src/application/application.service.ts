@@ -1,5 +1,10 @@
 // src/application/application.service.ts
-import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
@@ -13,59 +18,81 @@ export class ApplicationService {
   private readonly BASE_URL_APPLICATION: string;
   private readonly BASE_URL_API: string;
   constructor(
-    private  prisma: PrismaService,
-    private configService: ConfigService
+    private prisma: PrismaService,
+    private configService: ConfigService,
   ) {
-    this.BASE_URL_APPLICATION = this.configService.get<string>('BASE_URL_APPLICATION');
+    this.BASE_URL_APPLICATION = this.configService.get<string>(
+      'BASE_URL_APPLICATION',
+    );
     this.BASE_URL_API = this.configService.get<string>('BASE_URL_API');
   }
 
-  
-  public async createApplication(ownerId: string, createApplicationDto: CreateApplicationDto) {
+  public async createApplication(
+    ownerId: string,
+    createApplicationDto: CreateApplicationDto,
+  ) {
     Logger.warn(`Creating application with ownerId: ${ownerId}`);
     for (const actor of createApplicationDto.actors) {
-    
       const userExists = await this.prisma.user.findUnique({
         where: { keycloakId: actor.userId },
       });
       Logger.warn('actor', JSON.stringify(actor));
       if (!userExists) {
-        throw new BadRequestException(`User with ID ${actor.userId} does not exist.`);
+        throw new BadRequestException(
+          `User with ID ${actor.userId} does not exist.`,
+        );
       }
     }
-   
-    const applicationMetadata = await this.createApplicationMetadata(ownerId)
-    const application = await this.persistApplication(ownerId, applicationMetadata.id, createApplicationDto)
-    const updatedApplication = await this.updateApplicationUrls(application.id)
+
+    const applicationMetadata = await this.createApplicationMetadata(ownerId);
+    const application = await this.persistApplication(
+      ownerId,
+      applicationMetadata.id,
+      createApplicationDto,
+    );
+    const updatedApplication = await this.updateApplicationUrls(application.id);
     return updatedApplication;
   }
-  
-  public async updateApplication(applicationId: string, applicationToUpdate: UpdateApplicationDto) {
+
+  public async updateApplication(
+    applicationId: string,
+    applicationToUpdate: UpdateApplicationDto,
+  ) {
     try {
-      const isAppplicationExist = await this.isApplicationExist(applicationId)
+      const isAppplicationExist = await this.isApplicationExist(applicationId);
       if (!isAppplicationExist) {
         throw new NotFoundException('Application not found');
       }
 
-      const hasApplicationMetadata = await this.hasApplicationMetadata(applicationToUpdate?.metadataId)
+      const hasApplicationMetadata = await this.hasApplicationMetadata(
+        applicationToUpdate?.metadataId,
+      );
       if (!hasApplicationMetadata) {
         throw new NotFoundException('Metadata not found');
       }
 
-      const hasParent = await this.hasParent(applicationToUpdate?.parentId)
+      const hasParent = await this.hasParent(applicationToUpdate?.parentId);
       if (!hasParent) {
         throw new NotFoundException('Parent application not found');
       }
 
       if (applicationToUpdate.parentId === applicationId) {
-        throw new BadRequestException('An application cannot be its own parent');
+        throw new BadRequestException(
+          'An application cannot be its own parent',
+        );
       }
-    
+
       return await this.prisma.$transaction(async () => {
-        return await this.persistApplicationToUpdate(applicationId, applicationToUpdate)
+        return await this.persistApplicationToUpdate(
+          applicationId,
+          applicationToUpdate,
+        );
       });
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       throw new BadRequestException('Failed to update application');
@@ -107,7 +134,7 @@ export class ApplicationService {
       purposes: application.purposes,
       tags: application.tags,
       lifecycleId: application.lifecycleId,
-      parentId: application.parentId || null, 
+      parentId: application.parentId || null,
     };
 
     return applicationDto;
@@ -122,10 +149,14 @@ export class ApplicationService {
       },
     });
 
-    return applicationMetadata
+    return applicationMetadata;
   }
 
-  private async persistApplication(ownerId: string, applicationMetadataId: string, createApplicationDto)  {
+  private async persistApplication(
+    ownerId: string,
+    applicationMetadataId: string,
+    createApplicationDto,
+  ) {
     const application = await this.prisma.application.create({
       data: {
         label: createApplicationDto.label,
@@ -141,9 +172,14 @@ export class ApplicationService {
         lifecycle: {
           create: {
             status: createApplicationDto.lifecycle.status,
-            firstProductionDate: new Date(createApplicationDto.lifecycle.firstProductionDate),
-            plannedDecommissioningDate: createApplicationDto.lifecycle.plannedDecommissioningDate
-              ? new Date(createApplicationDto.lifecycle.plannedDecommissioningDate)
+            firstProductionDate: new Date(
+              createApplicationDto.lifecycle.firstProductionDate,
+            ),
+            plannedDecommissioningDate: createApplicationDto.lifecycle
+              .plannedDecommissioningDate
+              ? new Date(
+                  createApplicationDto.lifecycle.plannedDecommissioningDate,
+                )
               : undefined,
             metadata: { connect: { id: applicationMetadataId } },
           },
@@ -162,8 +198,12 @@ export class ApplicationService {
         compliances: {
           create: createApplicationDto.compliances.map((compliance) => ({
             ...compliance,
-            validityStart: compliance.validityStart ? new Date(compliance.validityStart) : undefined,
-            validityEnd: compliance.validityEnd ? new Date(compliance.validityEnd) : undefined,
+            validityStart: compliance.validityStart
+              ? new Date(compliance.validityStart)
+              : undefined,
+            validityEnd: compliance.validityEnd
+              ? new Date(compliance.validityEnd)
+              : undefined,
           })),
         },
         externals: {
@@ -176,7 +216,9 @@ export class ApplicationService {
             metadata: { connect: { id: applicationMetadataId } },
           })),
         },
-        parent: createApplicationDto.parentId ? { connect: { id: createApplicationDto.parentId } } : undefined,
+        parent: createApplicationDto.parentId
+          ? { connect: { id: createApplicationDto.parentId } }
+          : undefined,
       },
       include: {
         lifecycle: { include: { metadata: true } },
@@ -186,7 +228,7 @@ export class ApplicationService {
         externals: true,
       },
     });
-    return application
+    return application;
   }
 
   private async updateApplicationUrls(applicationId: string) {
@@ -205,30 +247,35 @@ export class ApplicationService {
     });
   }
 
-  private async isApplicationExist (applicationId: string): Promise<boolean> {
+  private async isApplicationExist(applicationId: string): Promise<boolean> {
     const application = await this.prisma.application.findUnique({
       where: { id: applicationId },
     });
 
-    return !!application
-  } 
+    return !!application;
+  }
 
-  private async hasApplicationMetadata (applicationMetadataId: string): Promise<boolean> {
+  private async hasApplicationMetadata(
+    applicationMetadataId: string,
+  ): Promise<boolean> {
     const metadata = await this.prisma.metadata.findUnique({
       where: { id: applicationMetadataId },
     });
-    return !!metadata
+    return !!metadata;
   }
 
-  private async hasParent (applicationParentId: string): Promise<boolean> {
+  private async hasParent(applicationParentId: string): Promise<boolean> {
     const parent = await this.prisma.application.findUnique({
       where: { id: applicationParentId },
     });
-    return !!parent
+    return !!parent;
   }
 
   //TODO : VERIFIER QUE ID EST DANS APPLICATION TO UPDATE
-  private async persistApplicationToUpdate (applicationId: string, applicationToUpdate: UpdateApplicationDto) {
+  private async persistApplicationToUpdate(
+    applicationId: string,
+    applicationToUpdate: UpdateApplicationDto,
+  ) {
     return await this.prisma.application.update({
       where: { id: applicationId },
       data: {
@@ -254,14 +301,20 @@ export class ApplicationService {
           ? {
               update: {
                 status: applicationToUpdate.lifecycle.status,
-                firstProductionDate: applicationToUpdate.lifecycle.firstProductionDate
+                firstProductionDate: applicationToUpdate.lifecycle
+                  .firstProductionDate
                   ? new Date(applicationToUpdate.lifecycle.firstProductionDate)
                   : undefined,
-                plannedDecommissioningDate: applicationToUpdate.lifecycle.plannedDecommissioningDate
-                  ? new Date(applicationToUpdate.lifecycle.plannedDecommissioningDate)
+                plannedDecommissioningDate: applicationToUpdate.lifecycle
+                  .plannedDecommissioningDate
+                  ? new Date(
+                      applicationToUpdate.lifecycle.plannedDecommissioningDate,
+                    )
                   : undefined,
                 metadata: applicationToUpdate.lifecycle.metadataId
-                  ? { connect: { id: applicationToUpdate.lifecycle.metadataId } }
+                  ? {
+                      connect: { id: applicationToUpdate.lifecycle.metadataId },
+                    }
                   : undefined,
               },
             }
@@ -269,7 +322,7 @@ export class ApplicationService {
         actors: applicationToUpdate.actors
           ? {
               deleteMany: {},
-              create: applicationToUpdate.actors.map(actor => ({
+              create: applicationToUpdate.actors.map((actor) => ({
                 role: actor.role,
                 user: {
                   connect: { keycloakId: actor.userId },
@@ -283,12 +336,16 @@ export class ApplicationService {
         compliances: applicationToUpdate.compliances
           ? {
               deleteMany: {},
-              create: applicationToUpdate.compliances.map(compliance => ({
+              create: applicationToUpdate.compliances.map((compliance) => ({
                 type: compliance.type,
                 name: compliance.name,
                 status: compliance.status,
-                validityStart: compliance.validityStart ? new Date(compliance.validityStart) : undefined,
-                validityEnd: compliance.validityEnd ? new Date(compliance.validityEnd) : undefined,
+                validityStart: compliance.validityStart
+                  ? new Date(compliance.validityStart)
+                  : undefined,
+                validityEnd: compliance.validityEnd
+                  ? new Date(compliance.validityEnd)
+                  : undefined,
                 scoreValue: compliance.scoreValue,
                 scoreUnit: compliance.scoreUnit,
                 notes: compliance.notes,
@@ -310,5 +367,4 @@ export class ApplicationService {
       },
     });
   }
-
 }
