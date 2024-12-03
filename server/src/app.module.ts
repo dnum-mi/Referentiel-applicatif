@@ -12,6 +12,7 @@ import { UserService } from './user/user.service';
 import { ExternalSourceModule } from './external-source/external-source.module';
 import { ConfigModule } from '@nestjs/config';
 import { ExternalModule } from './external/external.module';
+import { ExportService } from './application/export.service';
 @Module({
   imports: [
     PrismaModule,
@@ -24,6 +25,6 @@ import { ExternalModule } from './external/external.module';
     ExternalModule,
   ],
   controllers: [AppController, ApplicationController, UserController],
-  providers: [AppService, ApplicationService, UserService],
+  providers: [AppService, ApplicationService, ExportService, UserService],
 })
 export class AppModule {}

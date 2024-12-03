@@ -48,17 +48,20 @@ export class CreateComplianceDto {
     enum: ComplianceType,
     description: 'Type of compliance (e.g., regulation, policy)',
   })
+  @IsOptional()
   @IsEnum(ComplianceType)
   type: ComplianceType;
 
   @ApiProperty({ example: 'GDPR', description: 'Name of the compliance' })
   @IsString()
+  @IsOptional()
   name: string;
 
   @ApiProperty({
     enum: ComplianceStatus,
     description: 'Compliance status (e.g., compliant, non_compliant)',
   })
+  @IsOptional()
   @IsEnum(ComplianceStatus)
   status: ComplianceStatus;
 
@@ -121,6 +124,7 @@ export class CreateLifecycleDto {
     description: 'First production date (ISO 8601)',
   })
   @IsDateString()
+  @IsOptional()
   firstProductionDate: string;
 
   @ApiProperty({
@@ -166,7 +170,7 @@ export class CreateApplicationDto {
   })
   @IsOptional()
   @IsString()
-  shortName?: string;
+  shortName: string;
 
   @ApiProperty({
     example: 'http://example.com/logo.png',

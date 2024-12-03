@@ -1,4 +1,9 @@
-import { IsString, IsNotEmpty, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsDateString,
+  IsOptional,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateExternalDto {
@@ -25,5 +30,6 @@ export class CreateExternalDto {
   @ApiProperty()
   @IsDateString()
   @IsNotEmpty()
+  @IsOptional()
   lastSourceUpdate: string;
 }

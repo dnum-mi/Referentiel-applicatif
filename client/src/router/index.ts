@@ -20,7 +20,7 @@ const routes = [
   },
   {
     name: routeNames.PROFILEAPP,
-    path: "/applications/:id",
+    path: "/application/:id",
     component: () => import("@/views/ApplicationProfile.vue"),
   },
 ];
