@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRegisterSW } from "virtual:pwa-register/vue";
 import { ref } from "vue";
-import useToaster from "./composables/use-toaster"; // Assurez-vous d'importer `watch`
+import useToaster from "./composables/use-toaster";
 import { routeNames } from "./router/route-names";
 import { authentication } from "./services/authentication";
 
@@ -47,7 +47,6 @@ authentication.createLoginUrl({ redirectUri: window.location.href }).then((login
       iconAttrs: { title: "Se connecter" },
     },
   ];
-  console.log(loginUrlLink);
 });
 
 const authenticatedQuickLinks: QuickLink[] = [
@@ -93,7 +92,7 @@ function close() {
     <router-view />
   </div>
 
-  <DsfrFooter :logo-text :homeTo :ecosystemLinks :mandatoryLinks :operatorTo />
+  <DsfrFooter :logo-text :home-to :ecosystem-links :mandatory-links :operator-to />
 
   <!-- <DsfrConsent>
     <p>
