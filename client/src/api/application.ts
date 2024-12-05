@@ -19,9 +19,10 @@ const Applications = {
       const application = await axios.get(`/applications/${id}`, {
         withCredentials: true,
         headers: {
-          'Authorization': `Bearer ${authentication.token}`
-        }});
-      
+          Authorization: `Bearer ${authentication.token}`,
+        },
+      });
+
       return application;
     } catch (error) {
       throw error;

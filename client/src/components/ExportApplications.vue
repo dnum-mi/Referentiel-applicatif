@@ -27,10 +27,6 @@ async function exportToCsv() {
 
 <template>
   <div>
-    <DsfrButton
-      label="Exporter en CSV"
-      icon="ri-download-line"
-      @click="exportToCsv"
-    />
+    <DsfrButton label="Exporter en CSV" icon="ri-download-line" @click="exportToCsv" />
   </div>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import ExportApplications from '@/components/ExportApplications.vue'
-import SearchApplications from '@/components/SearchApplications.vue'
+import ExportApplications from "@/components/ExportApplications.vue";
+import SearchApplications from "@/components/SearchApplications.vue";
 </script>
 
 <template>

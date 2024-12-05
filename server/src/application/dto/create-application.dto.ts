@@ -53,7 +53,7 @@ export class CreateComplianceDto {
   @ApiProperty({ example: 'GDPR', description: 'Name of the compliance' })
   @IsString()
   @IsOptional()
-  name: string | null;;
+  name: string | null;
 
   @ApiProperty({
     enum: ComplianceStatus,
@@ -69,7 +69,7 @@ export class CreateComplianceDto {
   })
   @IsOptional()
   @IsDateString()
-  validityStart?: string | null;;
+  validityStart?: string | null;
 
   @ApiProperty({
     example: '2025-01-01',
@@ -78,7 +78,7 @@ export class CreateComplianceDto {
   })
   @IsOptional()
   @IsDateString()
-  validityEnd?: string | null;;
+  validityEnd?: string | null;
 
   @ApiProperty({
     example: '85',
@@ -87,7 +87,7 @@ export class CreateComplianceDto {
   })
   @IsOptional()
   @IsString()
-  scoreValue?: string | null;;
+  scoreValue?: string | null;
 
   @ApiProperty({
     example: '%',
@@ -96,7 +96,7 @@ export class CreateComplianceDto {
   })
   @IsOptional()
   @IsString()
-  scoreUnit?: string | null;;
+  scoreUnit?: string | null;
 
   @ApiProperty({
     example: 'Notes about the compliance',
@@ -105,7 +105,7 @@ export class CreateComplianceDto {
   })
   @IsOptional()
   @IsString()
-  notes?: string | null;;
+  notes?: string | null;
 }
 
 export class CreateLifecycleDto {

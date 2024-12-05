@@ -67,11 +67,14 @@ export class ApplicationController {
   @Get('export')
   @ApiOperation({ summary: 'Exporter les applications' })
   @ApiResponse({ status: 200, description: 'Export réalisé avec succès.' })
-  @ApiResponse({ status: 400, description: 'Erreur lors de l\'exportation.' })
-  async exportApplications(@Query() query: SearchApplicationDto, 
-  @Response() res) {
+  @ApiResponse({ status: 400, description: "Erreur lors de l'exportation." })
+  async exportApplications(
+    @Query() query: SearchApplicationDto,
+    @Response() res,
+  ) {
     try {
-      const applications = await this.applicationService.searchApplications(query);
+      const applications =
+        await this.applicationService.searchApplications(query);
 
       const headers = ['id', 'label', 'description', 'createdBy', 'createdAt'];
       const data = applications.map((app) => ({
@@ -85,10 +88,13 @@ export class ApplicationController {
       const csvContent = this.exportService.generateCsv(data, headers);
 
       res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename="applications.csv"');
+      res.setHeader(
+        'Content-Disposition',
+        'attachment; filename="applications.csv"',
+      );
       res.status(200).send(csvContent);
     } catch (error) {
-      throw new BadRequestException('Erreur lors de l\'exportation.');
+      throw new BadRequestException("Erreur lors de l'exportation.");
     }
   }
 
@@ -98,7 +104,7 @@ export class ApplicationController {
   ): Promise<GetApplicationDto> {
     try {
       const application = await this.applicationService.getApplicationById(id);
-      Logger.log(application)
+      Logger.log(application);
       return application;
     } catch (error) {
       throw new NotFoundException(error);

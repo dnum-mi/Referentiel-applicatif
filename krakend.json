@@ -15,7 +15,7 @@
       ],
       "max_age": "12h",
       "allow_credentials": true,
-      "debug":true
+      "debug": true
     },
     "security/jwt": {
       "alg": "RS256",
