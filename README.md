@@ -42,7 +42,7 @@ Liste des outils utilisés par le projet à installer :
 
 > L'API sera accessible a l'adresse [http://localhost:3500](http://localhost:3500/)
 
-> Le swagger de l'API sera accessible a l'adresse [http://localhost:3500/api/v2]()
+> Le swagger de l'API sera accessible a l'adresse [http://localhost:3500/api]()
 
 ```bash
   pnpm run docker:start

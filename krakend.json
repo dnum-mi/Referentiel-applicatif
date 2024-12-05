@@ -38,70 +38,70 @@
   },
   "endpoints": [
     {
-      "endpoint": "api/v2/",
+      "endpoint": "api/",
       "output_encoding": "no-op",
       "backend": [
         {
           "encoding": "no-op",
           "host": ["http://backend:3500"],
-          "url_pattern": "api/v2/"
+          "url_pattern": "api/"
         }
       ]
     },
     {
-      "endpoint": "api/v2/{ressource}",
+      "endpoint": "api/{ressource}",
       "output_encoding": "no-op",
       "backend": [
         {
           "encoding": "no-op",
           "host": ["http://backend:3500"],
-          "url_pattern": "api/v2/{ressource}"
+          "url_pattern": "api/{ressource}"
         }
       ]
     },
     {
-      "endpoint": "api/v2/applications",
+      "endpoint": "api/applications",
       "method": "POST",
       "backend": [
         {
           "host": ["http://backend:3500"],
-          "url_pattern": "api/v2/applications",
+          "url_pattern": "api/applications",
           "method": "POST"
         }
       ],
       "output_encoding": "no-op"
     },
     {
-      "endpoint": "api/v2/applications/search",
+      "endpoint": "api/applications/search",
       "method": "GET",
       "input_query_strings": ["*"],
       "backend": [
         {
           "host": ["http://backend:3500"],
-          "url_pattern": "api/v2/applications/search",
+          "url_pattern": "api/applications/search",
           "method": "GET",
           "is_collection": true
         }
       ]
     },
     {
-      "endpoint": "api/v2/{ressource}/{action}",
+      "endpoint": "api/{ressource}/{action}",
       "output_encoding": "no-op",
       "backend": [
         {
           "encoding": "no-op",
           "host": ["http://backend:3500"],
-          "url_pattern": "api/v2/{ressource}/{action}"
+          "url_pattern": "api/{ressource}/{action}"
         }
       ]
     },
     {
-      "endpoint": "api/v2/applications/{id}",
+      "endpoint": "api/applications/{id}",
       "method": "GET",
       "backend": [
         {
           "host": ["http://backend:3500"],
-          "url_pattern": "api/v2/applications/{id}",
+          "url_pattern": "api/applications/{id}",
           "method": "GET"
         }
       ],

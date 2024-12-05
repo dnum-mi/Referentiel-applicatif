@@ -9,7 +9,7 @@ async function bootstrap() {
     logger: ['error', 'warn', 'log', 'debug'],
   });
   const logger = new Logger('Bootstrap');
-  app.setGlobalPrefix('api/v2');
+  app.setGlobalPrefix('api');
 
   const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
 
@@ -45,7 +45,7 @@ async function bootstrap() {
     .addSecurityRequirements('oauth2')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/v2/', app, document, {
+  SwaggerModule.setup('api/', app, document, {
     explorer: true,
     jsonDocumentUrl: 'swagger/json',
     //customCss: theme.getBuffer(SwaggerThemeNameEnum.DARK),
