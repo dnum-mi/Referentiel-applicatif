@@ -11,15 +11,15 @@
             </div>
             <div class="fr-grid-row fr-grid-row--gutters">
               <div class="fr-col-md-3">
-                <img
-                  src="../../public/assets/svg-screen.svg"
-                  alt=""
-                >
+                <img src="../../public/assets/svg-screen.svg" alt="" />
               </div>
               <div class="fr-col-md-9">
                 <div class="fr-m-0">
                   <p>
-                    Le référentiel des applications représente l'ensemble des produits numériques et logiciels utilisés au sein du système d'information; Il permet de centraliser, structurer, et gérer efficacement pour un accès et une utilisation optimisés; Il "participe à la protection, à la défense et à la résilience du système d’information"(*). Il est adressé à l'ensemble des acteurs du Système d'information.
+                    Le référentiel des applications représente l'ensemble des produits numériques et logiciels utilisés au sein du système
+                    d'information; Il permet de centraliser, structurer, et gérer efficacement pour un accès et une utilisation optimisés;
+                    Il "participe à la protection, à la défense et à la résilience du système d’information"(*). Il est adressé à l'ensemble
+                    des acteurs du Système d'information.
                   </p>
                 </div>
               </div>
@@ -38,80 +38,45 @@
               <div class="fr-col-12 fr-col-sm-4">
                 <div class="fr-tile">
                   <div class="fr-tile__body">
-                    <img
-                      src="../../public/assets/svg-centralize.svg"
-                      alt=""
-                    >
-                    <h3 class="fr-tile__title">
-                      Centralisation
-                    </h3>
-                    <p class="fr-tile__desc fr-text--sm">
-                      Rassembler toutes les fiches produits dans un seul point de vérité.
-                    </p>
+                    <img src="../../public/assets/svg-centralize.svg" alt="" />
+                    <h3 class="fr-tile__title">Centralisation</h3>
+                    <p class="fr-tile__desc fr-text--sm">Rassembler toutes les fiches produits dans un seul point de vérité.</p>
                   </div>
                 </div>
               </div>
               <div class="fr-col-12 fr-col-sm-4">
                 <div class="fr-tile">
                   <div class="fr-tile__body">
-                    <img
-                      src="../../public/assets/svg-loupe.svg"
-                      alt=""
-                    >
-                    <h3 class="fr-tile__title">
-                      Facilité d'accès
-                    </h3>
-                    <p class="fr-tile__desc fr-text--sm">
-                      Avoir une vue d'ensemble claire des produits à disposition des utilisateurs.
-                    </p>
+                    <img src="../../public/assets/svg-loupe.svg" alt="" />
+                    <h3 class="fr-tile__title">Facilité d'accès</h3>
+                    <p class="fr-tile__desc fr-text--sm">Avoir une vue d'ensemble claire des produits à disposition des utilisateurs.</p>
                   </div>
                 </div>
               </div>
               <div class="fr-col-12 fr-col-sm-4">
                 <div class="fr-tile">
                   <div class="fr-tile__body">
-                    <img
-                      src="../../public/assets/svg-dependencies.svg"
-                      alt=""
-                    >
-                    <h3 class="fr-tile__title">
-                      Gestion des dépendances
-                    </h3>
-                    <p class="fr-tile__desc fr-text--sm">
-                      Comprendre les interconnexions et dépendances entre applications.
-                    </p>
+                    <img src="../../public/assets/svg-dependencies.svg" alt="" />
+                    <h3 class="fr-tile__title">Gestion des dépendances</h3>
+                    <p class="fr-tile__desc fr-text--sm">Comprendre les interconnexions et dépendances entre applications.</p>
                   </div>
                 </div>
               </div>
               <div class="fr-col-12 fr-col-sm-4">
                 <div class="fr-tile">
                   <div class="fr-tile__body">
-                    <img
-                      src="../../public/assets/svgviewer-output(3).svg"
-                      alt=""
-                    >
-                    <h3 class="fr-tile__title">
-                      Amélioration de la maintenance
-                    </h3>
-                    <p class="fr-tile__desc fr-text--sm">
-                      Simplifier les processus de mise à jour et d’audit.
-                    </p>
+                    <img src="../../public/assets/svgviewer-output(3).svg" alt="" />
+                    <h3 class="fr-tile__title">Amélioration de la maintenance</h3>
+                    <p class="fr-tile__desc fr-text--sm">Simplifier les processus de mise à jour et d’audit.</p>
                   </div>
                 </div>
               </div>
               <div class="fr-col-12 fr-col-sm-4">
                 <div class="fr-tile">
                   <div class="fr-tile__body">
-                    <img
-                      src="../../public/assets/svg-stats.svg"
-                      alt=""
-                    >
-                    <h3 class="fr-tile__title">
-                      Amélioration de l'exploitabilité
-                    </h3>
-                    <p class="fr-tile__desc fr-text--sm">
-                      mesurer les impactes d'incidents opérationnels.
-                    </p>
+                    <img src="../../public/assets/svg-stats.svg" alt="" />
+                    <h3 class="fr-tile__title">Amélioration de l'exploitabilité</h3>
+                    <p class="fr-tile__desc fr-text--sm">mesurer les impactes d'incidents opérationnels.</p>
                   </div>
                 </div>
               </div>

@@ -1,42 +1,42 @@
 <script setup lang="ts">
-import { useRegisterSW } from 'virtual:pwa-register/vue'
-import { ref } from 'vue'
-import useToaster from './composables/use-toaster'
-import { routeNames } from './router/route-names'
-import { authentication } from './services/authentication'
+import { useRegisterSW } from "virtual:pwa-register/vue";
+import { ref } from "vue";
+import useToaster from "./composables/use-toaster";
+import { routeNames } from "./router/route-names";
+import { authentication } from "./services/authentication";
 
-const authenticated = ref(false)
-authentication.init({ onLoad: 'check-sso' }).then(answer => (authenticated.value = answer))
+const authenticated = ref(false);
+authentication.init({ onLoad: "check-sso" }).then((answer) => (authenticated.value = answer));
 
-const toaster = useToaster()
+const toaster = useToaster();
 
-const logoText = ['Ministère', 'de l’intérieur']
-const serviceDescription = 'Une application pour les réunir toutes'
-const serviceTitle = 'Référentiel des Applications'
-const homeTo = '/applications'
-const operatorTo = '/applications'
+const logoText = ["Ministère", "de l’intérieur"];
+const serviceDescription = "Une application pour les réunir toutes";
+const serviceTitle = "Référentiel des Applications";
+const homeTo = "/applications";
+const operatorTo = "/applications";
 const ecosystemLinks = [
-  { label: 'Grist', href: 'https://grist.numerique.gouv.fr/' },
-  { label: 'CCT', href: 'https://cct.sg.minint.fr/accueil/Accueil.html' },
-  { label: 'Code source', href: 'http://github.com/dnum-mi/referentiel-applications' },
-  { label: 'Api du référentiel', href: `${import.meta.env.VITE_RDA_API_URL}` },
-]
+  { label: "Grist", href: "https://grist.numerique.gouv.fr/" },
+  { label: "CCT", href: "https://cct.sg.minint.fr/accueil/Accueil.html" },
+  { label: "Code source", href: "http://github.com/dnum-mi/referentiel-applications" },
+  { label: "Api du référentiel", href: `${import.meta.env.VITE_RDA_API_URL}` },
+];
 const mandatoryLinks = [
   { label: "Accessibilité : non conforme" },
   {
     label: "Contact",
     href: "https://tchap.gouv.fr/#/room/!ydoKqFOXRAQPQYFvqa:agent.interieur.tchap.gouv.fr?via=agent.interieur.tchap.gouv.fr",
   },
-]
+];
 
 interface QuickLink {
-  label: string
-  to: { name: string } | string
-  icon?: string
-  iconAttrs?: Record<string, string>
+  label: string;
+  to: { name: string } | string;
+  icon?: string;
+  iconAttrs?: Record<string, string>;
 }
 
-const unauthenticatedQuickLinks = ref([])
+const unauthenticatedQuickLinks = ref([]);
 
 authentication.createLoginUrl({ redirectUri: window.location.href }).then((loginUrlLink) => {
   unauthenticatedQuickLinks.value = [
@@ -46,8 +46,8 @@ authentication.createLoginUrl({ redirectUri: window.location.href }).then((login
       icon: "ri-lock-line",
       iconAttrs: { title: "Se connecter" },
     },
-  ]
-})
+  ];
+});
 
 const authenticatedQuickLinks: QuickLink[] = [
   {
@@ -60,21 +60,21 @@ const authenticatedQuickLinks: QuickLink[] = [
     icon: "ri-logout-box-r-line",
     iconAttrs: { title: "Déconnexion" },
   },
-]
+];
 
-const searchQuery = ref('')
+const searchQuery = ref("");
 
-const { setScheme, theme } = useScheme()
+const { setScheme, theme } = useScheme();
 
-function changeTheme () {
-  setScheme(theme.value === 'light' ? 'dark' : 'light')
+function changeTheme() {
+  setScheme(theme.value === "light" ? "dark" : "light");
 }
 
-const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW()
+const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW();
 
-function close () {
-  offlineReady.value = false
-  needRefresh.value = false
+function close() {
+  offlineReady.value = false;
+  needRefresh.value = false;
 }
 </script>
 
@@ -92,13 +92,7 @@ function close () {
     <router-view />
   </div>
 
-  <DsfrFooter
-    :logo-text
-    :home-to
-    :ecosystem-links
-    :mandatory-links
-    :operator-to
-  />
+  <DsfrFooter :logo-text :home-to :ecosystem-links :mandatory-links :operator-to />
 
   <!-- <DsfrConsent>
     <p>
@@ -110,15 +104,7 @@ function close () {
     </p>
   </DsfrConsent> -->
 
-  <ReloadPrompt
-    :offline-ready="offlineReady"
-    :need-refresh="needRefresh"
-    @close="close"
-    @update-service-worker="updateServiceWorker"
-  />
+  <ReloadPrompt :offline-ready="offlineReady" :need-refresh="needRefresh" @close="close" @update-service-worker="updateServiceWorker" />
 
-  <AppToaster
-    :messages="toaster.messages"
-    @close-message="toaster.removeMessage($event)"
-  />
+  <AppToaster :messages="toaster.messages" @close-message="toaster.removeMessage($event)" />
 </template>
