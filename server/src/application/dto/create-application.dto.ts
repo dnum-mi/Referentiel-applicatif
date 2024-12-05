@@ -6,7 +6,6 @@ import {
   IsEnum,
   IsDateString,
   ValidateNested,
-  ArrayMinSize,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -53,7 +52,8 @@ export class CreateComplianceDto {
 
   @ApiProperty({ example: 'GDPR', description: 'Name of the compliance' })
   @IsString()
-  name: string;
+  @IsOptional()
+  name: string | null;
 
   @ApiProperty({
     enum: ComplianceStatus,
@@ -69,7 +69,7 @@ export class CreateComplianceDto {
   })
   @IsOptional()
   @IsDateString()
-  validityStart?: string;
+  validityStart?: string | null;
 
   @ApiProperty({
     example: '2025-01-01',
@@ -78,7 +78,7 @@ export class CreateComplianceDto {
   })
   @IsOptional()
   @IsDateString()
-  validityEnd?: string;
+  validityEnd?: string | null;
 
   @ApiProperty({
     example: '85',
@@ -87,7 +87,7 @@ export class CreateComplianceDto {
   })
   @IsOptional()
   @IsString()
-  scoreValue?: string;
+  scoreValue?: string | null;
 
   @ApiProperty({
     example: '%',
@@ -96,7 +96,7 @@ export class CreateComplianceDto {
   })
   @IsOptional()
   @IsString()
-  scoreUnit?: string;
+  scoreUnit?: string | null;
 
   @ApiProperty({
     example: 'Notes about the compliance',
@@ -105,7 +105,7 @@ export class CreateComplianceDto {
   })
   @IsOptional()
   @IsString()
-  notes?: string;
+  notes?: string | null;
 }
 
 export class CreateLifecycleDto {
@@ -121,7 +121,8 @@ export class CreateLifecycleDto {
     description: 'First production date (ISO 8601)',
   })
   @IsDateString()
-  firstProductionDate: string;
+  @IsOptional()
+  firstProductionDate?: string | null;
 
   @ApiProperty({
     example: '2025-12-31',
@@ -166,7 +167,7 @@ export class CreateApplicationDto {
   })
   @IsOptional()
   @IsString()
-  shortName?: string;
+  shortName: string | null;
 
   @ApiProperty({
     example: 'http://example.com/logo.png',

@@ -4,6 +4,7 @@ import {
   BadRequestException,
   NotFoundException,
   Logger,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
@@ -11,6 +12,7 @@ import { UpdateApplicationDto } from './dto/update-application.dto';
 import { SearchApplicationDto } from './dto/search-application.dto';
 import { GetApplicationDto } from './dto/get-application.dto';
 import { ConfigService } from '@nestjs/config';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ApplicationService {
@@ -100,14 +102,42 @@ export class ApplicationService {
   }
 
   public async searchApplications(searchParams: SearchApplicationDto) {
-    return await this.prisma.application.findMany({
-      where: {
-        label: {
-          contains: searchParams.label,
-          mode: 'insensitive',
+    const { label } = searchParams;
+
+    const whereClause: Prisma.ApplicationWhereInput = {
+      ...(label
+        ? {
+            label: {
+              contains: label,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          }
+        : {}),
+    };
+
+    const orderByClause: Prisma.Enumerable<Prisma.ApplicationOrderByWithRelationInput> =
+      {
+        metadata: {
+          updatedAt: 'desc',
         },
-      },
-    });
+      };
+
+    try {
+      const applications = await this.prisma.application.findMany({
+        where: whereClause,
+        orderBy: orderByClause,
+        take: 12,
+        include: {
+          lifecycle: true,
+          actors: true,
+          metadata: true,
+        },
+      });
+
+      return applications;
+    } catch (error) {
+      throw error;
+    }
   }
 
   public async getApplicationById(id: string): Promise<GetApplicationDto> {

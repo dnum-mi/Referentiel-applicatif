@@ -1,22 +1,30 @@
 import type { Application } from "@/models/Application";
 import requests from "./xhr-client";
+import axios from "axios";
+import { authentication } from "@/services/authentication";
 
 const Applications = {
-  async getAllApplicationBySearch(label: string): Promise<Application[]> {
+  async getAllApplicationBySearch(label?: string): Promise<Application[]> {
     try {
-      return await requests.get<Application[]>("/applications/search", { params: { label } });
+      return await requests.get<Application[]>("/applications/search", {
+        params: label ? { label } : undefined,
+      });
     } catch (error) {
-      console.error("Erreur lors de la recherche d'applications :", error);
       throw error;
     }
   },
 
-  // Récupérer toutes les applications
-  async getAllApplications(): Promise<Application[]> {
+  async getApplicationById(id: string) {
     try {
-      return await requests.get<Application[]>("/applications");
+      const application = await axios.get(`/applications/${id}`, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${authentication.token}`,
+        },
+      });
+
+      return application;
     } catch (error) {
-      console.error("Erreur lors de la récupération de toutes les applications :", error);
       throw error;
     }
   },

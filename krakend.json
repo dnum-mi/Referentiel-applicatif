@@ -14,7 +14,8 @@
         "Content-Type"
       ],
       "max_age": "12h",
-      "allow_credentials": true
+      "allow_credentials": true,
+      "debug": true
     },
     "security/jwt": {
       "alg": "RS256",
@@ -93,6 +94,18 @@
           "url_pattern": "api/v2/{ressource}/{action}"
         }
       ]
+    },
+    {
+      "endpoint": "api/v2/applications/{id}",
+      "method": "GET",
+      "backend": [
+        {
+          "host": ["http://backend:3500"],
+          "url_pattern": "api/v2/applications/{id}",
+          "method": "GET"
+        }
+      ],
+      "output_encoding": "no-op"
     }
   ]
 }
