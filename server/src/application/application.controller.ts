@@ -84,12 +84,10 @@ export class ApplicationController {
 
       const csvContent = this.exportService.generateCsv(data, headers);
 
-      // Envoyer le fichier CSV dans la réponse
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', 'attachment; filename="applications.csv"');
       res.status(200).send(csvContent);
     } catch (error) {
-      Logger.error('Erreur lors de l\'exportation des applications', error);
       throw new BadRequestException('Erreur lors de l\'exportation.');
     }
   }

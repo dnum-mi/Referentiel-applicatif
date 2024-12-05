@@ -31,5 +31,5 @@ export class CreateExternalDto {
   @IsDateString()
   @IsNotEmpty()
   @IsOptional()
-  lastSourceUpdate: string;
+  lastSourceUpdate: string | null;
 }
