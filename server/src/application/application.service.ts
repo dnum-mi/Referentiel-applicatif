@@ -136,7 +136,7 @@ export class ApplicationService {
 
       return applications;
     } catch (error) {
-      throw new InternalServerErrorException('Erreur interne du serveur.');
+      throw error;
     }
   }
 
