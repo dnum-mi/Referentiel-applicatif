@@ -8,7 +8,7 @@ COPY . .
 
 # Install application dependencies
 RUN npm install -g pnpm
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 RUN npx prisma generate
 
 # Define the port on which the NestJS application is listening

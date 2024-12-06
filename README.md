@@ -22,36 +22,29 @@ Fournir un point de vérité pour répertorier, catégoriser et gérer les méta
 Liste des outils utilisés par le projet à installer :
 
 - [Docker](https://docs.docker.com/get-started/get-docker/)
-- [NodeJs](https://nodejs.org/en/download/package-manager)
 
-### Étapes d'Installation
+### How to run ?
 
-1. **Installer les dépendances**
-
-   ```bash
-   pnpm install
-   ```
-
-2. **Configurer les variables d'environnement**
-   ```bash
-   cp .env.example .env
-   # Modifier le fichier .env selon vos besoins
-   ```
-
-### Démarrage de l'API
-
-> L'API sera accessible a l'adresse [http://localhost:3500](http://localhost:3500/)
-
-> Le swagger de l'API sera accessible a l'adresse [http://localhost:3500/api/v2]()
+1. Run the stack
 
 ```bash
-  pnpm run docker:start
+docker compose up -d
 ```
 
-### Arret de l'API
+2. Run migrations (in the backend container)
 
 ```bash
-  pnpm run docker:stop
+npx prisma migrate deploy
 ```
+
+### How to stop ?
+
+```bash
+docker compose down
+```
+
+### More
+
+See [docker-compose.yml](docker-compose.yml) for services definitions.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
