@@ -156,14 +156,14 @@ export class ApplicationService {
     const applicationDto: GetApplicationDto = {
       id: application.id,
       label: application.label,
-      shortName: application.shortName,
-      logo: application.logo,
+      shortName: application.shortName || null,
+      logo: application.logo || null,
       description: application.description,
       url: application.url,
       uri: application.uri,
       purposes: application.purposes,
       tags: application.tags,
-      lifecycleId: application.lifecycleId,
+      lifecycleId: application.lifecycleId || null,
       parentId: application.parentId || null,
     };
 
@@ -190,8 +190,8 @@ export class ApplicationService {
     const application = await this.prisma.application.create({
       data: {
         label: createApplicationDto.label,
-        shortName: createApplicationDto.shortName,
-        logo: createApplicationDto.logo,
+        shortName: createApplicationDto.shortName || null,
+        logo: createApplicationDto.logo || null,
         description: createApplicationDto.description,
         url: createApplicationDto.url || this.BASE_URL_APPLICATION,
         uri: createApplicationDto.uri || this.BASE_URL_API,
@@ -203,7 +203,7 @@ export class ApplicationService {
           create: {
             status: createApplicationDto.lifecycle.status,
             firstProductionDate: new Date(
-              createApplicationDto.lifecycle.firstProductionDate,
+              createApplicationDto.lifecycle.firstProductionDate || null,
             ),
             plannedDecommissioningDate: createApplicationDto.lifecycle
               .plannedDecommissioningDate
@@ -331,10 +331,12 @@ export class ApplicationService {
           ? {
               update: {
                 status: applicationToUpdate.lifecycle.status,
-                firstProductionDate: applicationToUpdate.lifecycle
-                  .firstProductionDate
-                  ? new Date(applicationToUpdate.lifecycle.firstProductionDate)
-                  : undefined,
+                firstProductionDate:
+                  applicationToUpdate.lifecycle.firstProductionDate || null
+                    ? new Date(
+                        applicationToUpdate.lifecycle.firstProductionDate,
+                      )
+                    : undefined,
                 plannedDecommissioningDate: applicationToUpdate.lifecycle
                   .plannedDecommissioningDate
                   ? new Date(
