@@ -18,7 +18,7 @@ services:
   backend:
     build:
       context: ./server
-    command: pnpm run start:dev
+    command: pnpm start:dev
     environment:
       - DATABASE_URL=postgresql://postgres:password@postgres:5432/postgres
       - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:8080,http://krakend:8080
@@ -31,6 +31,7 @@ services:
       - "3500:3500"
     volumes:
       - ./server:/app
+      - /app/node_modules
 
   keycloak:
     build:
