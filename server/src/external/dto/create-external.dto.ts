@@ -25,7 +25,7 @@ export class CreateExternalDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  shortName: string;
+  shortName: string | null;
 
   @ApiProperty()
   @IsDateString()

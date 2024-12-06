@@ -8,7 +8,8 @@ export class GetApplicationDto {
   label: string;
 
   @IsString()
-  shortName: string;
+  @IsOptional()
+  shortName: string | null;
 
   @IsString()
   logo: string;

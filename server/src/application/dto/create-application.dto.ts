@@ -17,10 +17,12 @@ export class CreateActorDto {
     description: 'Role of the actor in the application',
   })
   @IsString()
+  @IsOptional()
   role: string;
 
   @ApiProperty({ example: 'user123', description: 'ID of the user' })
   @IsString()
+  @IsOptional()
   userId: string;
 
   @ApiProperty({
@@ -48,6 +50,7 @@ export class CreateComplianceDto {
     description: 'Type of compliance (e.g., regulation, policy)',
   })
   @IsEnum(ComplianceType)
+  @IsOptional()
   type: ComplianceType;
 
   @ApiProperty({ example: 'GDPR', description: 'Name of the compliance' })
@@ -59,6 +62,7 @@ export class CreateComplianceDto {
     enum: ComplianceStatus,
     description: 'Compliance status (e.g., compliant, non_compliant)',
   })
+  @IsOptional()
   @IsEnum(ComplianceStatus)
   status: ComplianceStatus;
 
@@ -114,6 +118,7 @@ export class CreateLifecycleDto {
     description: 'Status of the lifecycle (e.g., in_production)',
   })
   @IsEnum(LifecycleStatus)
+  @IsOptional()
   status: LifecycleStatus;
 
   @ApiProperty({
@@ -122,7 +127,7 @@ export class CreateLifecycleDto {
   })
   @IsDateString()
   @IsOptional()
-  firstProductionDate?: string | null;
+  firstProductionDate?: string;
 
   @ApiProperty({
     example: '2025-12-31',
@@ -167,7 +172,7 @@ export class CreateApplicationDto {
   })
   @IsOptional()
   @IsString()
-  shortName: string | null;
+  shortName: string;
 
   @ApiProperty({
     example: 'http://example.com/logo.png',
@@ -238,7 +243,7 @@ export class CreateApplicationDto {
   @ValidateNested()
   @Type(() => CreateLifecycleDto)
   lifecycle: CreateLifecycleDto = {
-    status: LifecycleStatus.IN_PRODUCTION, // Par défaut
+    status: LifecycleStatus.UNDER_CONSTRUCTION,
     firstProductionDate: new Date().toISOString(),
   };
 
@@ -249,7 +254,7 @@ export class CreateApplicationDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateActorDto)
-  actors: CreateActorDto[] = []; // Tableau vide par défaut
+  actors: CreateActorDto[] = [];
 
   @ApiProperty({ type: [CreateComplianceDto] })
   @IsArray()

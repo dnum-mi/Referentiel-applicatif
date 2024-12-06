@@ -1,8 +1,8 @@
 model Application {
   id                       String     @id @default(uuid())
   label                    String
-  shortName                String
-  logo                     String
+  shortName                String?
+  logo                     String?
   description              String
   url                      String
   uri                      String

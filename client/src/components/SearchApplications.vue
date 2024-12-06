@@ -43,10 +43,10 @@ onMounted(async () => {
 
     <div v-if="searchResults.length" class="card-container">
       <DsfrCard
+        class="fixed-card"
         v-for="(app, index) in searchResults"
         :key="index"
         :title="app.label || 'Applications'"
-        :description="app.description || 'N/A'"
         :img-src="app.logo || ''"
         :link="{ name: 'application', params: { id: app.id } }"
       />
@@ -65,18 +65,23 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.loading-message {
-  color: #007bff;
-}
-
-.error-message {
-  color: red;
-}
-
 .card-container {
   margin: 2em;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1rem;
+}
+
+.fixed-card {
+  height: 300px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.fixed-card .card-content {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

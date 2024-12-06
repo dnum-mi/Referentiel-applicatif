@@ -1,7 +1,7 @@
 model Lifecycle {
   id                       String     @id @default(uuid())
   status                      LifecycleStatus
-  firstProductionDate         DateTime
+  firstProductionDate         DateTime?
   plannedDecommissioningDate  DateTime?
   metadataId                  String            
   metadata                    Metadata          @relation("LifecycleMetadata", fields: [metadataId], references: [id])
@@ -15,4 +15,5 @@ enum LifecycleStatus {
   under_construction
   in_production
   decommissioned
+  retired_from_service
 }
