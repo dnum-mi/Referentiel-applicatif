@@ -4,8 +4,6 @@ model Application {
   shortName                String?
   logo                     String?
   description              String
-  url                      String
-  uri                      String
   purposes                 String[]
   tags                     String[]     
   lifecycleId              String              

@@ -213,24 +213,6 @@ export class CreateApplicationDto {
   tags?: string[];
 
   @ApiProperty({
-    example: 'http://example.com/app',
-    description: 'URI of the application',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  uri?: string;
-
-  @ApiProperty({
-    example: 'http://example.com/dashboard',
-    description: 'URL of the application',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  url?: string;
-
-  @ApiProperty({
     example: 'parentApp123',
     description: 'Parent application ID',
     required: false,
