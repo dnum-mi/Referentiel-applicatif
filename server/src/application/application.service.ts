@@ -4,30 +4,18 @@ import {
   BadRequestException,
   NotFoundException,
   Logger,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
 import { SearchApplicationDto } from './dto/search-application.dto';
 import { GetApplicationDto } from './dto/get-application.dto';
-import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ApplicationService {
   applications: any;
-  private readonly BASE_URL_APPLICATION: string;
-  private readonly BASE_URL_API: string;
-  constructor(
-    private prisma: PrismaService,
-    private configService: ConfigService,
-  ) {
-    this.BASE_URL_APPLICATION = this.configService.get<string>(
-      'BASE_URL_APPLICATION',
-    );
-    this.BASE_URL_API = this.configService.get<string>('BASE_URL_API');
-  }
+  constructor(private prisma: PrismaService) {}
 
   public async createApplication(
     ownerId: string,
@@ -52,8 +40,7 @@ export class ApplicationService {
       applicationMetadata.id,
       createApplicationDto,
     );
-    const updatedApplication = await this.updateApplicationUrls(application.id);
-    return updatedApplication;
+    return application;
   }
 
   public async updateApplication(
@@ -159,8 +146,6 @@ export class ApplicationService {
       shortName: application.shortName || null,
       logo: application.logo || null,
       description: application.description,
-      url: application.url,
-      uri: application.uri,
       purposes: application.purposes,
       tags: application.tags,
       lifecycleId: application.lifecycleId || null,
@@ -193,8 +178,6 @@ export class ApplicationService {
         shortName: createApplicationDto.shortName || null,
         logo: createApplicationDto.logo || null,
         description: createApplicationDto.description,
-        url: createApplicationDto.url || this.BASE_URL_APPLICATION,
-        uri: createApplicationDto.uri || this.BASE_URL_API,
         purposes: createApplicationDto.purposes,
         tags: createApplicationDto.tags,
         metadata: { connect: { id: applicationMetadataId } },
@@ -259,22 +242,6 @@ export class ApplicationService {
       },
     });
     return application;
-  }
-
-  private async updateApplicationUrls(applicationId: string) {
-    return await this.prisma.application.update({
-      where: { id: applicationId },
-      data: {
-        url: `${this.BASE_URL_APPLICATION}/${applicationId}`,
-        uri: `${this.BASE_URL_API}/${applicationId}`,
-      },
-      include: {
-        lifecycle: { include: { metadata: true } },
-        metadata: true,
-        actors: true,
-        compliances: true,
-      },
-    });
   }
 
   private async isApplicationExist(applicationId: string): Promise<boolean> {

@@ -17,12 +17,6 @@ export class GetApplicationDto {
   @IsString()
   description: string;
 
-  @IsString()
-  url: string;
-
-  @IsString()
-  uri: string;
-
   @IsArray()
   purposes: string[];
 
