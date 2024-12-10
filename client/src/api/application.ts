@@ -1,7 +1,6 @@
 import type { Application } from "@/models/Application";
 import requests from "./xhr-client";
 import axios from "axios";
-import { authentication } from "@/services/authentication";
 
 const Applications = {
   async getAllApplicationBySearch(label?: string): Promise<Application[]> {
@@ -14,16 +13,9 @@ const Applications = {
     }
   },
 
-  async getApplicationById(id: string) {
+  async getApplicationById(id: string): Promise<Application> {
     try {
-      const application = await axios.get(`/applications/${id}`, {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${authentication.token}`,
-        },
-      });
-
-      return application;
+      return await axios.get(`/applications/${id}`);
     } catch (error) {
       throw error;
     }

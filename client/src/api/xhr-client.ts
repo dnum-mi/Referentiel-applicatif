@@ -1,3 +1,4 @@
+import { authentication } from "@/services/authentication";
 import axios, { type AxiosResponse } from "axios";
 
 axios.defaults.baseURL = `${import.meta.env.VITE_RDA_API_URL ?? "VITE_RDA_API_URL"}`;
@@ -6,10 +7,21 @@ axios.defaults.headers.common.Accept = "application/json";
 axios.defaults.headers.common["Content-Type"] = "application/json";
 axios.defaults.timeout = 10000;
 
-// Fonction pour extraire le corps de la réponse
+axios.interceptors.request.use(
+  (config) => {
+    const token = authentication.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
 const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
-// Méthodes HTTP génériques
 export function get<T>(endpoint: string, params?: any): Promise<T> {
   return axios.get<T>(endpoint, params).then(responseBody);
 }
@@ -26,7 +38,6 @@ export function del<T>(endpoint: string, params?: any): Promise<T> {
   return axios.delete<T>(endpoint, { params }).then(responseBody);
 }
 
-// Exportation des méthodes
 const requests = {
   get,
   post,
