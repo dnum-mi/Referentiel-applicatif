@@ -17,7 +17,12 @@ import {
 import { ApplicationService } from './application.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiExcludeEndpoint,
+} from '@nestjs/swagger';
 import { SearchApplicationDto } from './dto/search-application.dto';
 import { GetApplicationDto } from './dto/get-application.dto';
 import { ExportService } from './export.service';
@@ -60,14 +65,21 @@ export class ApplicationController {
   }
 
   @Get('search')
-  async searchApplications(@Query() query: SearchApplicationDto) {
-    return await this.applicationService.searchApplications(query);
+  @ApiOperation({ summary: 'Rechercher des applications' })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Liste des applications correspondant aux critères de recherche.',
+  })
+  async searchApplications(@Query() searchParams: SearchApplicationDto) {
+    return await this.applicationService.searchApplications(searchParams);
   }
 
   @Get('export')
   @ApiOperation({ summary: 'Exporter les applications' })
   @ApiResponse({ status: 200, description: 'Export réalisé avec succès.' })
   @ApiResponse({ status: 400, description: "Erreur lors de l'exportation." })
+  @ApiExcludeEndpoint()
   async exportApplications(
     @Query() query: SearchApplicationDto,
     @Response() res,
