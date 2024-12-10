@@ -1,7 +1,7 @@
 import { authentication } from "@/services/authentication";
 import axios, { type AxiosResponse } from "axios";
 
-axios.defaults.baseURL = `${import.meta.env.VITE_RDA_API_URL ?? "VITE_RDA_API_URL"}`;
+axios.defaults.baseURL = `${import.meta.env.VITE_RDA_API_URL ?? "VITE_RDA_API_URL"}/api/v2`;
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common.Accept = "application/json";
 axios.defaults.headers.common["Content-Type"] = "application/json";
