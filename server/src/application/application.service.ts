@@ -89,7 +89,7 @@ export class ApplicationService {
   }
 
   public async searchApplications(searchParams: SearchApplicationDto) {
-    const { label } = searchParams;
+    const { label, page = 1, limit = 12 } = searchParams;
 
     const whereClause: Prisma.ApplicationWhereInput = {
       ...(label
@@ -109,11 +109,14 @@ export class ApplicationService {
         },
       };
 
+    const skip = (page - 1) * limit;
+
     try {
       const applications = await this.prisma.application.findMany({
         where: whereClause,
         orderBy: orderByClause,
-        take: 12,
+        take: limit,
+        skip: skip,
         include: {
           lifecycle: true,
           actors: true,
