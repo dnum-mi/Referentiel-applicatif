@@ -38,22 +38,22 @@ interface QuickLink {
 
 const unauthenticatedQuickLinks = ref([]);
 
-// authentication.createLoginUrl({ redirectUri: window.location.href }).then((loginUrlLink) => {
-unauthenticatedQuickLinks.value = [
-  //   {
-  //     label: "Se connecter",
-  //     to: loginUrlLink, // URL temporaire
-  //     icon: "ri-lock-line",
-  //     iconAttrs: { title: "Se connecter" },
-  //   },
+authentication.createLoginUrl({ redirectUri: window.location.href }).then((loginUrlLink) => {
+  unauthenticatedQuickLinks.value = [
+    {
+      label: "Se connecter",
+      to: loginUrlLink,
+      icon: "ri-lock-line",
+      iconAttrs: { title: "Se connecter" },
+    },
+  ];
+});
+
+const authenticatedQuickLinks: QuickLink[] = [
   {
     label: "Rechercher une application",
     to: { name: routeNames.SEARCHAPP },
   },
-];
-// });
-
-const authenticatedQuickLinks: QuickLink[] = [
   {
     label: "Déconnexion",
     to: authentication.createLogoutUrl(),
