@@ -46,14 +46,14 @@ authentication.createLoginUrl({ redirectUri: window.location.href }).then((login
       icon: "ri-lock-line",
       iconAttrs: { title: "Se connecter" },
     },
+    {
+      label: "Rechercher une application",
+      to: { name: routeNames.SEARCHAPP },
+    },
   ];
 });
 
 const authenticatedQuickLinks: QuickLink[] = [
-  {
-    label: "Rechercher une application",
-    to: { name: routeNames.SEARCHAPP },
-  },
   {
     label: "Déconnexion",
     to: authentication.createLogoutUrl(),
