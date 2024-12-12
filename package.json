@@ -1,4 +1,6 @@
 {
+  "name": "referentiel-applications",
+  "type": "module",
   "scripts": {
     "format": "prettier . --write",
     "format-check": "prettier . --check"

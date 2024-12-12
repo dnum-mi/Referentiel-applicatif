@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import axios from "axios";
+import { ref } from "vue";
 
 const searchLabel = ref(""); // Champ de recherche lié au composant
 

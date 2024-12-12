@@ -8,7 +8,9 @@ const props = defineProps<{ application: Application }>();
   <div>
     <h3>Objectifs</h3>
     <ul>
-      <li v-for="(purpose, index) in application.purposes" :key="index">{{ purpose }}</li>
+      <li v-for="(purpose, index) in application.purposes" :key="index">
+        {{ purpose }}
+      </li>
     </ul>
   </div>
 </template>

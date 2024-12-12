@@ -1,6 +1,6 @@
 import type { Application } from "@/models/Application";
-import requests from "./xhr-client";
 import axios from "axios";
+import requests from "./xhr-client";
 
 const Applications = {
   async getAllApplicationBySearch(label?: string): Promise<Application[]> {

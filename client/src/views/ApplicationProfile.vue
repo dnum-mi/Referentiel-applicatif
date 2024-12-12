@@ -7,7 +7,7 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 const id = route.params.id as string;
-let application = ref<Application | null>(null);
+const application = ref<Application | null>(null);
 const isLoading = ref(false);
 const errorMessage = ref("");
 

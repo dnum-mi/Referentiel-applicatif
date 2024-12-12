@@ -32,3 +32,62 @@ jobs:
         run: |
           npm ci
           npm run format-check
+
+  test-e2e:
+    name: Run unit tests and E2E tests
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+
+    env:
+      API_PORT: 3500
+      API_HOST: localhost
+      PUBLIC_URL: http://localhost:5173
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/postgres
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          check-latest: true
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install server dependencies
+        run: |
+          cd server
+          pnpm install
+
+      - name: Install client dependencies
+        run: |
+          cd client
+          pnpm install
+
+      - name: Start server for E2E tests
+        run: |
+          cd server
+          pnpm run start:dev &
+          sleep 10  # Attendre que le serveur démarre
+
+      - name: Start client for E2E tests
+        run: |
+          cd client
+          pnpm run dev &
+          sleep 10  # Attendre que le client démarre
+
+      - name: Install Cypress
+        run: |
+          cd client
+          pnpm install
+          npx cypress install
+
+      - name: Run Cypress E2E tests
+        run: |
+          cd client
+          pnpm run test:e2e-run --headless --browser chrome

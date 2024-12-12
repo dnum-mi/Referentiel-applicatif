@@ -43,9 +43,9 @@ onMounted(async () => {
 
     <div v-if="searchResults.length" class="card-container">
       <DsfrCard
-        class="fixed-card"
         v-for="(app, index) in searchResults"
         :key="index"
+        class="fixed-card"
         :title="app.label || 'Applications'"
         :img-src="app.logo || ''"
         :link="{ name: 'application', params: { id: app.id } }"

@@ -8,9 +8,6 @@
     "types": ["cypress", "node"],
     "noEmit": true
   },
-  "include": [
-    "./**/*.ts",
-     "vite.config.ts"
-  ],
+  "include": ["./**/*.ts", "vite.config.ts", "cypress/**/*.ts"],
   "exclude": []
 }
