@@ -31,8 +31,8 @@ async function bootstrap() {
         description: 'OAuth2 authentication using Keycloak',
         flows: {
           authorizationCode: {
-            authorizationUrl: `${process.env.KEYCLOAK_BASE_URL}/realms/referentiel-applications/protocol/openid-connect/auth`,
-            tokenUrl: `${process.env.KEYCLOAK_BASE_URL}/realms/referentiel-applications/protocol/openid-connect/token`,
+            authorizationUrl: `${process.env.KEYCLOAK_BASE_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/auth`,
+            tokenUrl: `${process.env.KEYCLOAK_BASE_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/token`,
             scopes: {
               openid: 'OpenID scope',
               profile: 'Profile scope',
