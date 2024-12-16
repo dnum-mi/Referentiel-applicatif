@@ -6,11 +6,13 @@ import {
   Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateApplicationDto } from './dto/create-application.dto';
-import { UpdateApplicationDto } from './dto/update-application.dto';
+import {
+  CreateApplicationDto,
+  PatchApplicationDto,
+} from './dto/create-application.dto';
 import { SearchApplicationDto } from './dto/search-application.dto';
 import { GetApplicationDto } from './dto/get-application.dto';
-import { Prisma } from '@prisma/client';
+import { Prisma, Application } from '@prisma/client';
 
 @Injectable()
 export class ApplicationService {
@@ -43,49 +45,15 @@ export class ApplicationService {
     return application;
   }
 
-  public async updateApplication(
-    applicationId: string,
-    applicationToUpdate: UpdateApplicationDto,
-  ) {
-    try {
-      const isAppplicationExist = await this.isApplicationExist(applicationId);
-      if (!isAppplicationExist) {
-        throw new NotFoundException('Application not found');
-      }
-
-      const hasApplicationMetadata = await this.hasApplicationMetadata(
-        applicationToUpdate?.metadataId,
-      );
-      if (!hasApplicationMetadata) {
-        throw new NotFoundException('Metadata not found');
-      }
-
-      const hasParent = await this.hasParent(applicationToUpdate?.parentId);
-      if (!hasParent) {
-        throw new NotFoundException('Parent application not found');
-      }
-
-      if (applicationToUpdate.parentId === applicationId) {
-        throw new BadRequestException(
-          'An application cannot be its own parent',
-        );
-      }
-
-      return await this.prisma.$transaction(async () => {
-        return await this.persistApplicationToUpdate(
-          applicationId,
-          applicationToUpdate,
-        );
-      });
-    } catch (error) {
-      if (
-        error instanceof NotFoundException ||
-        error instanceof BadRequestException
-      ) {
-        throw error;
-      }
-      throw new BadRequestException('Failed to update application');
-    }
+  async update(params: {
+    where: Prisma.ApplicationWhereUniqueInput;
+    data: PatchApplicationDto;
+  }): Promise<Application> {
+    const { where, data } = params;
+    return this.prisma.application.update({
+      data,
+      where,
+    });
   }
 
   public async searchApplications(searchParams: SearchApplicationDto) {
@@ -245,128 +213,5 @@ export class ApplicationService {
       },
     });
     return application;
-  }
-
-  private async isApplicationExist(applicationId: string): Promise<boolean> {
-    const application = await this.prisma.application.findUnique({
-      where: { id: applicationId },
-    });
-
-    return !!application;
-  }
-
-  private async hasApplicationMetadata(
-    applicationMetadataId: string,
-  ): Promise<boolean> {
-    const metadata = await this.prisma.metadata.findUnique({
-      where: { id: applicationMetadataId },
-    });
-    return !!metadata;
-  }
-
-  private async hasParent(applicationParentId: string): Promise<boolean> {
-    const parent = await this.prisma.application.findUnique({
-      where: { id: applicationParentId },
-    });
-    return !!parent;
-  }
-
-  //TODO : VERIFIER QUE ID EST DANS APPLICATION TO UPDATE
-  private async persistApplicationToUpdate(
-    applicationId: string,
-    applicationToUpdate: UpdateApplicationDto,
-  ) {
-    return await this.prisma.application.update({
-      where: { id: applicationId },
-      data: {
-        label: applicationToUpdate.label,
-        shortName: applicationToUpdate.shortName,
-        logo: applicationToUpdate.logo,
-        description: applicationToUpdate.description,
-        purposes: applicationToUpdate.purposes,
-        tags: applicationToUpdate.tags,
-        parent: applicationToUpdate.parentId
-          ? {
-              connect: { id: applicationToUpdate.parentId },
-            }
-          : {
-              disconnect: true,
-            },
-        metadata: applicationToUpdate.metadataId
-          ? {
-              connect: { id: applicationToUpdate.metadataId },
-            }
-          : undefined,
-        lifecycle: applicationToUpdate.lifecycle
-          ? {
-              update: {
-                status: applicationToUpdate.lifecycle.status,
-                firstProductionDate:
-                  applicationToUpdate.lifecycle.firstProductionDate || null
-                    ? new Date(
-                        applicationToUpdate.lifecycle.firstProductionDate,
-                      )
-                    : undefined,
-                plannedDecommissioningDate: applicationToUpdate.lifecycle
-                  .plannedDecommissioningDate
-                  ? new Date(
-                      applicationToUpdate.lifecycle.plannedDecommissioningDate,
-                    )
-                  : undefined,
-                metadata: applicationToUpdate.lifecycle.metadataId
-                  ? {
-                      connect: { id: applicationToUpdate.lifecycle.metadataId },
-                    }
-                  : undefined,
-              },
-            }
-          : undefined,
-        actors: applicationToUpdate.actors
-          ? {
-              deleteMany: {},
-              create: applicationToUpdate.actors.map((actor) => ({
-                role: actor.role,
-                user: {
-                  connect: { keycloakId: actor.userId },
-                },
-                organization: actor.organizationId
-                  ? { connect: { id: actor.organizationId } }
-                  : undefined,
-              })),
-            }
-          : undefined,
-        compliances: applicationToUpdate.compliances
-          ? {
-              deleteMany: {},
-              create: applicationToUpdate.compliances.map((compliance) => ({
-                type: compliance.type,
-                name: compliance.name,
-                status: compliance.status,
-                validityStart: compliance.validityStart
-                  ? new Date(compliance.validityStart)
-                  : undefined,
-                validityEnd: compliance.validityEnd
-                  ? new Date(compliance.validityEnd)
-                  : undefined,
-                scoreValue: compliance.scoreValue,
-                scoreUnit: compliance.scoreUnit,
-                notes: compliance.notes,
-              })),
-            }
-          : undefined,
-      },
-      include: {
-        lifecycle: {
-          include: {
-            metadata: true,
-          },
-        },
-        metadata: true,
-        parent: true,
-        children: true,
-        actors: true,
-        compliances: true,
-      },
-    });
   }
 }

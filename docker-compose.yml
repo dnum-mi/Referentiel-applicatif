@@ -24,8 +24,6 @@ services:
       - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:8080,http://krakend:8080
       - KEYCLOAK_BASE_URL=http://localhost:8082
       - KEYCLOAK_REALM=referentiel-applications
-      # To be deleted
-      - KEYCLOAK_CLIENT_SECRET="client secret"
     depends_on:
       - postgres
     ports:
@@ -33,6 +31,19 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
+
+  prisma-studio:
+    build:
+      context: ./server
+    command: npx prisma studio
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/postgres
+      - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:8080,http://krakend:8080
+      - KEYCLOAK_BASE_URL=http://localhost:8082
+    depends_on:
+      - postgres
+    ports:
+      - "5555:5555"
 
   keycloak:
     build:
