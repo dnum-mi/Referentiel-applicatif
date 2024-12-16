@@ -3,15 +3,24 @@
   "name": "krakend",
   "extra_config": {
     "security/cors": {
-      "allow_origins": ["http://localhost:5173"],
-      "allow_methods": ["GET", "HEAD", "POST", "OPTIONS"],
+      "allow_origins": ["http://localhost:5173", "http://localhost:8080"],
+      "allow_methods": [
+        "GET",
+        "HEAD",
+        "POST",
+        "OPTIONS",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
       "expose_headers": ["Content-Length", "Content-Type"],
       "allow_headers": [
         "Accept-Language",
         "X-User-Id",
         "X-User-Email",
         "Authorization",
-        "Content-Type"
+        "Content-Type",
+        "Origin"
       ],
       "max_age": "12h",
       "allow_credentials": true,
@@ -49,17 +58,6 @@
       ]
     },
     {
-      "endpoint": "api/v2/{ressource}",
-      "output_encoding": "no-op",
-      "backend": [
-        {
-          "encoding": "no-op",
-          "host": ["http://backend:3500"],
-          "url_pattern": "api/v2/{ressource}"
-        }
-      ]
-    },
-    {
       "endpoint": "api/v2/applications",
       "method": "POST",
       "backend": [
@@ -69,7 +67,37 @@
           "method": "POST"
         }
       ],
-      "output_encoding": "no-op"
+      "output_encoding": "no-op",
+      "input_headers": [
+        "Authorization",
+        "X-User",
+        "X-Role",
+        "ClientId",
+        "X-Requested-With",
+        "Content-Type",
+        "Content-Length"
+      ]
+    },
+    {
+      "endpoint": "api/v2/applications/{id}",
+      "method": "PATCH",
+      "backend": [
+        {
+          "host": ["http://backend:3500"],
+          "url_pattern": "api/v2/applications",
+          "method": "PATCH"
+        }
+      ],
+      "output_encoding": "no-op",
+      "input_headers": [
+        "Authorization",
+        "X-User",
+        "X-Role",
+        "ClientId",
+        "X-Requested-With",
+        "Content-Type",
+        "Content-Length"
+      ]
     },
     {
       "endpoint": "api/v2/applications/search",

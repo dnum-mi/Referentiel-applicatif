@@ -1,4 +1,5 @@
 import { CreateExternalDto } from './../../external/dto/create-external.dto';
+import { PartialType, PickType } from '@nestjs/mapped-types';
 import {
   IsString,
   IsOptional,
@@ -254,3 +255,8 @@ export class CreateApplicationDto {
   @Type(() => CreateExternalDto)
   externals: CreateExternalDto[] = [];
 }
+
+export class PatchApplicationDto extends PickType(
+  PartialType(CreateApplicationDto),
+  ['label', 'shortName', 'description'] as const,
+) {}

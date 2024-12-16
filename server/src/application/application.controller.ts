@@ -15,8 +15,10 @@ import {
   Response,
 } from '@nestjs/common';
 import { ApplicationService } from './application.service';
-import { CreateApplicationDto } from './dto/create-application.dto';
-import { UpdateApplicationDto } from './dto/update-application.dto';
+import {
+  CreateApplicationDto,
+  PatchApplicationDto,
+} from './dto/create-application.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -57,11 +59,7 @@ export class ApplicationController {
       createApplicationDto,
     );
 
-    return {
-      status: 201,
-      message: 'Application créée avec succès',
-      data: newApplication,
-    };
+    return newApplication;
   }
 
   @Get('search')
@@ -124,20 +122,13 @@ export class ApplicationController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Mettre à jour une application existante' })
-  @ApiResponse({
-    status: 200,
-    description: 'Application mise à jour avec succès.',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Application, metadata ou parent non trouvé.',
-  })
   async update(
     @Param('id') id: string,
-    @Body() applicationToUpdate: UpdateApplicationDto,
-    @Request() req,
-  ) {
-    return this.applicationService.updateApplication(id, applicationToUpdate);
+    @Body() applicationToUpdate: PatchApplicationDto,
+  ): Promise<PatchApplicationDto> {
+    return this.applicationService.update({
+      where: { id: id },
+      data: applicationToUpdate,
+    });
   }
 }

@@ -17,7 +17,7 @@ async function doSearch() {
       isLoading.value = true;
       errorMessage.value = "";
       const results = await Applications.getAllApplicationBySearch(searchTerm.value || "");
-      searchResults.value = results?.collection || [];
+      searchResults.value = results || [];
     } catch (error) {
       errorMessage.value = "Une erreur est survenue lors du chargement des applications.";
     } finally {
