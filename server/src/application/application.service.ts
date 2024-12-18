@@ -126,6 +126,10 @@ export class ApplicationService {
     return applicationDto;
   }
 
+  public async getApplications() {
+    return await this.prisma.application.findMany();
+  }
+
   private async createApplicationMetadata(ownerId: string) {
     const applicationMetadata = await this.prisma.metadata.create({
       data: {

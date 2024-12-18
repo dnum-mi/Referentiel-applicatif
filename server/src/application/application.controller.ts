@@ -109,9 +109,7 @@ export class ApplicationController {
   }
 
   @Get(':id')
-  async getApplicationById(
-    @Param('id') id: string,
-  ): Promise<GetApplicationDto> {
+  async findOne(@Param('id') id: string): Promise<GetApplicationDto> {
     try {
       const application = await this.applicationService.getApplicationById(id);
       Logger.log(application);
@@ -119,6 +117,13 @@ export class ApplicationController {
     } catch (error) {
       throw new NotFoundException(error);
     }
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Récupérer les applications' })
+  @ApiResponse({ status: 200, description: 'Liste des applications' })
+  async findAll() {
+    return await this.applicationService.getApplications();
   }
 
   @Patch(':id')
