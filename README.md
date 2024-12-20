@@ -1,5 +1,7 @@
 # Référentiel des applications
 
+## Introduction
+
 L'application "Référentiel des applications" est de cataloguer et gérer les informations sur les applications utilisées au sein du ministère de l'intérieur
 
 ### Objectif
