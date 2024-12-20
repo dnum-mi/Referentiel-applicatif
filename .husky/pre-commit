@@ -2,7 +2,7 @@ echo "Running pre-commit checks..."
 
 echo "Validating commit message..."
 
-# pnpm commitlint --edit $1
+pnpm commitlint --edit $1
 
 pnpm run format-check
 
