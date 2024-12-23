@@ -1,6 +1,4 @@
-# vue-dsfr-project
-
-Ce gabarit possède tous les outils configurés pour développer un projets Vue 3 et VueDsfr avec Vite.
+# Client
 
 ## Configuration recommandée
 
@@ -26,35 +24,35 @@ Si le plugin TypeScript ne vous semble pas assez performant, Volar a aussi impl�
 ## Installer les dépendances
 
 ```sh
-npm install
+pnpm install
 ```
 
 ### Compilation et Hot-Reload pour le développement
 
 ```sh
-npm run dev
+pnpm run dev
 ```
 
 ### Vérification des types, Compilation et Minification pour la Production
 
 ```sh
-npm run build
+pnpm run build
 ```
 
 ## Voir l'application avec le code de production
 
 ```sh
-npm run preview
+pnpm run preview
 ```
 
 ## Déployer le code de production
 
 Déployer le contenu du dossier `dist` après avoir généré le code de production.
 
-### Vérifier la syntaxe et le formattage avec [ESLint](https://eslint.org/)
+### Vérifier la syntaxe et le formattage avec Prettier
 
 ```sh
-npm run lint
+npm run format
 ```
 
 ### Lancer les Tests Unitaires avec [Vitest](https://vitest.dev/)
