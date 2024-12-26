@@ -7,3 +7,9 @@ body,
 .h-full {
   height: 100%;
 }
+
+.button-right {
+  margin: 1em;
+  display: flex;
+  justify-content: flex-end;
+}

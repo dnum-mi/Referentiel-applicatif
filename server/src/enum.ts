@@ -36,3 +36,9 @@ export enum ExternalSourceValueType {
   IDENTIFIER = 'identifier',
   NAME = 'name',
 }
+
+export enum AnomalyNotificationStatus {
+  PENDING = 'in_pending',
+  INPROGRESS = 'in_progress',
+  DONE = 'done',
+}
