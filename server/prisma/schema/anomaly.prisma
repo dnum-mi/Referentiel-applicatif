@@ -1,0 +1,33 @@
+model AnomalyNotification {
+  id            String                    @id @default(uuid())
+  applicationId String
+  notifierId    String
+  notifier      User                      @relation("UserAnomalyNotification", fields: [notifierId], references: [keycloakId])
+  description   String
+  status        AnomalyNotificationStatus @default(in_pending)
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+
+  history     AnomalyNotificationHistory[]
+  application Application?                 @relation("ApplicationAnomalyNotification", fields: [applicationId], references: [id])
+
+  @@map("anomalyNotification")
+}
+
+model AnomalyNotificationHistory {
+  id                  String                    @id @default(uuid())
+  issueNotificationId String
+  action              String
+  status              AnomalyNotificationStatus
+  date                DateTime                  @default(now())
+
+  issueNotification AnomalyNotification @relation(fields: [issueNotificationId], references: [id])
+
+  @@map("anomalyNotificationHystory")
+}
+
+enum AnomalyNotificationStatus {
+  in_pending
+  in_progress
+  done
+}

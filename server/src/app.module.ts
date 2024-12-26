@@ -13,18 +13,33 @@ import { ExternalSourceModule } from './external-source/external-source.module';
 import { ConfigModule } from '@nestjs/config';
 import { ExternalModule } from './external/external.module';
 import { ExportService } from './application/export.service';
+import { AnomalyNotificationModule } from './anomaly-notification/anomaly-notification.module';
+import { AnomalyNotificationController } from './anomaly-notification/anomaly-notification.controller';
+import { AnomalyNotificationService } from './anomaly-notification/anomaly-notification.service';
 @Module({
   imports: [
     PrismaModule,
     UserModule,
     ApplicationModule,
     ExternalSourceModule,
+    ExternalModule,
+    AnomalyNotificationModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    ExternalModule,
   ],
-  controllers: [AppController, ApplicationController, UserController],
-  providers: [AppService, ApplicationService, ExportService, UserService],
+  controllers: [
+    AppController,
+    ApplicationController,
+    AnomalyNotificationController,
+    UserController,
+  ],
+  providers: [
+    AppService,
+    ApplicationService,
+    AnomalyNotificationService,
+    ExportService,
+    UserService,
+  ],
 })
 export class AppModule {}

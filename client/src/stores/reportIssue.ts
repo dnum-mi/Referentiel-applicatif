@@ -1,0 +1,46 @@
+// src/stores/reportIssueStore.ts
+
+import { defineStore } from "pinia";
+import reportIssue from "@/api/reportIssue";
+import type { ReportIssue } from "@/models/ReportIssue";
+
+export const useReportIssueStore = defineStore("ReportIssueStore", {
+  state: () => ({
+    report: [] as ReportIssue[],
+  }),
+
+  actions: {
+    async proposeCorrection(applicationId: string, correctionText: string) {
+      try {
+        const notifierId = "f15d1c13-8198-4ca5-a180-94656e20d568";
+
+        const payload: ReportIssue = {
+          applicationId,
+          notifierId,
+          description: correctionText,
+          status: "in_pending",
+        };
+
+        const response = await reportIssue.createReportIssue(payload);
+        console.log(response);
+
+        this.report = [...this.report, response.data];
+
+        return response;
+      } catch (error) {
+        console.error("Erreur proposeCorrection :", error);
+        throw error;
+      }
+    },
+
+    // Option supplémentaire: Fonction pour re-fetcher les anomalies
+    async fetchAnomalies() {
+      try {
+        const response = await reportIssue.getAnomalies(); // Assurez-vous d'implémenter cette méthode
+        this.anomalies = response.data;
+      } catch (error) {
+        console.error("Erreur lors du fetch des anomalies :", error);
+      }
+    },
+  },
+});
