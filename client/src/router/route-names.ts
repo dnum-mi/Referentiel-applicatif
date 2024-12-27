@@ -5,4 +5,5 @@ export const routeNames = {
   CREATEAPP: "create",
   PROFILEAPP: "application",
   SEARCHAPP: "recherche-application",
+  ISSUELIST: "issue-list",
 } as const;

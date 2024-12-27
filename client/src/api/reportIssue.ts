@@ -10,6 +10,15 @@ const reportIssue = {
       throw error;
     }
   },
+  async getReportIssue() {
+    console.log("test");
+    try {
+      const response = await requests.get<ReportIssue[]>("/anomaly-notifications");
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export default reportIssue;

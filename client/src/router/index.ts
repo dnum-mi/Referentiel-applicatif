@@ -13,6 +13,11 @@ const routes = [
     component: () => import("@/views/AppHome.vue"),
   },
   {
+    name: routeNames.ISSUELIST,
+    path: "/issue-list",
+    component: () => import("@/views/IssuePage.vue"),
+  },
+  {
     name: routeNames.CREATEAPP,
     path: "/create-application",
     component: () => import("@/views/CreateApplication.vue"),
