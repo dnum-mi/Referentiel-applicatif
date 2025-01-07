@@ -43,6 +43,33 @@ npx prisma migrate deploy
 docker compose down
 ```
 
+### Conventional commit
+
+Nous suivons les Conventional Commits pour garantir la cohérence et faciliter le versionnement. Voici quelques exemples :
+•feat(auth): add login functionality
+• fix(ui): correct button alignment
+• docs(readme): update installation instructions
+
+Les commits sont validés automatiquement à l’aide de Husky et Commitlint.
+
+### Contribution
+
+Workflow de Contribution
+
+1.  Créez une branche depuis main :
+
+```bash
+git switch -c feature/your-feature-name
+```
+
+2. Assurez-vous que le code respecte les normes :
+
+• Formatage :
+
+```bash
+pnpm run format
+```
+
 ### More
 
 See [docker-compose.yml](docker-compose.yml) for services definitions.

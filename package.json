@@ -1,9 +1,14 @@
 {
   "scripts": {
     "format": "prettier . --write",
-    "format-check": "prettier . --check"
+    "format-check": "prettier . --check",
+    "prepare": "husky && husky install",
+    "commitlint": "commitlint --edit"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "husky": "^8.0.0",
     "prettier": "3.3.3"
   }
 }
