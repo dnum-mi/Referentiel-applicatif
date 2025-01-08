@@ -19,7 +19,7 @@ const reportIssue = {
       throw error;
     }
   },
-  async getReportIssueBySearch(notifierId?: string): Promise<ReportIssue[]> {
+  async getReportIssueByNotifierId(notifierId?: string): Promise<ReportIssue[]> {
     try {
       return await requests.get<ReportIssue[]>("/anomaly-notifications/search", {
         params: notifierId ? { notifierId } : undefined,
