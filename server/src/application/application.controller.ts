@@ -55,7 +55,7 @@ export class ApplicationController {
     );
 
     const newApplication = await this.applicationService.createApplication(
-      userFromDb.keycloakId,
+      userFromDb.id,
       createApplicationDto,
     );
 
