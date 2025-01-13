@@ -9,6 +9,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateApplicationDto,
   PatchApplicationDto,
+  UpdateActorDto,
+  UpdateComplianceDto,
 } from './dto/create-application.dto';
 import { SearchApplicationDto } from './dto/search-application.dto';
 import { GetApplicationDto } from './dto/get-application.dto';
@@ -45,15 +47,44 @@ export class ApplicationService {
     return application;
   }
 
-  async update(params: {
+  public async update(params: {
     where: Prisma.ApplicationWhereUniqueInput;
     data: PatchApplicationDto;
   }): Promise<Application> {
     const { where, data } = params;
-    return this.prisma.application.update({
-      data,
-      where,
-    });
+
+    const applicationUpdates: Prisma.ApplicationUpdateInput = {};
+
+    this.applyScalarAndSimpleRelationUpdates(data, applicationUpdates);
+
+    if (data.compliances !== undefined) {
+      await this.applyComplianceUpdates(
+        where.id,
+        data.compliances,
+        applicationUpdates,
+      );
+    }
+
+    if (data.actors !== undefined) {
+      await this.applyActorUpdates(where.id, data.actors, applicationUpdates);
+    }
+
+    try {
+      return await this.prisma.application.update({
+        where,
+        data: applicationUpdates,
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(
+          `Application non trouvée pour l'ID: ${where.id}`,
+        );
+      }
+      throw error;
+    }
   }
 
   public async searchApplications(searchParams: SearchApplicationDto) {
@@ -98,32 +129,61 @@ export class ApplicationService {
     }
   }
 
-  public async getApplicationById(id: string): Promise<GetApplicationDto> {
+  // public async getApplicationById(id: string): Promise<GetApplicationDto> {
+  //   const application = await this.prisma.application.findUnique({
+  //     where: { id },
+  //     include: {
+  //       lifecycle: true,
+  //       actors: true,
+  //       compliances: true,
+  //     },
+  //   });
+
+  //   if (!application) {
+  //     throw new Error('Application not found');
+  //   }
+
+  //   const applicationDto: GetApplicationDto = {
+  //     id: application.id,
+  //     label: application.label,
+  //     shortName: application.shortName || null,
+  //     logo: application.logo || null,
+  //     description: application.description,
+  //     purposes: application.purposes,
+  //     tags: application.tags,
+  //     lifecycleId: application.lifecycleId || null,
+  //     parentId: application.parentId || null,
+  //   };
+
+  //   return applicationDto;
+  // }
+
+  public async getApplicationById(id: string) {
     const application = await this.prisma.application.findUnique({
       where: { id },
       include: {
-        lifecycle: true,
-        actors: true,
+        lifecycle: {
+          include: { metadata: true },
+        },
+        actors: {
+          include: {
+            user: true,
+            externalOrganization: true,
+          },
+        },
+        compliances: true,
+        externals: {
+          include: { externalSource: true },
+        },
+        parent: true,
       },
     });
 
     if (!application) {
-      throw new Error('Application not found');
+      throw new NotFoundException('Application not found');
     }
 
-    const applicationDto: GetApplicationDto = {
-      id: application.id,
-      label: application.label,
-      shortName: application.shortName || null,
-      logo: application.logo || null,
-      description: application.description,
-      purposes: application.purposes,
-      tags: application.tags,
-      lifecycleId: application.lifecycleId || null,
-      parentId: application.parentId || null,
-    };
-
-    return applicationDto;
+    return application;
   }
 
   public async getApplications() {
@@ -217,5 +277,229 @@ export class ApplicationService {
       },
     });
     return application;
+  }
+
+  private applyScalarAndSimpleRelationUpdates(
+    data: PatchApplicationDto,
+    applicationUpdates: Prisma.ApplicationUpdateInput,
+  ): void {
+    if (data.label !== undefined) {
+      applicationUpdates.label = data.label;
+    }
+    if (data.shortName !== undefined) {
+      applicationUpdates.shortName = data.shortName;
+    }
+    if (data.description !== undefined) {
+      applicationUpdates.description = data.description;
+    }
+    if (data.purposes !== undefined) {
+      applicationUpdates.purposes = { set: data.purposes };
+    }
+    if (data.tags !== undefined) {
+      applicationUpdates.tags = { set: data.tags };
+    }
+    if (data.parentId !== undefined) {
+      applicationUpdates.parent = data.parentId
+        ? { connect: { id: data.parentId } }
+        : { disconnect: true };
+    }
+    if (data.lifecycle !== undefined) {
+      applicationUpdates.lifecycle = {
+        update: {
+          ...(data.lifecycle.status !== undefined && {
+            status: data.lifecycle.status,
+          }),
+          ...(data.lifecycle.firstProductionDate !== undefined && {
+            firstProductionDate: data.lifecycle.firstProductionDate,
+          }),
+          ...(data.lifecycle.plannedDecommissioningDate !== undefined && {
+            plannedDecommissioningDate:
+              data.lifecycle.plannedDecommissioningDate,
+          }),
+        },
+      };
+    }
+  }
+
+  private async applyComplianceUpdates(
+    applicationId: string,
+    incomingComplianceDtos: UpdateComplianceDto[],
+    applicationUpdates: Prisma.ApplicationUpdateInput,
+  ): Promise<void> {
+    const existingComplianceRecords = await this.prisma.compliance.findMany({
+      where: { applicationId },
+      select: { id: true },
+    });
+
+    const existingComplianceIds = existingComplianceRecords.map((c) => c.id);
+    const incomingComplianceIds = this.getIncomingComplianceIds(
+      incomingComplianceDtos,
+    );
+
+    const complianceIdsToDelete = this.findComplianceIdsToDelete(
+      existingComplianceIds,
+      incomingComplianceIds,
+    );
+    const compliancesToCreate = this.findCompliancesToCreate(
+      incomingComplianceDtos,
+    );
+    const compliancesToUpdate = this.findCompliancesToUpdate(
+      incomingComplianceDtos,
+      existingComplianceIds,
+    );
+
+    applicationUpdates.compliances = {
+      delete: complianceIdsToDelete.map((id) => ({ id })),
+      update: this.buildComplianceUpdateList(compliancesToUpdate),
+      create: this.buildComplianceCreateList(compliancesToCreate),
+    };
+  }
+
+  private getIncomingComplianceIds(dtos: UpdateComplianceDto[]): string[] {
+    return dtos.filter((dto) => dto.id).map((dto) => dto.id as string);
+  }
+
+  private findComplianceIdsToDelete(
+    existingIds: string[],
+    incomingIds: string[],
+  ): string[] {
+    return existingIds.filter((id) => !incomingIds.includes(id));
+  }
+
+  private findCompliancesToCreate(
+    dtos: UpdateComplianceDto[],
+  ): UpdateComplianceDto[] {
+    return dtos.filter((dto) => !dto.id);
+  }
+
+  private findCompliancesToUpdate(
+    dtos: UpdateComplianceDto[],
+    existingIds: string[],
+  ): UpdateComplianceDto[] {
+    return dtos.filter((dto) => dto.id && existingIds.includes(dto.id));
+  }
+
+  private buildComplianceUpdateList(
+    dtos: UpdateComplianceDto[],
+  ): Prisma.ComplianceUpdateWithWhereUniqueWithoutApplicationInput[] {
+    return dtos.map((dto) => ({
+      where: { id: dto.id },
+      data: {
+        ...(dto.type !== undefined && { type: dto.type }),
+        ...(dto.name !== undefined && { name: dto.name }),
+        ...(dto.status !== undefined && { status: dto.status }),
+        ...(dto.validityStart !== undefined && {
+          validityStart: dto.validityStart ? new Date(dto.validityStart) : null,
+        }),
+        ...(dto.validityEnd !== undefined && {
+          validityEnd: dto.validityEnd ? new Date(dto.validityEnd) : null,
+        }),
+        ...(dto.scoreValue !== undefined && { scoreValue: dto.scoreValue }),
+        ...(dto.scoreUnit !== undefined && { scoreUnit: dto.scoreUnit }),
+        ...(dto.notes !== undefined && { notes: dto.notes }),
+      },
+    }));
+  }
+
+  private buildComplianceCreateList(
+    dtos: UpdateComplianceDto[],
+  ): Prisma.ComplianceCreateWithoutApplicationInput[] {
+    return dtos.map((dto) => ({
+      type: dto.type,
+      name: dto.name,
+      status: dto.status,
+      validityStart: dto.validityStart ? new Date(dto.validityStart) : null,
+      validityEnd: dto.validityEnd ? new Date(dto.validityEnd) : null,
+      scoreValue: dto.scoreValue,
+      scoreUnit: dto.scoreUnit,
+      notes: dto.notes,
+    }));
+  }
+
+  private async applyActorUpdates(
+    applicationId: string,
+    incomingActorDtos: UpdateActorDto[],
+    applicationUpdates: Prisma.ApplicationUpdateInput,
+  ): Promise<void> {
+    const existingActors = await this.prisma.actor.findMany({
+      where: { applicationId },
+      select: { id: true },
+    });
+
+    const existingActorIds = existingActors.map((a) => a.id);
+    const incomingActorIds = incomingActorDtos
+      .filter((a) => a.id)
+      .map((a) => a.id as string);
+
+    const actorsToCreate = this.findActorsToCreate(incomingActorDtos);
+    const actorsToUpdate = this.findActorsToUpdate(
+      incomingActorDtos,
+      existingActorIds,
+    );
+    const actorIdsToDelete = this.findActorIdsToDelete(
+      existingActorIds,
+      incomingActorIds,
+    );
+
+    applicationUpdates.actors = {
+      delete: actorIdsToDelete.map((id) => ({ id })),
+      update: this.buildActorUpdateList(actorsToUpdate),
+      create: this.buildActorCreateList(actorsToCreate, applicationId),
+    };
+  }
+
+  private findActorsToCreate(dtos: UpdateActorDto[]): UpdateActorDto[] {
+    return dtos.filter((dto) => !dto.id);
+  }
+
+  private findActorsToUpdate(
+    dtos: UpdateActorDto[],
+    existingIds: string[],
+  ): UpdateActorDto[] {
+    return dtos.filter((dto) => dto.id && existingIds.includes(dto.id));
+  }
+
+  private findActorIdsToDelete(
+    existingIds: string[],
+    incomingIds: string[],
+  ): string[] {
+    return existingIds.filter((id) => !incomingIds.includes(id));
+  }
+
+  private buildActorUpdateList(
+    dtos: UpdateActorDto[],
+  ): Prisma.ActorUpdateWithWhereUniqueWithoutApplicationInput[] {
+    return dtos.map((dto) => ({
+      where: { id: dto.id },
+      data: {
+        ...(dto.role !== undefined && { role: dto.role }),
+        ...(dto.user && {
+          user: {
+            update: {
+              ...(dto.user.email !== undefined && { email: dto.user.email }),
+            },
+          },
+        }),
+      },
+    }));
+  }
+
+  private buildActorCreateList(
+    dtos: UpdateActorDto[],
+    applicationId: string,
+  ): Prisma.ActorCreateWithoutApplicationInput[] {
+    return dtos.map((dto) => {
+      if (!dto.user || !dto.user.keycloakId) {
+        throw new Error('Missing user.keycloakId for a new Actor');
+      }
+
+      return {
+        role: dto.role,
+        application: { connect: { id: applicationId } },
+        user: {
+          connect: { keycloakId: dto.user.keycloakId },
+        },
+      };
+    });
   }
 }

@@ -2,8 +2,7 @@
 import type { Application } from "@/models/Application";
 import { ref } from "vue";
 import InformationsGenerales from "./InformationsGenerales.vue";
-import Objectifs from "./Objectifs.vue";
-import Tags from "./Tags.vue";
+import Acteurs from "./Acteurs.vue";
 
 const props = defineProps<{ application: Application }>();
 
@@ -12,8 +11,18 @@ const activeTab = ref(0);
 const tabListName = "Informations sur l’application";
 const tabTitles = [
   { title: "Informations générales", icon: "ri-checkbox-circle-line", tabId: "tab-0", panelId: "tab-content-0" },
-  { title: "Objectifs", icon: "ri-checkbox-circle-line", tabId: "tab-1", panelId: "tab-content-2" },
-  { title: "Tags", icon: "ri-checkbox-circle-line", tabId: "tab-2", panelId: "tab-content-3" },
+  {
+    title: "Conformité",
+    icon: "ri-shield-check-line",
+    tabId: "tab-1",
+    panelId: "tab-content-1",
+  },
+  {
+    title: "Acteurs",
+    icon: "ri-team-line",
+    tabId: "tab-2",
+    panelId: "tab-content-2",
+  },
 ];
 </script>
 
@@ -40,11 +49,11 @@ const tabTitles = [
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 1" panel-id="tab-content-1" tab-id="tab-1">
-      <Objectifs :application="props.application" />
+      <Compliances :application="props.application" />
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 2" panel-id="tab-content-2" tab-id="tab-2">
-      <Tags :application="props.application" />
+      <Acteurs :application="props.application" />
     </DsfrTabContent>
   </DsfrTabs>
 </template>
