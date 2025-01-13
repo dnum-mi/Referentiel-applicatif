@@ -62,8 +62,6 @@ async function patchApplication() {
           <DsfrSelect v-model="compliance.status" label="Statut" :options="complianceStatuses" />
           <!-- Autres champs -->
           <DsfrInput v-model="compliance.notes" label="Notes" label-visible isTextarea />
-          <DsfrInput v-model="compliance.validityStart" label="Date de début (ISO 8601)" label-visible />
-          <DsfrInput v-model="compliance.validityEnd" label="Date de fin (ISO 8601)" label-visible />
           <DsfrInput v-model="compliance.scoreValue" label="Score" label-visible />
           <DsfrInput v-model="compliance.scoreUnit" label="Unité de score" label-visible />
         </div>

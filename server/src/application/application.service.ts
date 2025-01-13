@@ -129,35 +129,6 @@ export class ApplicationService {
     }
   }
 
-  // public async getApplicationById(id: string): Promise<GetApplicationDto> {
-  //   const application = await this.prisma.application.findUnique({
-  //     where: { id },
-  //     include: {
-  //       lifecycle: true,
-  //       actors: true,
-  //       compliances: true,
-  //     },
-  //   });
-
-  //   if (!application) {
-  //     throw new Error('Application not found');
-  //   }
-
-  //   const applicationDto: GetApplicationDto = {
-  //     id: application.id,
-  //     label: application.label,
-  //     shortName: application.shortName || null,
-  //     logo: application.logo || null,
-  //     description: application.description,
-  //     purposes: application.purposes,
-  //     tags: application.tags,
-  //     lifecycleId: application.lifecycleId || null,
-  //     parentId: application.parentId || null,
-  //   };
-
-  //   return applicationDto;
-  // }
-
   public async getApplicationById(id: string) {
     const application = await this.prisma.application.findUnique({
       where: { id },

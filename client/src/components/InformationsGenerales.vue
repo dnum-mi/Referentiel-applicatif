@@ -12,6 +12,14 @@ const toaster = useToaster();
 const isAddingTag = ref(false);
 const newTag = ref("");
 
+const lifecycleStatusesDict = {
+  under_construction: " en construction",
+  in_production: "en production",
+  decommissioned: "décomissioné",
+};
+
+const lifecycleStatuses = computed(() => Object.entries(lifecycleStatusesDict).map(([value, text]) => ({ value, text })));
+
 function startAddingTag() {
   isAddingTag.value = true;
   newTag.value = "";
@@ -59,7 +67,7 @@ async function patchApplication() {
         <DsfrInput v-model="application.shortName" label="Nom abrégé" label-visible required />
       </div>
       <div class="input-group">
-        <DsfrInput v-model="application.description" label="Description" label-visible required isTextarea />
+        <DsfrInput v-model="application.description" label="Description" label-visible required isTextarea :rows="10" />
       </div>
 
       <div v-if="application.parent || application.lifecycle" class="sub-section">
@@ -78,13 +86,7 @@ async function patchApplication() {
           <h3 class="sub-section-title">Cycle de vie</h3>
           <div class="lifecycle-info">
             <div class="input-group">
-              <DsfrInput v-model="application.lifecycle.status" label="Statut" label-visible />
-            </div>
-            <div class="input-group">
-              <DsfrInput v-model="application.lifecycle.firstProductionDate" label="Première mise en production" label-visible />
-            </div>
-            <div class="input-group">
-              <DsfrInput v-model="application.lifecycle.plannedDecommissioningDate" label="Date de fin prévue" label-visible />
+              <DsfrSelect v-model="application.lifecycle.status" label="Statut" :options="lifecycleStatuses" />
             </div>
           </div>
         </div>
