@@ -10,4 +10,4 @@ import { UserModule } from 'src/user/user.module';
   providers: [AnomalyNotificationService],
   exports: [AnomalyNotificationService],
 })
-export class AnomalyNotificationModule { }
+export class AnomalyNotificationModule {}

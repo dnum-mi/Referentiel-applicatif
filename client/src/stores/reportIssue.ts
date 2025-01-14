@@ -12,11 +12,8 @@ export const useReportIssueStore = defineStore("ReportIssueStore", {
   actions: {
     async proposeCorrection(applicationId: string, correctionText: string) {
       try {
-        const notifierId = "";
-
         const payload: ReportIssue = {
           applicationId,
-          notifierId,
           description: correctionText,
           status: "in_pending",
         };

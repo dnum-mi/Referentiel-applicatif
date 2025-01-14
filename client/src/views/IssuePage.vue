@@ -24,18 +24,16 @@ const loadReports = async () => {
         to: { name: routeNames.PROFILEAPP, params: { id: report.application?.id } },
       },
       report.description,
-      formatDate(report.createdAt)
+      formatDate(report.createdAt),
     ]);
-
   } catch (error) {
-    console.error("Une erreur est survenue lors du chargement des anomalies :", error);
+    console.error("Une erreur est survenue lors du chargement des signalements :", error);
   }
 };
 
 onMounted(() => {
   loadReports();
 });
-
 </script>
 
 <template>
@@ -58,8 +56,7 @@ onMounted(() => {
     >
       <template #cell="{ colKey, cell }">
         <template v-if="colKey === 'Application'">
-          <router-link 
-            :to= "cell.to">
+          <router-link :to="cell.to">
             {{ cell.label }}
           </router-link>
         </template>
@@ -68,11 +65,8 @@ onMounted(() => {
         </template>
       </template>
     </DsfrDataTable>
-  <!--  IDs sélectionnées : {{ selection }} -->
+    <!--  IDs sélectionnées : {{ selection }} -->
   </div>
 </template>
 
-
-<style scoped>
-
-</style>
+<style scoped></style>

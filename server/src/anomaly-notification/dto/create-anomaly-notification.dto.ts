@@ -11,7 +11,17 @@ export class CreateAnomalyNotificationDto {
   @IsString()
   description: string;
 
-  @IsOptional()
   @IsEnum(AnomalyNotificationStatus)
   status?: AnomalyNotificationStatus;
+}
+
+export class CreateAnomalyNotificationRequestDto {
+  @IsString()
+  applicationId: string;
+
+  @IsString()
+  description: string;
+
+  @IsEnum(AnomalyNotificationStatus)
+  status: AnomalyNotificationStatus;
 }

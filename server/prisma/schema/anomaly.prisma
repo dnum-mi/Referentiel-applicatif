@@ -23,7 +23,7 @@ model AnomalyNotificationHistory {
 
   issueNotification AnomalyNotification @relation(fields: [issueNotificationId], references: [id])
 
-  @@map("anomalyNotificationHystory")
+  @@map("anomalyNotificationHistory")
 }
 
 enum AnomalyNotificationStatus {

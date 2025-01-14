@@ -1,6 +1,5 @@
 import type { ReportIssue } from "../models/ReportIssue";
 import requests from "./xhr-client";
-import axios from "axios";
 
 const reportIssue = {
   async createReportIssue(data: Promise<ReportIssue[]>) {
@@ -18,14 +17,14 @@ const reportIssue = {
     } catch (error) {
       throw error;
     }
-  },/*
+  } /*
   async getAllIssueByNotifierId(notifierId?: string): Promise<ReportIssue[]> {
     try {
       return await axios.get(`/anomaly-notification/${notifierId}`);
     } catch (error) {
       throw error;
     }
-  },*/
+  },*/,
   async getReportIssueByNotifierId(): Promise<ReportIssue[]> {
     try {
       return await requests.get<ReportIssue[]>("/anomaly-notifications/user-notifications");

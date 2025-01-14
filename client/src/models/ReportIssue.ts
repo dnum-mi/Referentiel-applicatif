@@ -1,6 +1,6 @@
 export interface ReportIssue {
   applicationId: string;
-  notifierId: string;
+  notifierId?: string;
   description: string;
   status: string;
 }

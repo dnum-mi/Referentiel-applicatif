@@ -3,20 +3,17 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateAnomalyNotificationDto } from './dto/create-anomaly-notification.dto';
 import { UpdateAnomalyNotificationDto } from './dto/update-anomaly-notification.dto';
 import { GetAnomalyNotificationDto } from './dto/get-anomaly-notification.dto';
-import { UserService } from './../user/user.service';
 import { AuthUtils } from '../utils/helpers';
-import {
-  Logger,
-} from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class AnomalyNotificationService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
-  async create(req: any, data: CreateAnomalyNotificationDto) {
+  public async create(req: any, data: CreateAnomalyNotificationDto) {
     const decodedToken = AuthUtils.getDecodedToken(req);
     const notifierId = decodedToken.sub;
-    return this.prisma.anomalyNotification.create({
+    const correctionDemand = this.prisma.anomalyNotification.create({
       data: {
         application: {
           connect: { id: data.applicationId },
@@ -28,6 +25,15 @@ export class AnomalyNotificationService {
         status: data.status,
       },
     });
+    Logger.log(
+      {
+        message: 'Demannde de correction créée',
+        data: data,
+      },
+      'create',
+    );
+
+    return correctionDemand;
   }
 
   /**
@@ -35,9 +41,26 @@ export class AnomalyNotificationService {
    * @returns Un tableau de notifications d'anomalies.
    */
   async findAll() {
-    return this.prisma.anomalyNotification.findMany({
+    Logger.log(
+      {
+        message: 'Récupération de toutes les notifications',
+      },
+      'findAll',
+    );
+
+    const notifications = await this.prisma.anomalyNotification.findMany({
       include: { history: true, application: true },
     });
+
+    Logger.log(
+      {
+        message: 'Notifications récupérées',
+        count: notifications.length,
+      },
+      'findAll',
+    );
+
+    return notifications;
   }
 
   /**
@@ -60,16 +83,22 @@ export class AnomalyNotificationService {
   public async getAnomalyNotificationByNotifierId(
     notifierId: string,
   ): Promise<GetAnomalyNotificationDto[]> {
-    const anomalyNotifications = await this.prisma.anomalyNotification.findMany({
-      where: { notifierId },
-      include: { history: true, application: true },
-    });
-
+    const anomalyNotifications = await this.prisma.anomalyNotification.findMany(
+      {
+        where: { notifierId },
+        include: { history: true, application: true },
+      },
+    );
     if (!anomalyNotifications || anomalyNotifications.length === 0) {
+      Logger.error(
+        {
+          message: 'Aucune notification trouvée pour notifierId',
+          notifierId: notifierId,
+        },
+        'getAnomalyNotificationByNotifierId',
+      );
       throw new Error('Aucune notification de signalement trouvée');
     }
-
-    // Transformer chaque notification en DTO
     const anomalyNotificationDtos = anomalyNotifications.map((anomaly) => ({
       id: anomaly.id,
       applicationId: anomaly.applicationId,
@@ -83,10 +112,12 @@ export class AnomalyNotificationService {
       createdAt: anomaly.createdAt,
       updatedAt: anomaly.updatedAt || null,
     }));
-
+    Logger.log({
+      message: 'Récupération des notifications par notifierId',
+      notifierId: notifierId,
+    });
     return anomalyNotificationDtos;
   }
-
 
   /**
    * Met à jour une notification d'anomalie existante.
@@ -110,7 +141,7 @@ export class AnomalyNotificationService {
    * @throws NotFoundException Si la notification n'est pas trouvée.
    */
   async remove(id: string) {
-    await this.findOne(id); // Vérifie si l'élément existe
+    await this.findOne(id);
     return this.prisma.anomalyNotification.delete({
       where: { id },
     });

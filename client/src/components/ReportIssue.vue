@@ -15,7 +15,7 @@ const toaster = useToaster();
 const title = "Proposer une correction";
 const opened = ref(false);
 
-const hint = `Veuillez renseigner les anomalies détectées pour l'application "${props.application.data.label}"`;
+const hint = `Veuillez renseigner votre signalement  détectées pour l'application "${props.application.data.label}"`;
 const label = "Proposition";
 
 const useReportIssue = useReportIssueStore();
