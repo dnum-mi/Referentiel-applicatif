@@ -2,19 +2,27 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAnomalyNotificationDto } from './dto/create-anomaly-notification.dto';
 import { UpdateAnomalyNotificationDto } from './dto/update-anomaly-notification.dto';
+import { GetAnomalyNotificationDto } from './dto/get-anomaly-notification.dto';
+import { UserService } from './../user/user.service';
+import { AuthUtils } from '../utils/helpers';
+import {
+  Logger,
+} from '@nestjs/common';
 
 @Injectable()
 export class AnomalyNotificationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
-  async create(data: CreateAnomalyNotificationDto) {
+  async create(req: any, data: CreateAnomalyNotificationDto) {
+    const decodedToken = AuthUtils.getDecodedToken(req);
+    const notifierId = decodedToken.sub;
     return this.prisma.anomalyNotification.create({
       data: {
         application: {
           connect: { id: data.applicationId },
         },
         notifier: {
-          connect: { keycloakId: data.notifierId },
+          connect: { keycloakId: notifierId },
         },
         description: data.description,
         status: data.status,
@@ -48,6 +56,37 @@ export class AnomalyNotificationService {
     }
     return notification;
   }
+
+  public async getAnomalyNotificationByNotifierId(
+    notifierId: string,
+  ): Promise<GetAnomalyNotificationDto[]> {
+    const anomalyNotifications = await this.prisma.anomalyNotification.findMany({
+      where: { notifierId },
+      include: { history: true, application: true },
+    });
+
+    if (!anomalyNotifications || anomalyNotifications.length === 0) {
+      throw new Error('Aucune notification de signalement trouvée');
+    }
+
+    // Transformer chaque notification en DTO
+    const anomalyNotificationDtos = anomalyNotifications.map((anomaly) => ({
+      id: anomaly.id,
+      applicationId: anomaly.applicationId,
+      application: {
+        id: anomaly.application?.id,
+        label: anomaly.application?.label,
+      },
+      notifierId: anomaly.notifierId,
+      description: anomaly.description,
+      status: anomaly.status,
+      createdAt: anomaly.createdAt,
+      updatedAt: anomaly.updatedAt || null,
+    }));
+
+    return anomalyNotificationDtos;
+  }
+
 
   /**
    * Met à jour une notification d'anomalie existante.

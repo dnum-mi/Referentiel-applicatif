@@ -1,3 +1,5 @@
+import { UserService } from './../user/user.service';
+import { AuthUtils } from '../utils/helpers';
 import {
   Controller,
   Get,
@@ -6,52 +8,56 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
+  NotFoundException,
+  Logger,
 } from '@nestjs/common';
+import {
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { AnomalyNotificationService } from './anomaly-notification.service';
 import { CreateAnomalyNotificationDto } from './dto/create-anomaly-notification.dto';
+import { GetAnomalyNotificationDto } from './dto/get-anomaly-notification.dto';
 import { UpdateAnomalyNotificationDto } from './dto/update-anomaly-notification.dto';
 
 @Controller('anomaly-notifications')
 export class AnomalyNotificationController {
   constructor(
     private readonly anomalyNotificationService: AnomalyNotificationService,
-  ) {}
+    private readonly userService: UserService,
+  ) { }
 
-  /**
-   * Crée une nouvelle notification d'anomalie.
-   * @param data Les données de création de la notification.
-   * @returns La notification créée.
-   */
   @Post()
-  create(@Body() data: CreateAnomalyNotificationDto) {
-    return this.anomalyNotificationService.create(data);
+  create(@Request() req, @Body() data: CreateAnomalyNotificationDto) {
+    return this.anomalyNotificationService.create(req, data);
   }
 
-  /**
-   * Récupère toutes les notifications d'anomalies.
-   * @returns Un tableau de notifications.
-   */
   @Get()
   findAll() {
     return this.anomalyNotificationService.findAll();
   }
 
-  /**
-   * Récupère une notification d'anomalie par son ID.
-   * @param id L'identifiant de la notification.
-   * @returns La notification trouvée.
-   */
+  @ApiOperation({ summary: 'Récupérer les notifications de signalements pour l\'utilisateur actuellement connecté' })
+  @ApiResponse({ status: 200, description: 'Liste des notifications de signalements retournée.' })
+  @ApiResponse({ status: 404, description: 'Aucune notification trouvée.' })
+  @Get('user-notifications')
+  async getAnomalyNotificationsByUser(@Request() req): Promise<GetAnomalyNotificationDto[]> {
+    try {
+      const decodedToken = AuthUtils.getDecodedToken(req);
+      const userFromDb = await AuthUtils.findOrCreateUser(decodedToken, this.userService);
+      const anomalyNotifications = await this.anomalyNotificationService.getAnomalyNotificationByNotifierId(userFromDb.keycloakId);
+      return anomalyNotifications;
+    } catch (error) {
+      throw new NotFoundException(error);
+    }
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.anomalyNotificationService.findOne(id);
   }
 
-  /**
-   * Met à jour une notification d'anomalie existante.
-   * @param id L'identifiant de la notification.
-   * @param updateDto Les nouvelles données pour la notification.
-   * @returns La notification mise à jour.
-   */
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -60,11 +66,6 @@ export class AnomalyNotificationController {
     return this.anomalyNotificationService.update(id, updateDto);
   }
 
-  /**
-   * Supprime une notification d'anomalie.
-   * @param id L'identifiant de la notification.
-   * @returns La notification supprimée.
-   */
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.anomalyNotificationService.remove(id);
