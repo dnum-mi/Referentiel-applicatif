@@ -12,7 +12,7 @@ export const useReportIssueStore = defineStore("ReportIssueStore", {
   actions: {
     async proposeCorrection(applicationId: string, correctionText: string) {
       try {
-        const notifierId = "f15d1c13-8198-4ca5-a180-94656e20d568";
+        const notifierId = "";
 
         const payload: ReportIssue = {
           applicationId,

@@ -47,7 +47,6 @@ export class AnomalyNotificationController {
       const decodedToken = AuthUtils.getDecodedToken(req);
       const userFromDb = await AuthUtils.findOrCreateUser(decodedToken, this.userService);
       const anomalyNotifications = await this.anomalyNotificationService.getAnomalyNotificationByNotifierId(userFromDb.keycloakId);
-      Logger.log(anomalyNotifications);
       return anomalyNotifications;
     } catch (error) {
       throw new NotFoundException(error);
