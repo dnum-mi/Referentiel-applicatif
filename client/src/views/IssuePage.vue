@@ -7,8 +7,8 @@ import { formatDate } from "@/composables/use-date";
 
 const props = defineProps<{ application: Application }>();
 
-const title = "Liste des anomalies";
-const headers = ["Application", "Description", "Date", "Statut", "Actions"];
+const title = "Liste des signalements";
+const headers = ["Application", "Description", "Date"];
 
 const rows = ref<(string | { component: string; [k: string]: unknown })[][]>([]);
 const selection = ref<string[]>([]);
@@ -16,8 +16,7 @@ const currentPage = ref<number>(0);
 
 const loadReports = async () => {
   try {
-    const reportList = await Issues.getReportIssue();
-    console.log("Données reçues :", reportList);
+    const reportList = await Issues.getReportIssueByNotifierId();
 
     rows.value = reportList.map((report: any) => [
       {
@@ -25,35 +24,11 @@ const loadReports = async () => {
         to: { name: routeNames.PROFILEAPP, params: { id: report.application?.id } },
       },
       report.description,
-      formatDate(report.createdAt), 
-      {
-        component: 'DsfrTag',
-        label: getStatusLabel(report.status),
-        class: report.status,
-      },
-      {
-        component: 'DsfrButton',
-        label: 'Supprimer',
-        id: report.id,
-        onClick: () => Issues.deleteReportIssue(report.id),
-      }
+      formatDate(report.createdAt)
     ]);
 
   } catch (error) {
     console.error("Une erreur est survenue lors du chargement des anomalies :", error);
-  }
-};
-
-const getStatusLabel = (status: string): string => {
-  switch (status) {
-    case "in_pending":
-      return "Non traité";
-    case "in_progress":
-      return "En cours";
-    case "done":
-      return "Fait";
-    default:
-      return "Non traité";
   }
 };
 
@@ -88,20 +63,6 @@ onMounted(() => {
             {{ cell.label }}
           </router-link>
         </template>
-        <template v-else-if="colKey === 'Statut'">
-          <DsfrTag 
-            :class="cell.class"
-            :label="cell.label"
-          />
-        </template>
-        <template v-else-if="colKey === 'Actions'">
-          <DsfrButton
-            v-if="cell.component === 'DsfrButton'"
-            :label="cell.label"
-            :id="cell.id"
-            @click="cell.onClick"
-          />
-        </template>
         <template v-else>
           {{ cell }}
         </template>
@@ -113,18 +74,5 @@ onMounted(() => {
 
 
 <style scoped>
-:deep(.in_progress) {
-  color: var(--info-425-625);
-  background-color: var(--info-950-100);
-}
 
-:deep(.in_pending) {
-  color: var(--error-425-625);
-  background-color: var(--error-950-100);
-}
-
-:deep(.done) {
-  color: var(--success-425-625);
-  background-color: var(--success-950-100);
-}
 </style>

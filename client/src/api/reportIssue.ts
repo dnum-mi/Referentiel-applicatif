@@ -18,12 +18,17 @@ const reportIssue = {
     } catch (error) {
       throw error;
     }
-  },
-  async getReportIssueByNotifierId(notifierId?: string): Promise<ReportIssue[]> {
+  },/*
+  async getAllIssueByNotifierId(notifierId?: string): Promise<ReportIssue[]> {
     try {
-      return await requests.get<ReportIssue[]>("/anomaly-notifications/search", {
-        params: notifierId ? { notifierId } : undefined,
-      });
+      return await axios.get(`/anomaly-notification/${notifierId}`);
+    } catch (error) {
+      throw error;
+    }
+  },*/
+  async getReportIssueByNotifierId(): Promise<ReportIssue[]> {
+    try {
+      return await requests.get<ReportIssue[]>("/anomaly-notifications/user-notifications");
     } catch (error) {
       throw error;
     }
