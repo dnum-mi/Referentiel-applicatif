@@ -7,7 +7,7 @@ import { formatDate } from "@/composables/use-date";
 
 const props = defineProps<{ application: Application }>();
 
-const title = "Liste des signalements";
+const title = "Liste de mes signalements";
 const headers = ["Application", "Description", "Date"];
 
 const rows = ref<(string | { component: string; [k: string]: unknown })[][]>([]);
@@ -49,8 +49,8 @@ onMounted(() => {
       row-key="id"
       :title="title"
       pagination
-      :rows-per-page="2"
-      :pagination-options="[1, 2, 3]"
+      :rows-per-page="10"
+      :pagination-options="[10, 20, 30]"
       bottom-action-bar-class="bottom-action-bar-class"
       pagination-wrapper-class="pagination-wrapper-class"
       sorted="id"

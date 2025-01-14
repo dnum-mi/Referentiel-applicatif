@@ -54,7 +54,7 @@ const authenticatedQuickLinks: QuickLink[] = [
     to: { name: routeNames.SEARCHAPP },
   },
   {
-    label: "Tableau des anomalies",
+    label: "Mes signalements",
     to: { name: routeNames.ISSUELIST },
   },
   {
