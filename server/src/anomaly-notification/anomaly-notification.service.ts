@@ -3,21 +3,26 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateAnomalyNotificationDto } from './dto/create-anomaly-notification.dto';
 import { UpdateAnomalyNotificationDto } from './dto/update-anomaly-notification.dto';
 import { GetAnomalyNotificationDto } from './dto/get-anomaly-notification.dto';
+import { UserService } from './../user/user.service';
+import { AuthUtils } from '../utils/helpers';
 import {
   Logger,
 } from '@nestjs/common';
+
 @Injectable()
 export class AnomalyNotificationService {
   constructor(private readonly prisma: PrismaService) { }
 
-  async create(data: CreateAnomalyNotificationDto) {
+  async create(req: any, data: CreateAnomalyNotificationDto) {
+    const decodedToken = AuthUtils.getDecodedToken(req);
+    const notifierId = decodedToken.sub;
     return this.prisma.anomalyNotification.create({
       data: {
         application: {
           connect: { id: data.applicationId },
         },
         notifier: {
-          connect: { keycloakId: data.notifierId },
+          connect: { keycloakId: notifierId },
         },
         description: data.description,
         status: data.status,

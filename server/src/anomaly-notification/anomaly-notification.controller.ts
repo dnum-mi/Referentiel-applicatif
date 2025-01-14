@@ -29,8 +29,8 @@ export class AnomalyNotificationController {
   ) { }
 
   @Post()
-  create(@Body() data: CreateAnomalyNotificationDto) {
-    return this.anomalyNotificationService.create(data);
+  create(@Request() req, @Body() data: CreateAnomalyNotificationDto) {
+    return this.anomalyNotificationService.create(req, data);
   }
 
   @Get()
