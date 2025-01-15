@@ -54,13 +54,16 @@ const authenticatedQuickLinks: QuickLink[] = [
     to: { name: routeNames.SEARCHAPP },
   },
   {
+    label: "Mes signalements",
+    to: { name: routeNames.ISSUELIST },
+  },
+  {
     label: "Déconnexion",
     to: authentication.createLogoutUrl(),
     icon: "ri-logout-box-r-line",
     iconAttrs: { title: "Déconnexion" },
   },
 ];
-
 const searchQuery = ref("");
 
 const { setScheme, theme } = useScheme();
