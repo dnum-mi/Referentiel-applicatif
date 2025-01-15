@@ -1,14 +1,15 @@
 model User {
-  id             String        @id @default(uuid())
-  keycloakId     String        @unique
-  email          String        @unique
-  organizationId String?
-  organization   External?     @relation(fields: [organizationId], references: [id])
-  createdSet     Metadata[]    @relation("MetadataCreatedBy")
-  updatedSet     Metadata[]    @relation("MetadataUpdatedBy")
-  applications   Application[] @relation("UserApplications")
-  dataOwners     Metadata[]    @relation("MetadataDataOwnerBy")
-  actors         Actor[]       @relation("UserActors")
+  id                  String                     @id @default(uuid())
+  keycloakId          String                @unique
+  email               String                @unique
+  organizationId      String?
+  organization        External?             @relation(fields: [organizationId], references: [id])
+  createdSet          Metadata[]            @relation("MetadataCreatedBy")
+  updatedSet          Metadata[]            @relation("MetadataUpdatedBy")
+  applications        Application[]         @relation("UserApplications")
+  dataOwners          Metadata[]            @relation("MetadataDataOwnerBy")
+  actors              Actor[]               @relation("UserActors")
+  AnomalyNotification AnomalyNotification[] @relation("UserAnomalyNotification")
 
   @@map("users")
 }

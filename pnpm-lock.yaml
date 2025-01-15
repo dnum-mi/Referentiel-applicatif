@@ -7,10 +7,21 @@ settings:
 importers:
 
   .:
+<<<<<<< HEAD
     devDependencies:
       '@commitlint/cli':
         specifier: ^19.6.1
         version: 19.6.1(@types/node@22.10.5)(typescript@5.7.2)
+=======
+    dependencies:
+      jose:
+        specifier: ^5.9.6
+        version: 5.9.6
+    devDependencies:
+      '@commitlint/cli':
+        specifier: ^19.6.1
+        version: 19.6.1(@types/node@22.10.6)(typescript@5.7.3)
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
       '@commitlint/config-conventional':
         specifier: ^19.6.0
         version: 19.6.0
@@ -20,9 +31,12 @@ importers:
       prettier:
         specifier: 3.3.3
         version: 3.3.3
+<<<<<<< HEAD
       prettier-plugin-prisma:
         specifier: ^5.0.0
         version: 5.0.0(prettier@3.3.3)
+=======
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
 
 packages:
 
@@ -103,6 +117,7 @@ packages:
     resolution: {integrity: sha512-DSHae2obMSMkAtTBSOulg5X7/z+rGLxcXQIkg3OmWvY6wifojge5uVMydfhUvs7yQj+V7jNmRZ2Xzl8GJyqRgg==}
     engines: {node: '>=v18'}
 
+<<<<<<< HEAD
   '@prisma/prisma-schema-wasm@4.17.0-26.6b0aef69b7cdfc787f822ecd7cdc76d5f1991584':
     resolution: {integrity: sha512-JFdsnSgBPN8reDTLOI9Vh/6ccCb2aD1LbY/LWQnkcIgNo6IdpzvuM+qRVbBuA6IZP2SdqQI8Lu6RL2P8EFBQUA==}
 
@@ -111,6 +126,13 @@ packages:
 
   '@types/node@22.10.5':
     resolution: {integrity: sha512-F8Q+SeGimwOo86fiovQh8qiXfFEh2/ocYv7tU5pJ3EXMSSxk1Joj5wefpFK2fHTf/N6HKGSxIDBT9f3gCxXPkQ==}
+=======
+  '@types/conventional-commits-parser@5.0.1':
+    resolution: {integrity: sha512-7uz5EHdzz2TqoMfV7ee61Egf5y6NkcO4FB/1iCCQnbeiI1F3xzv3vK5dBCXUCLQgGYS+mUeigK1iKQzvED+QnQ==}
+
+  '@types/node@22.10.6':
+    resolution: {integrity: sha512-qNiuwC4ZDAUNcY47xgaSuS92cjf8JbSUoaKS77bmLG1rU7MlATVSiw/IlrjtIyyskXBZ8KkNfjK/P5na7rgXbQ==}
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
 
   JSONStream@1.3.5:
     resolution: {integrity: sha512-E+iruNOY8VV9s4JEbe1aNEm6MiszPRr/UfcHMz0TQh1BXSxHK+ASV1R6W4HpjBhSeS+54PIsAMCBmwD06LLsqQ==}
@@ -265,6 +287,12 @@ packages:
     resolution: {integrity: sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==}
     hasBin: true
 
+<<<<<<< HEAD
+=======
+  jose@5.9.6:
+    resolution: {integrity: sha512-AMlnetc9+CV9asI19zHmrgS/WYsWUwCn2R7RzlbJWD7F9eWYUTGyBmU9o6PxngtLGOiDGPRu+Uc4fhKzbpteZQ==}
+
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
@@ -346,12 +374,15 @@ packages:
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
+<<<<<<< HEAD
   prettier-plugin-prisma@5.0.0:
     resolution: {integrity: sha512-jTJV04D9+yF7ziOOMs7CJe4ijgAH7DEGjt0SAWAToGNRy1H6BEhvcKA2UQH6gC6KVW5zeeOSAvsoiDDTt9oKXg==}
     engines: {node: '>=14', npm: '>=8'}
     peerDependencies:
       prettier: '>=2 || >=3'
 
+=======
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
   prettier@3.3.3:
     resolution: {integrity: sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==}
     engines: {node: '>=14'}
@@ -400,8 +431,13 @@ packages:
   tinyexec@0.3.2:
     resolution: {integrity: sha512-KQQR9yN7R5+OSwaK0XQoj22pwHoTlgYqmUscPYoknOoWCWfj/5/ABTMRi69FrKU5ffPVh5QcFikpWJI/P1ocHA==}
 
+<<<<<<< HEAD
   typescript@5.7.2:
     resolution: {integrity: sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==}
+=======
+  typescript@5.7.3:
+    resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -442,11 +478,19 @@ snapshots:
 
   '@babel/helper-validator-identifier@7.25.9': {}
 
+<<<<<<< HEAD
   '@commitlint/cli@19.6.1(@types/node@22.10.5)(typescript@5.7.2)':
     dependencies:
       '@commitlint/format': 19.5.0
       '@commitlint/lint': 19.6.0
       '@commitlint/load': 19.6.1(@types/node@22.10.5)(typescript@5.7.2)
+=======
+  '@commitlint/cli@19.6.1(@types/node@22.10.6)(typescript@5.7.3)':
+    dependencies:
+      '@commitlint/format': 19.5.0
+      '@commitlint/lint': 19.6.0
+      '@commitlint/load': 19.6.1(@types/node@22.10.6)(typescript@5.7.3)
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
       '@commitlint/read': 19.5.0
       '@commitlint/types': 19.5.0
       tinyexec: 0.3.2
@@ -493,15 +537,24 @@ snapshots:
       '@commitlint/rules': 19.6.0
       '@commitlint/types': 19.5.0
 
+<<<<<<< HEAD
   '@commitlint/load@19.6.1(@types/node@22.10.5)(typescript@5.7.2)':
+=======
+  '@commitlint/load@19.6.1(@types/node@22.10.6)(typescript@5.7.3)':
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
     dependencies:
       '@commitlint/config-validator': 19.5.0
       '@commitlint/execute-rule': 19.5.0
       '@commitlint/resolve-extends': 19.5.0
       '@commitlint/types': 19.5.0
       chalk: 5.4.1
+<<<<<<< HEAD
       cosmiconfig: 9.0.0(typescript@5.7.2)
       cosmiconfig-typescript-loader: 6.1.0(@types/node@22.10.5)(cosmiconfig@9.0.0(typescript@5.7.2))(typescript@5.7.2)
+=======
+      cosmiconfig: 9.0.0(typescript@5.7.3)
+      cosmiconfig-typescript-loader: 6.1.0(@types/node@22.10.6)(cosmiconfig@9.0.0(typescript@5.7.3))(typescript@5.7.3)
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -552,6 +605,7 @@ snapshots:
       '@types/conventional-commits-parser': 5.0.1
       chalk: 5.4.1
 
+<<<<<<< HEAD
   '@prisma/prisma-schema-wasm@4.17.0-26.6b0aef69b7cdfc787f822ecd7cdc76d5f1991584': {}
 
   '@types/conventional-commits-parser@5.0.1':
@@ -559,6 +613,13 @@ snapshots:
       '@types/node': 22.10.5
 
   '@types/node@22.10.5':
+=======
+  '@types/conventional-commits-parser@5.0.1':
+    dependencies:
+      '@types/node': 22.10.6
+
+  '@types/node@22.10.6':
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
     dependencies:
       undici-types: 6.20.0
 
@@ -620,6 +681,7 @@ snapshots:
       meow: 12.1.1
       split2: 4.2.0
 
+<<<<<<< HEAD
   cosmiconfig-typescript-loader@6.1.0(@types/node@22.10.5)(cosmiconfig@9.0.0(typescript@5.7.2))(typescript@5.7.2):
     dependencies:
       '@types/node': 22.10.5
@@ -628,13 +690,27 @@ snapshots:
       typescript: 5.7.2
 
   cosmiconfig@9.0.0(typescript@5.7.2):
+=======
+  cosmiconfig-typescript-loader@6.1.0(@types/node@22.10.6)(cosmiconfig@9.0.0(typescript@5.7.3))(typescript@5.7.3):
+    dependencies:
+      '@types/node': 22.10.6
+      cosmiconfig: 9.0.0(typescript@5.7.3)
+      jiti: 2.4.2
+      typescript: 5.7.3
+
+  cosmiconfig@9.0.0(typescript@5.7.3):
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.0
       js-yaml: 4.1.0
       parse-json: 5.2.0
     optionalDependencies:
+<<<<<<< HEAD
       typescript: 5.7.2
+=======
+      typescript: 5.7.3
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
 
   dargs@8.1.0: {}
 
@@ -697,6 +773,11 @@ snapshots:
 
   jiti@2.4.2: {}
 
+<<<<<<< HEAD
+=======
+  jose@5.9.6: {}
+
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
   js-tokens@4.0.0: {}
 
   js-yaml@4.1.0:
@@ -760,11 +841,14 @@ snapshots:
 
   picocolors@1.1.1: {}
 
+<<<<<<< HEAD
   prettier-plugin-prisma@5.0.0(prettier@3.3.3):
     dependencies:
       '@prisma/prisma-schema-wasm': 4.17.0-26.6b0aef69b7cdfc787f822ecd7cdc76d5f1991584
       prettier: 3.3.3
 
+=======
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
   prettier@3.3.3: {}
 
   require-directory@2.1.1: {}
@@ -795,7 +879,11 @@ snapshots:
 
   tinyexec@0.3.2: {}
 
+<<<<<<< HEAD
   typescript@5.7.2: {}
+=======
+  typescript@5.7.3: {}
+>>>>>>> 5ba0578 (feat: :sparkles: Add submission report (#181))
 
   undici-types@6.20.0: {}
 
