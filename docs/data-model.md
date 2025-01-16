@@ -3,21 +3,14 @@
 
 ```mermaid
 erDiagram
-    Applications ||--o{ ORDER : places
+    Applications }o --o| Applications : parent
     Applications {
-        uuid identifiant
-        string nom
-        string description
+         uuid id
+         string label               
+         string shortName
+         string description
+         string[] purposes
+         string[] tags
+         string lifecycldeId 
     }
-    ORDER ||--|{ LINE-ITEM : contains
-    ORDER {
-        int orderNumber
-        string deliveryAddress
-    }
-    LINE-ITEM {
-        string productCode
-        int quantity
-        float pricePerUnit
-    }
-
 ```
