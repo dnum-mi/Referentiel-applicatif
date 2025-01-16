@@ -7,11 +7,14 @@ export {};
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Acteurs: typeof import('./components/Acteurs.vue')['default']
     ActionsIssue: typeof import('./components/ActionsIssue.vue')['default']
     ActionsReportIssue: typeof import('./components/ActionsReportIssue.vue')['default']
+    AppDate: typeof import('./components/AppDate.vue')['default']
     ApplicationList: typeof import('./components/ApplicationList.vue')['default']
     ApplicationOverview: typeof import('./components/ApplicationOverview.vue')['default']
     AppToaster: typeof import('./components/AppToaster.vue')['default']
+    Compliances: typeof import('./components/Compliances.vue')['default']
     DsfrAlert: typeof import('@gouvminint/vue-dsfr')['DsfrAlert']
     DsfrBreadcrumb: typeof import('@gouvminint/vue-dsfr')['DsfrBreadcrumb']
     DsfrButton: typeof import('@gouvminint/vue-dsfr')['DsfrButton']
