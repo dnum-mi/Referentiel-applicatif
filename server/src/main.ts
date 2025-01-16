@@ -1,14 +1,13 @@
 // src/main.ts
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug'],
-  });
-  const logger = new Logger('Bootstrap');
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(Logger));
   app.setGlobalPrefix('api/v2');
 
   const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
@@ -57,6 +56,5 @@ async function bootstrap() {
     }),
   );
   await app.listen(3500);
-  logger.log(`Application en cours d'exécution`);
 }
 bootstrap();
