@@ -3,6 +3,7 @@ import { ref, computed } from "vue";
 import Applications from "@/api/application";
 import type { Application } from "@/models/Application";
 import useToaster from "@/composables/use-toaster";
+import AppDate from "./AppDate.vue";
 
 const props = defineProps<{ application: Application }>();
 const loading = ref(false);
@@ -62,6 +63,8 @@ async function patchApplication() {
           <DsfrSelect v-model="compliance.status" label="Statut" :options="complianceStatuses" />
           <!-- Autres champs -->
           <DsfrInput v-model="compliance.notes" label="Notes" label-visible isTextarea />
+          <AppDate v-model="compliance.validityStart" label="Date de début" />
+          <AppDate v-model="compliance.validityEnd" label="Date de fin" />
           <DsfrInput v-model="compliance.scoreValue" label="Score" label-visible />
           <DsfrInput v-model="compliance.scoreUnit" label="Unité de score" label-visible />
         </div>
