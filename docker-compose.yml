@@ -17,7 +17,7 @@ services:
 
   backend:
     build:
-      context: ./server
+      context: ./backend
     command: pnpm start:dev
     environment:
       - DATABASE_URL=postgresql://postgres:password@postgres:5432/postgres
@@ -29,12 +29,12 @@ services:
     ports:
       - "3500:3500"
     volumes:
-      - ./server:/app
+      - ./backend:/app
       - /app/node_modules
 
   prisma-studio:
     build:
-      context: ./server
+      context: ./backend
     command: npx prisma studio
     environment:
       - DATABASE_URL=postgresql://postgres:password@postgres:5432/postgres
@@ -65,7 +65,7 @@ services:
     image: node:22
     working_dir: /app
     volumes:
-      - ./client:/app
+      - ./frontend:/app
       - /app/node_modules
     ports:
       - "5173:5173"

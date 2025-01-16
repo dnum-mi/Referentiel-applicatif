@@ -1,4 +1,4 @@
-import { CreateExternalDto } from './../../external/dto/create-external.dto';
+import { CreateExternalDto } from '../../external/dto/create-external.dto';
 import { PartialType, PickType } from '@nestjs/mapped-types';
 import {
   IsString,

@@ -36,8 +36,8 @@ build-backend:
 
 build-frontend:
   variables:
-    WORKING_DIR: ./client
-    DOCKERFILE: ./client/Dockerfile
+    WORKING_DIR: ./frontend
+    DOCKERFILE: ./frontend/Dockerfile
     IMAGE_NAMES: ref-app-front:${CI_COMMIT_SHORT_SHA} ref-app-front:${CI_COMMIT_REF_NAME}
   stage: docker-build
   extends:
