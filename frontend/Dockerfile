@@ -2,9 +2,15 @@ FROM node:20-slim AS build
 
 WORKDIR /app
 
-COPY ./package.json ./package-lock.json ./
+RUN npm install -g pnpm
 
-RUN npm ci
+# Copy necessary files
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies using pnpm
+RUN pnpm install
+RUN pnpm install --frozen-lockfile
+
 
 COPY . .
 

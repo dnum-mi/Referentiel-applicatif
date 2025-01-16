@@ -3,6 +3,7 @@ import { ref } from "vue";
 import type { Application } from "@/models/Application";
 import useToaster from "@/composables/use-toaster";
 import Applications from "@/api/application";
+import AppDate from "./AppDate.vue";
 
 const props = defineProps<{ application: Application }>();
 const application = props.application;
@@ -87,6 +88,12 @@ async function patchApplication() {
           <div class="lifecycle-info">
             <div class="input-group">
               <DsfrSelect v-model="application.lifecycle.status" label="Statut" :options="lifecycleStatuses" />
+            </div>
+            <div class="input-group">
+              <AppDate v-model="application.lifecycle.firstProductionDate" label="Date de première production" />
+            </div>
+            <div class="input-group">
+              <AppDate v-model="application.lifecycle.plannedDecommissioningDate" label="Date de décommission prévue" />
             </div>
           </div>
         </div>
