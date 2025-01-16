@@ -27,13 +27,12 @@ onMounted(async () => {
 <template>
   <div>
     <DsfrBreadcrumb />
-    <h1>Fiche de l'application</h1>
     <div v-if="isLoading">Chargement...</div>
     <div v-else-if="errorMessage">
       {{ errorMessage }}
     </div>
     <div v-else-if="application">
-      <h2>{{ application.label }}</h2>
+      <h2>{{ application.data.label }}</h2>
       <ReportIssue class="button-right" :application="application" />
       <ApplicationOverview :application="application.data" />
     </div>

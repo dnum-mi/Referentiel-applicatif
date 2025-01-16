@@ -45,6 +45,30 @@ export class CreateActorDto {
   applicationId?: string;
 }
 
+export class UpdateActorUserDto {
+  @IsOptional()
+  @IsString()
+  keycloakId?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
+}
+
+export class UpdateActorDto {
+  @IsOptional()
+  id?: string;
+
+  @IsOptional()
+  @IsString()
+  role?: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => UpdateActorUserDto)
+  user?: UpdateActorUserDto;
+}
+
 export class CreateComplianceDto {
   @ApiProperty({
     enum: ComplianceType,
@@ -113,6 +137,54 @@ export class CreateComplianceDto {
   notes?: string | null;
 }
 
+export class UpdateComplianceDto {
+  @ApiProperty({
+    description: 'ID de la compliance (uniquement pour les existantes)',
+    required: false,
+  })
+  @IsOptional()
+  id?: string;
+
+  @ApiProperty({ enum: ComplianceType, required: false })
+  @IsOptional()
+  @IsEnum(ComplianceType)
+  type?: ComplianceType;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  name?: string | null;
+
+  @ApiProperty({ enum: ComplianceStatus, required: false })
+  @IsOptional()
+  @IsEnum(ComplianceStatus)
+  status?: ComplianceStatus;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  validityStart?: string | null;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  validityEnd?: string | null;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  scoreValue?: string | null;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  scoreUnit?: string | null;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  notes?: string | null;
+}
 export class CreateLifecycleDto {
   @ApiProperty({
     enum: LifecycleStatus,
@@ -258,5 +330,23 @@ export class CreateApplicationDto {
 
 export class PatchApplicationDto extends PickType(
   PartialType(CreateApplicationDto),
-  ['label', 'shortName', 'description'] as const,
-) {}
+  [
+    'label',
+    'shortName',
+    'description',
+    'purposes',
+    'tags',
+    'parentId',
+    'lifecycle',
+  ] as const,
+) {
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateComplianceDto)
+  compliances?: UpdateComplianceDto[];
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateActorDto)
+  actors?: UpdateActorDto[];
+}
