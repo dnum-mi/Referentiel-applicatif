@@ -32,3 +32,24 @@ jobs:
         run: |
           npm ci
           npm run format-check
+
+  test-backend:
+    name: Test Backend
+    needs: build-backend
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start stack using docker compose
+        run: IMAGE_TAG=${{ needs.build-backend.outputs.image_tag }} docker compose -f docker-compose.yml -f docker-compose.ci.yml up backend postgres -d
+      - run: docker compose exec backend pnpm run test:cov
+      - name: Produce the coverage report
+        uses: insightsengineering/coverage-action@v2
+        with:
+          coverage-summary-title: Backend Coverage Summary
+          path: ./backend/coverage/cobertura-coverage.xml
+          publish: true
+          # threshold: 80
+          diff-storage: _xml_coverage_reports_backend
