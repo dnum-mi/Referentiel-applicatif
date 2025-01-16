@@ -21,6 +21,7 @@
     "@gouvfr/dsfr": "~1.12.1",
     "@gouvminint/vue-dsfr": "^6.0.0",
     "axios": "^1.7.7",
+    "date-fns": "^4.1.0",
     "focus-trap": "^7.5.4",
     "focus-trap-vue": "^4.0.3",
     "jsonwebtoken": "^9.0.2",
