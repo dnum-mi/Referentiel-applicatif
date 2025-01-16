@@ -138,6 +138,58 @@ export class AnomalyNotificationService {
     return anomalyNotificationDtos;
   }
 
+  public async getAnomalyNotificationByApplicationId(
+    applicationId: string,
+  ): Promise<GetAnomalyNotificationDto[]> {
+    const anomalyNotifications = await this.prisma.anomalyNotification.findMany(
+      {
+        where: { applicationId },
+        include: {
+          history: true,
+          application: true,
+          notifier: true, // Inclure la relation vers 'User' pour récupérer les données de l'utilisateur
+        },
+      },
+    );
+
+    Logger.log(
+      {
+        message: 'notification by  app id',
+        data: anomalyNotifications,
+      },
+      'create',
+    );
+
+    if (!anomalyNotifications || anomalyNotifications.length === 0) {
+      Logger.error(
+        {
+          message: 'Aucune notification trouvée pour applicationId',
+          applicationId: applicationId,
+        },
+        'getAnomalyNotificationByApplicationId',
+      );
+      throw new Error(
+        'Aucune notification de signalement trouvée pour cette application',
+      );
+    }
+
+    return anomalyNotifications.map((anomaly) => ({
+      id: anomaly.id,
+      applicationId: anomaly.applicationId,
+      application: {
+        id: anomaly.application?.id,
+        label: anomaly.application?.label,
+      },
+      notifierId: anomaly.notifierId,
+      notifier: {
+        email: anomaly.notifier?.email || 'Non disponible', // Accéder à l'email de l'utilisateur via la relation
+      },
+      description: anomaly.description,
+      status: anomaly.status,
+      createdAt: anomaly.createdAt,
+      updatedAt: anomaly.updatedAt || null,
+    }));
+  }
   /**
    * Met à jour une notification d'anomalie existante.
    * @param id L'identifiant de la notification.
