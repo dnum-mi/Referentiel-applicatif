@@ -14,14 +14,14 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       image: ghcr.io/dnum-mi/referentiel-applications/backend
-      context: ./server
+      context: ./backend
 
   build-frontend:
     name: Build Frontend
     uses: ./.github/workflows/build.yml
     with:
       image: ghcr.io/dnum-mi/referentiel-applications/frontend
-      context: ./client
+      context: ./frontend
 
   test-format:
     name: Test Formatting
