@@ -21,16 +21,36 @@ export class ApplicationService {
   applications: any;
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * Crée une nouvelle application.
+   *
+   * @param ownerId L'identifiant du propriétaire de l'application.
+   * @param createApplicationDto Les données nécessaires à la création de l'application.
+   *
+   * @returns L'application nouvellement créée.
+   * @throws BadRequestException Si un utilisateur référencé dans les acteurs n'existe pas.
+   */
   public async createApplication(
     ownerId: string,
     createApplicationDto: CreateApplicationDto,
   ) {
-    Logger.warn(`Creating application with ownerId: ${ownerId}`);
+    Logger.log({
+      message: "Début de la création de l'application",
+      ownerId: ownerId,
+      action: 'create',
+    });
     for (const actor of createApplicationDto.actors) {
       const userExists = await this.prisma.user.findUnique({
         where: { id: actor.userId },
       });
-      Logger.warn('actor', JSON.stringify(actor));
+      Logger.log({
+        message: "Vérification de l'existence de l'utilisateur pour l'acteur",
+        actor: actor,
+        userExists: userExists
+          ? 'Utilisateur trouvé'
+          : 'Utilisateur non trouvé',
+        action: 'create',
+      });
       if (!userExists) {
         throw new BadRequestException(
           `User with ID ${actor.userId} does not exist.`,
@@ -44,14 +64,33 @@ export class ApplicationService {
       applicationMetadata.id,
       createApplicationDto,
     );
+    Logger.log({
+      message: 'Application créée avec succès',
+      applicationId: application.id,
+      action: 'create',
+    });
     return application;
   }
 
+  /**
+   * Met à jour une application existante.
+   *
+   * @param params Contient l'ID de l'application et les données à mettre à jour.
+   *
+   * @returns L'application mise à jour.
+   * @throws NotFoundException Si l'application à mettre à jour n'est pas trouvée.
+   */
   public async update(params: {
     where: Prisma.ApplicationWhereUniqueInput;
     data: PatchApplicationDto;
   }): Promise<Application> {
     const { where, data } = params;
+
+    Logger.log({
+      message: "Début de la mise à jour de l'application",
+      applicationId: where.id,
+      action: 'update',
+    });
 
     const applicationUpdates: Prisma.ApplicationUpdateInput = {};
 
@@ -70,25 +109,38 @@ export class ApplicationService {
     }
 
     try {
-      return await this.prisma.application.update({
+      const updatedApplication = await this.prisma.application.update({
         where,
         data: applicationUpdates,
       });
+      Logger.log({
+        message: 'Application mise à jour avec succès',
+        applicationId: updatedApplication.id,
+        action: 'update',
+      });
+      return updatedApplication;
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
-      ) {
-        throw new NotFoundException(
-          `Application non trouvée pour l'ID: ${where.id}`,
-        );
-      }
-      throw error;
+      throw new NotFoundException(
+        `Application non trouvée pour l'ID: ${where.id}`,
+      );
     }
   }
 
+  /**
+   * Recherche des applications selon les critères fournis.
+   *
+   * @param searchParams Les paramètres de recherche.
+   *
+   * @returns La liste des applications qui correspondent aux critères de recherche.
+   * @throws Error Si une erreur survient pendant la recherche.
+   */
   public async searchApplications(searchParams: SearchApplicationDto) {
     const { label, page = 1, limit = 12 } = searchParams;
+    Logger.log({
+      message: 'Début de la recherche des applications',
+      searchParams: searchParams,
+      action: 'search',
+    });
 
     const whereClause: Prisma.ApplicationWhereInput = {
       ...(label
@@ -123,13 +175,37 @@ export class ApplicationService {
         },
       });
 
+      Logger.log({
+        message: `Applications récupérées avec succès`,
+        applicationsCount: applications.length,
+        action: 'search',
+      });
+
       return applications;
     } catch (error) {
+      Logger.error({
+        message: 'Erreur lors de la recherche des applications',
+        error: error,
+        action: 'search',
+      });
       throw error;
     }
   }
 
+  /**
+   * Récupère une application spécifique par son ID.
+   *
+   * @param id L'identifiant de l'application à récupérer.
+   *
+   * @returns L'application trouvée.
+   * @throws NotFoundException Si l'application n'est pas trouvée.
+   */
   public async getApplicationById(id: string) {
+    Logger.log({
+      message: "Récupération de l'application par ID",
+      applicationId: id,
+      action: 'getApplicationById',
+    });
     const application = await this.prisma.application.findUnique({
       where: { id },
       include: {
@@ -151,14 +227,46 @@ export class ApplicationService {
     });
 
     if (!application) {
+      Logger.error({
+        message: 'Application non trouvée',
+        applicationId: id,
+        action: 'getApplicationById',
+      });
       throw new NotFoundException('Application not found');
     }
 
+    Logger.log({
+      message: 'Application récupérée avec succès',
+      applicationId: id,
+      action: 'getApplicationById',
+    });
     return application;
   }
 
+  /**
+   * Récupère toutes les applications.
+   *
+   * @returns La liste de toutes les applications.
+   * @throws Error Si une erreur survient pendant la récupération des applications.
+   */
   public async getApplications() {
-    return await this.prisma.application.findMany();
+    try {
+      const applications = await this.prisma.application.findMany();
+      Logger.log({
+        message: 'Applications récupérées avec succès',
+        applicationsCount: applications.length,
+        action: 'getApplications',
+      });
+
+      return applications;
+    } catch (error) {
+      Logger.error({
+        message: 'Erreur lors de la récupération des applications',
+        error: error,
+        action: 'getApplications',
+      });
+      throw error;
+    }
   }
 
   private async createApplicationMetadata(ownerId: string) {
