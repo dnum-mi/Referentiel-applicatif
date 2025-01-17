@@ -23,8 +23,8 @@ read_secret:
 
 build-backend:
   variables:
-    WORKING_DIR: ./server
-    DOCKERFILE: ./server/Dockerfile
+    WORKING_DIR: ./backend
+    DOCKERFILE: ./backend/Dockerfile
     IMAGE_NAMES: ref-app-back:${CI_COMMIT_SHORT_SHA} ref-app-back:${CI_COMMIT_REF_NAME}
   stage: docker-build
   extends:
