@@ -15,5 +15,5 @@ enum LifecycleStatus {
   under_construction
   in_production
   decommissioned
-  retired_from_service
+  decommissioning
 }
