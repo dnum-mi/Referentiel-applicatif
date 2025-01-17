@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
-import { LoggerModule } from 'nestjs-pino';
 
 import { ApplicationModule } from './application/application.module';
 import { UserModule } from './user/user.module';
@@ -17,6 +16,7 @@ import { ExportService } from './application/export.service';
 import { AnomalyNotificationModule } from './anomaly-notification/anomaly-notification.module';
 import { AnomalyNotificationController } from './anomaly-notification/anomaly-notification.controller';
 import { AnomalyNotificationService } from './anomaly-notification/anomaly-notification.service';
+import { LoggerModule } from './logger/logger.module';
 @Module({
   imports: [
     PrismaModule,
@@ -25,10 +25,10 @@ import { AnomalyNotificationService } from './anomaly-notification/anomaly-notif
     ExternalSourceModule,
     ExternalModule,
     AnomalyNotificationModule,
+    LoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    LoggerModule.forRoot(), // Added LoggerModule here
   ],
   controllers: [
     AppController,

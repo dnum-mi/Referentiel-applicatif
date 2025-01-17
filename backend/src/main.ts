@@ -1,15 +1,15 @@
 // src/main.ts
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { Logger } from 'nestjs-pino';
+import { Logger as PinoLogger, LoggerErrorInterceptor } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  app.useLogger(app.get(Logger));
+  app.useLogger(app.get(PinoLogger));
   app.setGlobalPrefix('api/v2');
-
+  app.useGlobalInterceptors(new LoggerErrorInterceptor());
   const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
 
   app.enableCors({
