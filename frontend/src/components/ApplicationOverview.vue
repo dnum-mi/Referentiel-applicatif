@@ -3,6 +3,7 @@ import type { Application } from "@/models/Application";
 import { ref } from "vue";
 import InformationsGenerales from "./InformationsGenerales.vue";
 import Acteurs from "./Acteurs.vue";
+import NotificationsApplication from "./NotificationsApplication.vue";
 
 const props = defineProps<{ application: Application }>();
 
@@ -23,6 +24,7 @@ const tabTitles = [
     tabId: "tab-2",
     panelId: "tab-content-2",
   },
+  { title: "Signalements", icon: "ri-alert-line", tabId: "tab-3", panelId: "tab-content-3" },
 ];
 </script>
 
@@ -54,6 +56,11 @@ const tabTitles = [
 
     <DsfrTabContent v-if="activeTab === 2" panel-id="tab-content-2" tab-id="tab-2">
       <Acteurs :application="props.application" />
+    </DsfrTabContent>
+
+    <DsfrTabContent v-if="activeTab === 3" panel-id="tab-content-3" tab-id="tab-3">
+      <NotificationsApplication :application="props.application" />
+      <!-- Composant Signalements -->
     </DsfrTabContent>
   </DsfrTabs>
 </template>

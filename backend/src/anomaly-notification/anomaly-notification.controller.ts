@@ -12,6 +12,7 @@ import {
   NotFoundException,
   Logger,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AnomalyNotificationService } from './anomaly-notification.service';
@@ -157,6 +158,21 @@ export class AnomalyNotificationController {
    * @returns La notification d'anomalie correspondant à l'ID.
    * @throws NotFoundException Si aucune notification n'est trouvée pour cet ID.
    */
+  @Get('/:applicationId')
+  async getNotificationsByApplicationId(
+    @Param('applicationId') applicationId: string,
+  ): Promise<GetAnomalyNotificationDto[]> {
+    try {
+      return await this.anomalyNotificationService.getAnomalyNotificationByApplicationId(
+        applicationId,
+      );
+    } catch (error) {
+      throw new NotFoundException(
+        "Aucune notification trouvée pour l'application avec l'ID spécifié.",
+      );
+    }
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une notification spécifique par ID' })
   findOne(@Param('id') id: string) {

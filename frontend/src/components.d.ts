@@ -34,6 +34,8 @@ declare module 'vue' {
     DsfrTag: typeof import('@gouvminint/vue-dsfr')['DsfrTag']
     ExportApplications: typeof import('./components/ExportApplications.vue')['default']
     InformationsGenerales: typeof import('./components/InformationsGenerales.vue')['default']
+    NotificationsApllication: typeof import('./components/NotificationsApplication.vue')['default']
+    NotificationsApplication: typeof import('./components/NotificationsApplication.vue')['default']
     Objectifs: typeof import('./components/Objectifs.vue')['default']
     ReloadPrompt: typeof import('./components/ReloadPrompt.vue')['default']
     ReportIssue: typeof import('./components/ReportIssue.vue')['default']
