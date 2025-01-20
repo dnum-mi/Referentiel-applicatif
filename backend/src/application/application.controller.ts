@@ -1,5 +1,4 @@
 import { UserService } from '../user/user.service';
-import { AuthUtils } from '../utils/helpers';
 import {
   Controller,
   Post,
@@ -12,6 +11,7 @@ import {
   NotFoundException,
   BadRequestException,
   Response,
+  Logger,
 } from '@nestjs/common';
 import { ApplicationService } from './application.service';
 import {
@@ -63,13 +63,16 @@ export class ApplicationController {
     @Body() createApplicationDto: CreateApplicationDto,
     @Request() req,
   ) {
-    const decodedToken = AuthUtils.getDecodedToken(req);
-    const userFromDb = await AuthUtils.findOrCreateUser(
-      decodedToken,
-      this.userService,
-    );
+    const user = req.user;
+
+    Logger.log({
+      message: "Début de la création de l'application",
+      userId: user.keycloakId,
+      action: 'create',
+    });
+
     const newApplication = await this.applicationService.createApplication(
-      userFromDb.keycloakId,
+      user.keycloakId,
       createApplicationDto,
     );
     return newApplication;

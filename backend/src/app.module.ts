@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -18,6 +18,8 @@ import { AnomalyNotificationController } from './anomaly-notification/anomaly-no
 import { AnomalyNotificationService } from './anomaly-notification/anomaly-notification.service';
 import { LoggerModule } from './logger/logger.module';
 import { CombinedInterceptor } from './logger/combined.interceptor';
+import { AuthMiddleware } from './middlewares/auth.middleware';
+
 @Module({
   imports: [
     PrismaModule,
@@ -44,6 +46,11 @@ import { CombinedInterceptor } from './logger/combined.interceptor';
     ExportService,
     UserService,
     CombinedInterceptor,
+    AuthMiddleware,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes('*');
+  }
+}
