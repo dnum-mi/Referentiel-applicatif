@@ -17,6 +17,7 @@ const lifecycleStatusesDict = {
   under_construction: " en construction",
   in_production: "en production",
   decommissioned: "décomissioné",
+  decommissioning: "en décomissionnement",
 };
 
 const lifecycleStatuses = computed(() => Object.entries(lifecycleStatusesDict).map(([value, text]) => ({ value, text })));
