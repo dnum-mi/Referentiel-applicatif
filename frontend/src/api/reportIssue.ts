@@ -17,14 +17,21 @@ const reportIssue = {
     } catch (error) {
       throw error;
     }
-  } /*
-  async getAllIssueByNotifierId(notifierId?: string): Promise<ReportIssue[]> {
+  },
+
+  // Dans le fichier reportIssue.ts
+  async getNotificationsByApplicationId(applicationId: string) {
     try {
-      return await axios.get(`/anomaly-notification/${notifierId}`);
+      console.log("Requesting notifications for applicationId:", applicationId);
+      const response = await requests.get<ReportIssue[]>(`/anomaly-notifications/${applicationId}`);
+      console.log(response);
+      return response;
     } catch (error) {
+      console.error("Erreur lors de la récupération des notifications :", error.response || error);
       throw error;
     }
-  },*/,
+  },
+
   async getReportIssueByNotifierId(): Promise<ReportIssue[]> {
     try {
       return await requests.get<ReportIssue[]>("/anomaly-notifications/user-notifications");
