@@ -58,10 +58,10 @@ export class AnomalyNotificationController {
     });
     const decodedToken = AuthUtils.getDecodedToken(req);
     if (typeof decodedToken.sub !== 'string') {
-      Logger.log({
-        message: 'Token invalide : identifiant utilisateur manquant',
-        error: 'BadRequestException',
-        action: 'create',
+      Logger.error({
+        action: 'CREATE_NOTIFICATION',
+        description: 'Token invalide : identifiant utilisateur manquant',
+        requestId: req['requestId'] || 'non défini',
       });
       throw new BadRequestException(
         'Token invalide : identifiant utilisateur manquant',
@@ -74,9 +74,12 @@ export class AnomalyNotificationController {
       notifierId: currentNotifierId,
     };
     Logger.log({
-      message: 'Données de la notification préparées pour la création.',
-      data: data,
-      action: 'create',
+      action: 'CREATE_NOTIFICATION',
+      description: 'Préparation des données de notification',
+      userId: currentNotifierId,
+      dataSummary: {
+        applicationId: data.applicationId,
+      },
     });
     return this.anomalyNotificationService.create(req, data);
   }
