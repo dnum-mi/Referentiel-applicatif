@@ -1,3 +1,4 @@
+import { AnomalyNotification } from './../../node_modules/.pnpm/@prisma+client@6.2.1_prisma@6.2.1/node_modules/.prisma/client/index.d';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAnomalyNotificationDto } from './dto/create-anomaly-notification.dto';
@@ -15,35 +16,30 @@ export class AnomalyNotificationService {
    * @param data Les données nécessaires pour créer la notification.
    * @returns La notification d'anomalie créée.
    */
-  public async create(req: Request, data: CreateAnomalyNotificationDto) {
-    const decodedToken = AuthUtils.getDecodedToken(req);
-    const notifierId = decodedToken.sub;
-
-    const correctionDemand = await this.prisma.anomalyNotification.create({
+  public async create(data: CreateAnomalyNotificationDto) {
+    const anomalyNotification = await this.prisma.anomalyNotification.create({
       data: {
         application: {
           connect: { id: data.applicationId },
         },
         notifier: {
-          connect: { id: notifierId },
+          connect: { id: data.notifierId },
         },
         description: data.description,
         status: data.status,
       },
     });
-
     Logger.log({
       message: "Création de la notification d'anomalie.",
       data: {
         applicationId: data.applicationId,
-        notifierId: notifierId,
+        notifierId: data.notifierId,
         description: data.description,
         status: data.status,
       },
       action: 'create',
     });
-
-    return correctionDemand;
+    return anomalyNotification;
   }
 
   /**

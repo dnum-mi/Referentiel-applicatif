@@ -1,5 +1,5 @@
 model User {
-  id                  String                     @id @default(uuid())
+  id                  String                @id @default(uuid())
   keycloakId          String                @unique
   email               String                @unique
   organizationId      String?
@@ -23,7 +23,6 @@ model Actor {
   externalOrganization External?    @relation("ActorOrganization", fields: [organizationId], references: [id])
   applicationId        String?
   application          Application? @relation("ApplicationActors", fields: [applicationId], references: [id])
-
   @@index([userId])
   @@index([applicationId])
   @@map("actors")

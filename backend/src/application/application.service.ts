@@ -43,7 +43,7 @@ export class ApplicationService {
       const userExists = await this.prisma.user.findUnique({
         where: { id: actor.userId },
       });
-      Logger.log({
+      Logger.verbose({
         message: "Vérification de l'existence de l'utilisateur pour l'acteur",
         actor: actor,
         userExists: userExists
@@ -568,15 +568,15 @@ export class ApplicationService {
     applicationId: string,
   ): Prisma.ActorCreateWithoutApplicationInput[] {
     return dtos.map((dto) => {
-      if (!dto.user || !dto.user.keycloakId) {
-        throw new Error('Missing user.keycloakId for a new Actor');
+      if (!dto.user || !dto.user.id) {
+        throw new Error('Missing user.id for a new Actor');
       }
 
       return {
         role: dto.role,
         application: { connect: { id: applicationId } },
         user: {
-          connect: { keycloakId: dto.user.keycloakId },
+          connect: { id: dto.user.id },
         },
       };
     });

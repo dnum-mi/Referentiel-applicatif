@@ -55,7 +55,7 @@ const Applications = {
               role: actor.role,
               user: actor.user
                 ? {
-                    keycloakId: actor.user.keycloakId,
+                    id: actor.user.id,
                     email: actor.user.email,
                   }
                 : null,

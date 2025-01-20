@@ -45,7 +45,7 @@ export class ExternalSourceController {
       const newExternalSource =
         await this.externalSourceService.createExternalSource(
           createExternalSourceDto,
-          userFromDb.keycloakId,
+          userFromDb.id,
         );
 
       return {

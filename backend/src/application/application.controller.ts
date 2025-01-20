@@ -71,7 +71,7 @@ export class ApplicationController {
     );
     Logger.log({
       message: "Début de la création de l'application",
-      userId: userFromDb.keycloakId,
+      userId: userFromDb.id,
       action: 'create',
     });
 
