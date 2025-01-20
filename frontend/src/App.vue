@@ -18,10 +18,10 @@ const operatorTo = "/applications";
 const ecosystemLinks = [
   { label: "CCT", href: "https://cct.sg.minint.fr/accueil/Accueil.html" },
   { label: "Code source", href: "http://github.com/dnum-mi/referentiel-applications" },
-  { label: "Api du référentiel", href: `${import.meta.env.VITE_RDA_API_URL}` },
+  { label: "Api du référentiel", href: `${import.meta.env.VITE_RDA_API_URL}/api/v2/` },
 ];
 const mandatoryLinks = [
-  { label: "Accessibilité : non conforme" },
+  { label: "Accessibilité : non conforme", to: "accessibilite" },
   {
     label: "Contact",
     href: "https://www.tchap.gouv.fr/#/room/!ydoKqFOXRAQPQYFvqa:agent.interieur.tchap.gouv.fr?via=agent.interieur.tchap.gouv.fr",
