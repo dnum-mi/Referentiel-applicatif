@@ -56,13 +56,24 @@ export class AnomalyNotificationController {
         'Token invalide : identifiant utilisateur manquant',
       );
     }
-    const currentNotifierId = decodedToken.sub;
+    const userFromDb = await AuthUtils.findOrCreateUser(
+      decodedToken,
+      this.userService,
+    );
 
     const data: CreateAnomalyNotificationDto = {
       ...requestData,
-      notifierId: currentNotifierId,
+      notifierId: userFromDb.id, // on passe la VRAIE PK de l’utilisateur
     };
-    return this.anomalyNotificationService.create(req, data);
+    Logger.log({
+      action: 'CREATE_NOTIFICATION',
+      description: 'Préparation des données de notification',
+      userId: userFromDb.id,
+      dataSummary: {
+        applicationId: data.applicationId,
+      },
+    });
+    return this.anomalyNotificationService.create(data);
   }
 
   /**
@@ -105,7 +116,7 @@ export class AnomalyNotificationController {
 
       const anomalyNotifications =
         await this.anomalyNotificationService.getAnomalyNotificationByNotifierId(
-          userFromDb.keycloakId,
+          userFromDb.id,
         );
       return anomalyNotifications;
     } catch (error) {

@@ -1,5 +1,6 @@
 model User {
-  keycloakId          String                @id
+  id                  String                @id @default(uuid())
+  keycloakId          String                @unique
   email               String                @unique
   organizationId      String?
   organization        External?             @relation(fields: [organizationId], references: [id])

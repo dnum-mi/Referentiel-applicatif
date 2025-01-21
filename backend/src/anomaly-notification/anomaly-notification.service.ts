@@ -14,26 +14,31 @@ export class AnomalyNotificationService {
    * @param data Les données nécessaires pour créer la notification.
    * @returns La notification d'anomalie créée.
    */
-  public async create(req: Request, data: CreateAnomalyNotificationDto) {
-    const decodedToken = AuthUtils.getDecodedToken(req);
-    const notifierId = decodedToken.sub;
-
-    const correctionDemand = await this.prisma.anomalyNotification.create({
+  public async create(data: CreateAnomalyNotificationDto) {
+    const anomalyNotification = await this.prisma.anomalyNotification.create({
       data: {
         application: {
           connect: { id: data.applicationId },
         },
         notifier: {
-          connect: { keycloakId: notifierId },
+          connect: { id: data.notifierId },
         },
         description: data.description,
         status: data.status,
       },
     });
-
-    return correctionDemand;
+    Logger.log({
+      message: "Création de la notification d'anomalie.",
+      data: {
+        applicationId: data.applicationId,
+        notifierId: data.notifierId,
+        description: data.description,
+        status: data.status,
+      },
+      action: 'create',
+    });
+    return anomalyNotification;
   }
-
   /**
    * Récupère toutes les notifications d'anomalies.
    * @returns Un tableau de notifications d'anomalies.

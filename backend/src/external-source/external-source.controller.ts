@@ -12,7 +12,6 @@ import { CreateExternalSourceDto } from './dto/create-external-source.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthUtils } from '../utils/helpers';
 
-@ApiTags('external-sources')
 @Controller('external-sources')
 export class ExternalSourceController {
   constructor(
@@ -45,7 +44,7 @@ export class ExternalSourceController {
       const newExternalSource =
         await this.externalSourceService.createExternalSource(
           createExternalSourceDto,
-          userFromDb.keycloakId,
+          userFromDb.id,
         );
 
       return {

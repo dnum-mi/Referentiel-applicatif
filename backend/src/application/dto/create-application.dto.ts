@@ -48,7 +48,7 @@ export class CreateActorDto {
 export class UpdateActorUserDto {
   @IsOptional()
   @IsString()
-  keycloakId?: string;
+  id?: string;
 
   @IsOptional()
   @IsString()

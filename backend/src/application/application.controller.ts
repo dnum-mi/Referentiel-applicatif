@@ -68,8 +68,14 @@ export class ApplicationController {
       decodedToken,
       this.userService,
     );
+    Logger.log({
+      message: "Début de la création de l'application",
+      userId: userFromDb.id,
+      action: 'create',
+    });
+
     const newApplication = await this.applicationService.createApplication(
-      userFromDb.keycloakId,
+      userFromDb.id,
       createApplicationDto,
     );
     return newApplication;

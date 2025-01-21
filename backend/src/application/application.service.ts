@@ -34,7 +34,7 @@ export class ApplicationService {
   ) {
     for (const actor of createApplicationDto.actors) {
       const userExists = await this.prisma.user.findUnique({
-        where: { keycloakId: actor.userId },
+        where: { id: actor.userId },
       });
 
       if (!userExists) {
@@ -224,7 +224,7 @@ export class ApplicationService {
         purposes: createApplicationDto.purposes,
         tags: createApplicationDto.tags,
         metadata: { connect: { id: applicationMetadataId } },
-        owner: { connect: { keycloakId: ownerId } },
+        owner: { connect: { id: ownerId } },
         lifecycle: {
           create: {
             status: createApplicationDto.lifecycle.status,
@@ -244,7 +244,7 @@ export class ApplicationService {
           create: Array.isArray(createApplicationDto.actors)
             ? createApplicationDto.actors.map((actorDto) => ({
                 role: actorDto.role,
-                user: { connect: { keycloakId: actorDto.userId } },
+                user: { connect: { id: actorDto.userId } },
                 externalOrganization: actorDto.organizationId
                   ? { connect: { id: actorDto.organizationId } }
                   : undefined,
@@ -497,15 +497,15 @@ export class ApplicationService {
     applicationId: string,
   ): Prisma.ActorCreateWithoutApplicationInput[] {
     return dtos.map((dto) => {
-      if (!dto.user || !dto.user.keycloakId) {
-        throw new Error('Missing user.keycloakId for a new Actor');
+      if (!dto.user || !dto.user.id) {
+        throw new Error('Missing user.id for a new Actor');
       }
 
       return {
         role: dto.role,
         application: { connect: { id: applicationId } },
         user: {
-          connect: { keycloakId: dto.user.keycloakId },
+          connect: { id: dto.user.id },
         },
       };
     });
