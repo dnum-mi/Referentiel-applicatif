@@ -302,15 +302,6 @@ export class CreateApplicationDto {
     firstProductionDate: new Date().toISOString(),
   };
 
-  @ApiProperty({
-    type: [CreateActorDto],
-    description: 'List of actors associated with the application',
-  })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateActorDto)
-  actors: CreateActorDto[] = [];
-
   @ApiProperty({ type: [CreateComplianceDto] })
   @IsArray()
   @ValidateNested({ each: true })

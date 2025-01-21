@@ -3,11 +3,11 @@ model Metadata {
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   createdById   String       
-  createdBy     User         @relation("MetadataCreatedBy", fields: [createdById], references: [keycloakId])
+  createdBy     User         @relation("MetadataCreatedBy", fields: [createdById], references: [id])
   updatedById   String       
-  updatedBy     User         @relation("MetadataUpdatedBy", fields: [updatedById], references: [keycloakId])
+  updatedBy     User         @relation("MetadataUpdatedBy", fields: [updatedById], references: [id])
   dataOwnerId       String?      
-  dataOwner         User?        @relation("MetadataDataOwnerBy", fields: [dataOwnerId], references: [keycloakId])
+  dataOwner         User?        @relation("MetadataDataOwnerBy", fields: [dataOwnerId], references: [id])
   externals      External[]  @relation("ExternalsMetadata")
   externalSources ExternalSource[] @relation("ExternalSourcesMetadata")
   applications  Application[] @relation("ApplicationMetadata") 

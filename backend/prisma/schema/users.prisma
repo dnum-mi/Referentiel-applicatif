@@ -17,8 +17,8 @@ model User {
 model Actor {
   id                   String       @id @default(uuid())
   role                 String
-  userId               String
-  user                 User         @relation("UserActors", fields: [userId], references: [keycloakId])
+  userId               String?
+  user                 User?         @relation("UserActors", fields: [userId], references: [id])
   organizationId       String?
   externalOrganization External?    @relation("ActorOrganization", fields: [organizationId], references: [id])
   applicationId        String?

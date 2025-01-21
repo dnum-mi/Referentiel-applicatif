@@ -39,6 +39,7 @@ export class AnomalyNotificationService {
     });
     return anomalyNotification;
   }
+
   /**
    * Récupère toutes les notifications d'anomalies.
    * @returns Un tableau de notifications d'anomalies.

@@ -19,7 +19,7 @@ model Application {
   anomalyNotification AnomalyNotification[] @relation("ApplicationAnomalyNotification")
 
   ownerId String
-  owner   User   @relation("UserApplications", fields: [ownerId], references: [keycloakId])
+  owner   User   @relation("UserApplications", fields: [ownerId], references: [id])
 
   @@index([label])
   @@index([shortName])

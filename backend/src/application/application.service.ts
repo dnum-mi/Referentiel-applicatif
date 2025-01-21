@@ -241,16 +241,14 @@ export class ApplicationService {
           },
         },
         actors: {
-          create: Array.isArray(createApplicationDto.actors)
-            ? createApplicationDto.actors.map((actorDto) => ({
-                role: actorDto.role,
-                user: { connect: { id: actorDto.userId } },
-                externalOrganization: actorDto.organizationId
-                  ? { connect: { id: actorDto.organizationId } }
-                  : undefined,
-              }))
-            : [],
+          create: [
+            {
+              role: 'Creator',
+              user: { connect: { id: ownerId } }
+            }
+          ],
         },
+  
         compliances: {
           create: createApplicationDto.compliances.map((compliance) => ({
             ...compliance,
