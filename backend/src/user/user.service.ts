@@ -11,18 +11,14 @@ export class UserService {
     });
   }
 
-  async findOrCreateByEmail(
-    email: string,
-    keycloakId: string,
-  ): Promise<User | null> {
+
+  async findOrCreateByEmail(email: string, keycloakId?: string): Promise<User> {
     return this.prisma.user.upsert({
-      where: {
-        email: email,
-      },
+      where: { email },
       update: {},
       create: {
-        email: email,
-        keycloakId: keycloakId,
+        email,
+        keycloakId: keycloakId ?? '',
       },
     });
   }

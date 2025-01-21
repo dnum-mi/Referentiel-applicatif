@@ -13,11 +13,15 @@ import {
 } from './dto/create-application.dto';
 import { SearchApplicationDto } from './dto/search-application.dto';
 import { Prisma, Application } from '@prisma/client';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class ApplicationService {
   applications: any;
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private userService: UserService,
+  )  {}
 
   /**
    * Crée une nouvelle application.
@@ -210,11 +214,73 @@ export class ApplicationService {
     return applicationMetadata;
   }
 
+  /**
+ * Construit la liste d'acteurs à créer pour une nouvelle Application.
+ *
+ * @param ownerId L'ID du user qui crée l'application (sera "Creator").
+ * @param actorDtos La liste des acteurs éventuels passés dans le DTO.
+ * @returns Un tableau d'objets `ActorCreateWithoutApplicationInput` prêts à être utilisés.
+ */
+private async buildActorsToCreate(
+  ownerId: string,
+  actorDtos: Array<{
+    userId?: string;
+    email?: string;
+    role: string;
+    organizationId?: string;
+  }>,
+): Promise<Prisma.ActorCreateWithoutApplicationInput[]> {
+ 
+  const actorsToCreate: Prisma.ActorCreateWithoutApplicationInput[] = [];
+
+
+  actorsToCreate.push({
+    role: 'Creator',
+    user: { connect: { id: ownerId } },
+  });
+
+  if (Array.isArray(actorDtos)) {
+    for (const actorDto of actorDtos) {
+      if (actorDto.userId) {
+        actorsToCreate.push({
+          role: actorDto.role,
+          user: { connect: { id: actorDto.userId } },
+          email: actorDto.email || null,
+        });
+      }
+      else if (actorDto.email) {
+        const user = await this.userService.findOrCreateByEmail(actorDto.email, '');
+        const userIdForActor = user.id;
+        actorsToCreate.push({
+          role: actorDto.role,
+          user: { connect: { id: userIdForActor } },
+          ...(actorDto.organizationId && {
+            externalOrganization: { connect: { id: actorDto.organizationId } },
+          }),
+        });
+      }
+      else {
+        throw new BadRequestException(
+          'Actor must have at least a userId or an email.',
+        );
+      }
+    }
+  }
+
+  return actorsToCreate;
+}
+
   private async persistApplication(
     ownerId: string,
     applicationMetadataId: string,
     createApplicationDto,
   ) {
+
+    const actorsToCreate = await this.buildActorsToCreate(
+      ownerId,
+      createApplicationDto.actors ?? [],
+    );
+
     const application = await this.prisma.application.create({
       data: {
         label: createApplicationDto.label,
@@ -241,12 +307,7 @@ export class ApplicationService {
           },
         },
         actors: {
-          create: [
-            {
-              role: 'Creator',
-              user: { connect: { id: ownerId } }
-            }
-          ],
+          create: actorsToCreate,
         },
   
         compliances: {

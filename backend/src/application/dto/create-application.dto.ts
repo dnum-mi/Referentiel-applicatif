@@ -7,6 +7,7 @@ import {
   IsEnum,
   IsDateString,
   ValidateNested,
+  IsEmail,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -20,6 +21,11 @@ export class CreateActorDto {
   @IsString()
   @IsOptional()
   role: string;
+
+  @IsEmail()
+  @IsOptional()
+  email?: string;
+
 
   @ApiProperty({ example: 'user123', description: 'ID of the user' })
   @IsString()
@@ -48,7 +54,7 @@ export class CreateActorDto {
 export class UpdateActorUserDto {
   @IsOptional()
   @IsString()
-  id?: string;
+  id  ?: string;
 
   @IsOptional()
   @IsString()
