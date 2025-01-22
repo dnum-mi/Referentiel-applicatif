@@ -32,7 +32,7 @@ export class AnomalyNotificationController {
   constructor(
     private readonly anomalyNotificationService: AnomalyNotificationService,
     private readonly userService: UserService,
-  ) {}
+  ) { }
 
   /**
    * Crée une nouvelle notification d'anomalie.
@@ -102,6 +102,7 @@ export class AnomalyNotificationController {
         decodedToken,
         this.userService,
       );
+
       const anomalyNotifications =
         await this.anomalyNotificationService.getAnomalyNotificationByNotifierId(
           userFromDb.keycloakId,
