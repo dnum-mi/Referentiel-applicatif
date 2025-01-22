@@ -9,6 +9,44 @@ const props = defineProps<{ application: Application }>();
 
 const notifications = ref<any[]>([]);
 
+const statusDictionary = {
+  in_pending: "En attente",
+  in_progress: "En cours",
+  done: "Terminé",
+};
+
+const statusIconClasses = {
+  in_pending: "ri-time-line",
+  in_progress: "ri-loader-2-line",
+  done: "ri-check-line",
+};
+
+const statusColors = {
+  in_pending: "bg-warning",
+  in_progress: "bg-info",
+  done: "bg-success",
+};
+
+const rowsPerPage = ref(2); // à dynamiser
+const currentPage = ref(0);
+
+const paginatedNotifications = computed(() => {
+  const start = currentPage.value * rowsPerPage.value;
+  const end = start + rowsPerPage.value;
+  return notifications.value.slice(start, end);
+});
+
+const totalNotifications = computed(() => notifications.value.length);
+
+const pages = computed(() => {
+  const totalPages = Math.max(1, Math.ceil(totalNotifications.value / rowsPerPage.value));
+  return Array.from({ length: totalPages }, (_, i) => ({
+    title: `${i + 1}`,
+    href: `#${i + 1}`,
+    label: `${i + 1}`,
+  }));
+});
+
 const loadNotifications = async () => {
   try {
     const notificationList = await Issue.getNotificationsByApplicationId(props.application.id);
@@ -28,7 +66,7 @@ onMounted(() => {
   <section class="fr-container fr-my-2v">
     <div v-if="notifications && notifications.length > 0">
       <ul class="fr-list fr-list--unstyled">
-        <li v-for="(notification, index) in notifications" :key="index" class="bg-contrast-grey fr-mt-2w">
+        <li v-for="(notification, index) in paginatedNotifications" :key="index" class="bg-contrast-grey fr-mt-2w">
           <header class="fr-grid-row fr-grid-row--middle fr-px-3w no-wrap">
             <div class="fr-text--sm text-grey-380">
               <strong>Notifié par:</strong> <span class="fr-text--bold">{{ notification.notifier.email }}</span>
@@ -53,6 +91,7 @@ onMounted(() => {
       <p>Aucune notification disponible.</p>
     </div>
   </section>
+  <DsfrPagination v-model:current-page="currentPage" :pages="pages" :rows-per-page="rowsPerPage" />
 </template>
 
 <style scoped>
