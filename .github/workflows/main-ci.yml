@@ -44,6 +44,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Start stack using docker compose
         run: IMAGE_TAG=${{ needs.build-backend.outputs.image_tag }} docker compose -f docker-compose.yml -f docker-compose.ci.yml up backend postgres -d
+      - run: docker compose exec backend npx prisma migrate deploy
       - run: docker compose exec backend pnpm run test:cov
       - name: Produce the coverage report
         uses: insightsengineering/coverage-action@v2
