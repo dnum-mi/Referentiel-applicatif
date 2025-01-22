@@ -4,7 +4,7 @@ import type { Application } from "@/models/Application";
 import { onMounted, ref } from "vue";
 import { routeNames } from "@/router/route-names";
 import { formatDate } from "@/composables/use-date";
-import {statusDictionary, statusIconClasses} from "@/composables/use-dictionnary";
+import { statusDictionary, statusIconClasses } from "@/composables/use-dictionnary";
 
 const title = "Liste de mes signalements";
 const headers = ["Application", "Description", "Date", "Statut"];
@@ -25,7 +25,7 @@ const loadReports = async () => {
       report.description,
       formatDate(report.createdAt),
       {
-        component: 'DsfrTag',
+        component: "DsfrTag",
         icon: statusIconClasses[report.status],
         label: statusDictionary[report.status],
         class: report.status,
@@ -38,7 +38,7 @@ const loadReports = async () => {
     }
     console.error("Une erreur est survenue lors du chargement des signalements :", error);
     throw error;
-    }
+  }
 };
 
 onMounted(() => {
@@ -47,7 +47,6 @@ onMounted(() => {
 </script>
 
 <template>
-
   <div class="fr-container fr-my-2v w-[800px]">
     <div v-if="rows.length === 0" class="text-center">
       <p>Aucun signalement recensé.</p>
@@ -69,7 +68,6 @@ onMounted(() => {
       sorted="id"
       :sortable-rows="['id']"
     >
-
       <template #cell="{ colKey, cell }">
         <template v-if="colKey === 'Application'">
           <router-link :to="cell.to">
@@ -77,11 +75,7 @@ onMounted(() => {
           </router-link>
         </template>
         <template v-else-if="colKey === 'Statut'">
-          <DsfrTag 
-            :icon="cell.icon"
-            :class="cell.class"
-            :label="cell.label"
-          />
+          <DsfrTag :icon="cell.icon" :class="cell.class" :label="cell.label" />
         </template>
         <template v-else>
           {{ cell }}
@@ -110,22 +104,21 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 200px; 
-  color: #555; 
+  height: 200px;
+  color: #555;
   font-size: 1.2rem;
-  font-weight: 500; 
-  background-color: #f9f9f9; 
-  border: 1px dashed #ccc; 
+  font-weight: 500;
+  background-color: #f9f9f9;
+  border: 1px dashed #ccc;
   border-radius: 8px;
-  padding: 20px; 
-  margin: 20px auto; 
-  width: 80%; 
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  padding: 20px;
+  margin: 20px auto;
+  width: 80%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .text-center p {
-  margin: 0; 
+  margin: 0;
   text-align: center;
 }
-
 </style>

@@ -3,7 +3,7 @@ import Issue from "@/api/reportIssue";
 import type { Application } from "@/models/Application";
 import { onMounted, ref } from "vue";
 import { formatDate } from "@/composables/use-date";
-import {statusDictionary, statusIconClasses, statusColors} from "@/composables/use-dictionnary";
+import { statusDictionary, statusIconClasses, statusColors } from "@/composables/use-dictionnary";
 
 const props = defineProps<{ application: Application }>();
 

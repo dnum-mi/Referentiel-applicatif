@@ -32,7 +32,7 @@ export class AnomalyNotificationController {
   constructor(
     private readonly anomalyNotificationService: AnomalyNotificationService,
     private readonly userService: UserService,
-  ) { }
+  ) {}
 
   /**
    * Crée une nouvelle notification d'anomalie.
