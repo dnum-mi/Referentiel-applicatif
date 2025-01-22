@@ -4,7 +4,6 @@ import { CreateAnomalyNotificationDto } from './dto/create-anomaly-notification.
 import { UpdateAnomalyNotificationDto } from './dto/update-anomaly-notification.dto';
 import { GetAnomalyNotificationDto } from './dto/get-anomaly-notification.dto';
 import { AuthUtils } from '../utils/helpers';
-import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class AnomalyNotificationService {
@@ -32,17 +31,6 @@ export class AnomalyNotificationService {
       },
     });
 
-    Logger.log({
-      message: "Création de la notification d'anomalie.",
-      data: {
-        applicationId: data.applicationId,
-        notifierId: notifierId,
-        description: data.description,
-        status: data.status,
-      },
-      action: 'create',
-    });
-
     return correctionDemand;
   }
 
@@ -54,11 +42,7 @@ export class AnomalyNotificationService {
     const notifications = await this.prisma.anomalyNotification.findMany({
       include: { history: true, application: true },
     });
-    Logger.log({
-      message: 'Notifications récupérées avec succès.',
-      count: notifications.length,
-      action: 'findAll',
-    });
+
     return notifications;
   }
 
@@ -69,27 +53,13 @@ export class AnomalyNotificationService {
    * @throws NotFoundException Si la notification n'est pas trouvée.
    */
   async findOne(id: string) {
-    Logger.log({
-      message: `Récupération de la notification avec l'ID: ${id}`,
-      action: 'findOne',
-    });
     const notification = await this.prisma.anomalyNotification.findUnique({
       where: { id },
       include: { history: true, application: true },
     });
     if (!notification) {
-      Logger.error({
-        message: `Notification avec l'ID ${id} non trouvée.`,
-        id: id,
-        action: 'findOne',
-      });
       throw new NotFoundException(`Notification avec l'id ${id} non trouvée`);
     }
-    Logger.log({
-      message: 'Notification trouvée avec succès.',
-      notification: notification,
-      action: 'findOne',
-    });
 
     return notification;
   }
@@ -97,10 +67,6 @@ export class AnomalyNotificationService {
   public async getAnomalyNotificationByNotifierId(
     notifierId: string,
   ): Promise<GetAnomalyNotificationDto[]> {
-    Logger.log({
-      message: `Récupération des notifications pour le notifierId: ${notifierId}`,
-      action: 'getAnomalyNotificationByNotifierId',
-    });
     const anomalyNotifications = await this.prisma.anomalyNotification.findMany(
       {
         where: { notifierId },
@@ -108,11 +74,6 @@ export class AnomalyNotificationService {
       },
     );
     if (!anomalyNotifications || anomalyNotifications.length === 0) {
-      Logger.error({
-        message: `Aucune notification trouvée pour notifierId: ${notifierId}`,
-        notifierId: notifierId,
-        action: 'getAnomalyNotificationByNotifierId',
-      });
       throw new NotFoundException('Aucune notification de signalement trouvée');
     }
     const anomalyNotificationDtos = anomalyNotifications.map((anomaly) => ({
@@ -128,12 +89,6 @@ export class AnomalyNotificationService {
       createdAt: anomaly.createdAt,
       updatedAt: anomaly.updatedAt || null,
     }));
-    Logger.log({
-      message: 'Notifications récupérées par notifierId.',
-      notifierId: notifierId,
-      count: anomalyNotificationDtos.length,
-      action: 'getAnomalyNotificationByNotifierId',
-    });
 
     return anomalyNotificationDtos;
   }
@@ -147,27 +102,12 @@ export class AnomalyNotificationService {
         include: {
           history: true,
           application: true,
-          notifier: true, // Inclure la relation vers 'User' pour récupérer les données de l'utilisateur
+          notifier: true,
         },
       },
-    );
-
-    Logger.log(
-      {
-        message: 'notification by  app id',
-        data: anomalyNotifications,
-      },
-      'create',
     );
 
     if (!anomalyNotifications || anomalyNotifications.length === 0) {
-      Logger.error(
-        {
-          message: 'Aucune notification trouvée pour applicationId',
-          applicationId: applicationId,
-        },
-        'getAnomalyNotificationByApplicationId',
-      );
       throw new Error(
         'Aucune notification de signalement trouvée pour cette application',
       );
@@ -198,22 +138,11 @@ export class AnomalyNotificationService {
    * @throws NotFoundException Si la notification n'est pas trouvée.
    */
   async update(id: string, data: UpdateAnomalyNotificationDto) {
-    Logger.log({
-      message: `Mise à jour de la notification avec l'ID: ${id}`,
-      data: data,
-      action: 'update',
-    });
     await this.findOne(id);
 
     const updatedNotification = await this.prisma.anomalyNotification.update({
       where: { id },
       data,
-    });
-
-    Logger.log({
-      message: 'Notification mise à jour avec succès.',
-      notification: updatedNotification,
-      action: 'update',
     });
 
     return updatedNotification;
@@ -227,30 +156,14 @@ export class AnomalyNotificationService {
    */
   async remove(id: string) {
     try {
-      Logger.log({
-        message: `Suppression de la notification avec l'ID: ${id}`,
-        action: 'remove',
-      });
-
       await this.findOne(id);
 
       const deletedNotification = await this.prisma.anomalyNotification.delete({
         where: { id },
       });
 
-      Logger.log({
-        message: 'Notification supprimée avec succès.',
-        notification: deletedNotification,
-        action: 'remove',
-      });
-
       return deletedNotification;
     } catch (error) {
-      Logger.error({
-        message: `Erreur lors de la suppression de la notification avec l'ID: ${id}`,
-        error: error,
-        action: 'remove',
-      });
       throw error;
     }
   }

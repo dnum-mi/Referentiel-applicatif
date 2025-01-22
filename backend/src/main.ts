@@ -4,12 +4,15 @@ import { NestFactory } from '@nestjs/core';
 import { Logger as PinoLogger, LoggerErrorInterceptor } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { CombinedInterceptor } from './logger/combined.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   app.useLogger(app.get(PinoLogger));
   app.setGlobalPrefix('api/v2');
-  app.useGlobalInterceptors(new LoggerErrorInterceptor());
+
+  const combinedInterceptor = app.get(CombinedInterceptor);
+  app.useGlobalInterceptors(combinedInterceptor);
   const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
 
   app.enableCors({

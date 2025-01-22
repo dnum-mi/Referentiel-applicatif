@@ -17,6 +17,7 @@ import { AnomalyNotificationModule } from './anomaly-notification/anomaly-notifi
 import { AnomalyNotificationController } from './anomaly-notification/anomaly-notification.controller';
 import { AnomalyNotificationService } from './anomaly-notification/anomaly-notification.service';
 import { LoggerModule } from './logger/logger.module';
+import { CombinedInterceptor } from './logger/combined.interceptor';
 @Module({
   imports: [
     PrismaModule,
@@ -42,6 +43,7 @@ import { LoggerModule } from './logger/logger.module';
     AnomalyNotificationService,
     ExportService,
     UserService,
+    CombinedInterceptor,
   ],
 })
 export class AppModule {}
