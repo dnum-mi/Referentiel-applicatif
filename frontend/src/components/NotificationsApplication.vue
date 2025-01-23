@@ -3,28 +3,11 @@ import Issue from "@/api/reportIssue";
 import type { Application } from "@/models/Application";
 import { onMounted, ref } from "vue";
 import { formatDate } from "@/composables/use-date";
+import { statusDictionary, statusIconClasses, statusColors } from "@/composables/use-dictionnary";
 
 const props = defineProps<{ application: Application }>();
 
 const notifications = ref<any[]>([]);
-
-const statusDictionary = {
-  in_pending: "En attente",
-  in_progress: "En cours",
-  done: "Terminé",
-};
-
-const statusIconClasses = {
-  in_pending: "ri-time-line",
-  in_progress: "ri-loader-2-line",
-  done: "ri-check-line",
-};
-
-const statusColors = {
-  in_pending: "bg-warning",
-  in_progress: "bg-info",
-  done: "bg-success",
-};
 
 const loadNotifications = async () => {
   try {

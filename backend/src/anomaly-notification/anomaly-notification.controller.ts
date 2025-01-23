@@ -102,6 +102,7 @@ export class AnomalyNotificationController {
         decodedToken,
         this.userService,
       );
+
       const anomalyNotifications =
         await this.anomalyNotificationService.getAnomalyNotificationByNotifierId(
           userFromDb.keycloakId,
