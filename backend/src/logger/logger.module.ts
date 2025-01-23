@@ -6,18 +6,6 @@ import { LoggerService } from './logger.service';
   imports: [
     PinoLoggerModule.forRoot({
       pinoHttp: {
-        transport:
-          process.env.NODE_ENV !== 'production' &&
-          process.env.NODE_ENV !== 'qualif'
-            ? {
-                target: require.resolve('pino-pretty'),
-                options: {
-                  colorize: true,
-                  levelFirst: true,
-                  translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
-                },
-              }
-            : undefined,
         redact: {
           paths: ['req.headers.authorization'],
           remove: true,
