@@ -98,8 +98,10 @@
                 <a
                   class="fr-btn fr-btn--secondary fr-btn--md fr-mt-2w"
                   href="https://www.tchap.gouv.fr/#/room/!ydoKqFOXRAQPQYFvqa:agent.interieur.tchap.gouv.fr?via=agent.interieur.tchap.gouv.fr"
-                  ><span class="fr-icon-mail-open-line fr-icon--sm fr-mr-1w" /> Contacter Nous</a
-                >
+                  target="_blank"
+                  ><span class="fr-icon-mail-open-line fr-icon--sm fr-mr-1w" />
+                  Nous Contacter sur Tchap
+                </a>
               </div>
             </div>
           </div>

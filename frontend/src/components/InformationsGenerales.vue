@@ -102,14 +102,14 @@ async function patchApplication() {
     </div>
 
     <div class="section">
-      <h3 class="section-title">Objectifs</h3>
+      <h3 class="section-title">Finalités</h3>
       <div class="objectives-list">
         <div v-for="(purpose, index) in application.purposes" :key="index" class="input-group">
-          <DsfrInput v-model="application.purposes[index]" :label="`Objectif #${index + 1}`" label-visible />
+          <DsfrInput v-model="application.purposes[index]" :label="`Finalités #${index + 1}`" label-visible />
         </div>
       </div>
       <div class="actions-inline">
-        <DsfrButton secondary label="Ajouter un objectif" @click="application.purposes.push('Nouvel objectif')" />
+        <DsfrButton secondary label="Ajouter une finalités" @click="application.purposes.push('Nouvel Finalités')" />
       </div>
     </div>
 
