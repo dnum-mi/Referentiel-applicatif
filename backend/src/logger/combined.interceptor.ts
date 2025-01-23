@@ -56,6 +56,27 @@ export class CombinedInterceptor implements NestInterceptor {
       requestSize,
     };
 
+    // Step: Start
+    this.logAction({
+      message: `Début du traitement de la requête ${method} ${url}`,
+      action: 'request_start',
+      step: 'start',
+    });
+
+    // Log for GET method with specific route
+    if (method === 'GET' && url.includes('application/search')) {
+      const label = query.label;
+
+      if (label) {
+        this.logAction({
+          message: `Recherche d'application avec le label "${label}"`,
+          action: 'search',
+          step: 'middle',
+          extra: { query },
+        });
+      }
+    }
+
     if (entityType === 'Application' || entityType === 'Notification') {
       try {
         let applicationId: string | undefined;
@@ -70,21 +91,32 @@ export class CombinedInterceptor implements NestInterceptor {
           const application = await this.getApplicationById(applicationId);
           const label = this.getLabel(application);
           this.logObjectParams.label = label;
-          this.logger.log(
-            `[${correlationId}] Traitement de l'entité ${entityType}: "${label}"`,
-          );
+
+          // Step: Middle
           this.logAction({
-            label,
+            message: `[${correlationId}] Traitement de l'entité ${entityType}: "${label}"`,
+            action: 'process_entity',
+            step: 'middle',
           });
         } else {
           this.logger.warn(
             `[${correlationId}] applicationId non trouvé pour l'entité ${entityType}.`,
           );
+          this.logAction({
+            message: `applicationId non trouvé pour l'entité ${entityType}.`,
+            action: 'error',
+            step: 'middle',
+          });
         }
       } catch (error) {
         this.logger.error(
           `[${correlationId}] Erreur lors de la récupération de l'application pour ${entityType}: ${error}`,
         );
+        this.logAction({
+          message: `Erreur lors de la récupération de l'application pour ${entityType}: ${error}`,
+          action: 'error',
+          step: 'middle',
+        });
       }
     }
 
@@ -92,6 +124,7 @@ export class CombinedInterceptor implements NestInterceptor {
       this.logAction({
         message: `Début création de ${entityType}`,
         action: 'create',
+        step: 'middle',
       });
     }
 
@@ -100,6 +133,7 @@ export class CombinedInterceptor implements NestInterceptor {
       this.logAction({
         message: `Début mise à jour de ${entityType} ${params.id}`,
         action: 'update',
+        step: 'start',
         extra: { oldData },
       });
     }
@@ -109,12 +143,12 @@ export class CombinedInterceptor implements NestInterceptor {
         const duration = Date.now() - start;
         const statusCode = response.statusCode;
         this.logObjectParams.statusCode = statusCode;
+
         this.logAction({
-          message: `[${correlationId}] Réponse envoyée`,
-          method,
-          url,
+          message: `[${correlationId}] Réponse envoyée pour ${method} ${url}`,
+          action: 'update_send',
+          step: 'end',
           durationMs: duration,
-          correlationId,
           statusCode,
         });
 
@@ -123,6 +157,7 @@ export class CombinedInterceptor implements NestInterceptor {
             this.logAction({
               message: `Création terminée de ${this.logObjectParams.entityType} "${this.logObjectParams.label}"`,
               action: 'create',
+              step: 'end',
               data: result,
             });
           }
@@ -132,9 +167,9 @@ export class CombinedInterceptor implements NestInterceptor {
             const modifiedFields = this.getModifiedFields(oldData, body);
             this.logAction({
               message: `Mise à jour terminée pour ${this.logObjectParams.entityType} "${this.logObjectParams.label}"`,
-              extra: {
-                modifiedFields,
-              },
+              action: 'update',
+              step: 'end',
+              extra: { modifiedFields },
             });
           }
         }
@@ -163,6 +198,11 @@ export class CombinedInterceptor implements NestInterceptor {
         `[${this.logObjectParams.correlationId}] Erreur lors de la récupération de l'ancienne version de l'application ${id}`,
         error,
       );
+      this.logAction({
+        message: `Erreur lors de la récupération de l'ancienne version de l'application ${id}`,
+        action: 'error',
+        step: 'middle',
+      });
       return;
     }
   }
@@ -208,18 +248,25 @@ export class CombinedInterceptor implements NestInterceptor {
           const loginTime = decodedToken.iat
             ? new Date(decodedToken.iat * 1000).toISOString()
             : undefined;
-          return {
-            user: decodedToken.sub,
-            loginTime,
-          };
+          return { user: decodedToken.sub, loginTime };
         }
         this.logger.error(
           `[${correlationId}] La claim "sub" est absente du token décodé.`,
         );
+        this.logAction({
+          message: `La claim "sub" est absente du token décodé.`,
+          action: 'error',
+          step: 'middle',
+        });
       } catch (error) {
         this.logger.error(
           `[${correlationId}] Erreur lors du décodage du token: ${error}`,
         );
+        this.logAction({
+          message: `Erreur lors du décodage du token: ${error}`,
+          action: 'error',
+          step: 'middle',
+        });
       }
     }
     return { user: null };
@@ -240,14 +287,24 @@ export class CombinedInterceptor implements NestInterceptor {
       return Buffer.byteLength(JSON.stringify(body));
     } catch (error) {
       this.logger.warn('Impossible de calculer la taille de la requête', error);
+      this.logAction({
+        message: `Impossible de calculer la taille de la requête`,
+        action: 'error',
+        step: 'middle',
+      });
       return 0;
     }
   }
 
-  private logAction(extra?: any): void {
+  private logAction(extra: {
+    action: string;
+    step: string;
+    [key: string]: any;
+  }): void {
     this.logger.log({
       ...this.logObjectParams,
       ...extra,
+      step: extra.step || 'unspecified',
       message: extra.message
         ? `[${this.logObjectParams.correlationId}] ${extra.message}`
         : '',
@@ -276,4 +333,5 @@ type LogObjectParams = {
   responseBody?: any;
   referer?: string;
   requestSize?: number;
+  step?: string;
 };
