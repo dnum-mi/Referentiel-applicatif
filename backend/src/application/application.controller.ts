@@ -72,7 +72,7 @@ export class ApplicationController {
     });
 
     const newApplication = await this.applicationService.createApplication(
-      user.keycloakId,
+      user.id,
       createApplicationDto,
     );
     return newApplication;

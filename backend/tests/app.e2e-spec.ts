@@ -5,13 +5,15 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 describe('AppController (e2e)', () => {
   const getApp = setupTestSuite();
+  const id = uuidv4();
   const keycloakId = uuidv4();
 
   beforeAll(async () => {
     const prismaService = new PrismaService();
     await prismaService.user.create({
       data: {
-        email: `${keycloakId}@test.fr`,
+        email: `${id}@test.fr`,
+        id: id,
         keycloakId: keycloakId,
       },
     });

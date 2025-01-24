@@ -15,7 +15,7 @@ export class AuthUtils {
     userService: UserService,
   ): Promise<any> {
     try {
-      const user = await userService.findOrCreateByEmail(
+      const user = await userService.findOrCreateUserByEmail(
         decodedToken.email as string,
         decodedToken.sub as string,
       );

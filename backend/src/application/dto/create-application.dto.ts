@@ -7,6 +7,8 @@ import {
   IsEnum,
   IsDateString,
   ValidateNested,
+  IsEmail,
+  IsNotEmpty,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -20,6 +22,10 @@ export class CreateActorDto {
   @IsString()
   @IsOptional()
   role: string;
+
+  @IsEmail()
+  @IsOptional()
+  email?: string;
 
   @ApiProperty({ example: 'user123', description: 'ID of the user' })
   @IsString()
@@ -48,7 +54,7 @@ export class CreateActorDto {
 export class UpdateActorUserDto {
   @IsOptional()
   @IsString()
-  keycloakId?: string;
+  userId: string;
 
   @IsOptional()
   @IsString()
@@ -302,14 +308,10 @@ export class CreateApplicationDto {
     firstProductionDate: new Date().toISOString(),
   };
 
-  @ApiProperty({
-    type: [CreateActorDto],
-    description: 'List of actors associated with the application',
-  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateActorDto)
-  actors: CreateActorDto[] = [];
+  actors: CreateActorDto[];
 
   @ApiProperty({ type: [CreateComplianceDto] })
   @IsArray()

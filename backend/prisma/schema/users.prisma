@@ -1,5 +1,6 @@
 model User {
-  keycloakId          String                @id
+  id                  String                @id @default(uuid())
+  keycloakId          String?                @unique
   email               String                @unique
   organizationId      String?
   organization        External?             @relation(fields: [organizationId], references: [id])
@@ -16,8 +17,9 @@ model User {
 model Actor {
   id                   String       @id @default(uuid())
   role                 String
-  userId               String
-  user                 User         @relation("UserActors", fields: [userId], references: [keycloakId])
+  userId               String?
+  email                String?
+  user                 User?         @relation("UserActors", fields: [userId], references: [id])
   organizationId       String?
   externalOrganization External?    @relation("ActorOrganization", fields: [organizationId], references: [id])
   applicationId        String?

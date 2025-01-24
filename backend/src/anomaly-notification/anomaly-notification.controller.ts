@@ -56,11 +56,14 @@ export class AnomalyNotificationController {
         'Token invalide : identifiant utilisateur manquant',
       );
     }
-    const currentNotifierId = decodedToken.sub;
+    const userFromDb = await AuthUtils.findOrCreateUser(
+      decodedToken,
+      this.userService,
+    );
 
     const data: CreateAnomalyNotificationDto = {
       ...requestData,
-      notifierId: currentNotifierId,
+      notifierId: userFromDb.id,
     };
     return this.anomalyNotificationService.create(req, data);
   }
@@ -105,7 +108,7 @@ export class AnomalyNotificationController {
 
       const anomalyNotifications =
         await this.anomalyNotificationService.getAnomalyNotificationByNotifierId(
-          userFromDb.keycloakId,
+          userFromDb.id,
         );
       return anomalyNotifications;
     } catch (error) {

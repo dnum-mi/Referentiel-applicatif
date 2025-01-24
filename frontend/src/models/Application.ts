@@ -68,6 +68,7 @@ export interface ExternalSource {
   metadataId?: string;
 }
 export interface User {
+  id: string;
   keycloakId: string;
   email: string;
   organizationId?: string | null;

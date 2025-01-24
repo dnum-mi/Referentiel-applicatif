@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { v4 as uuidv4 } from 'uuid';
 import { User } from '@prisma/client';
 @Injectable()
 export class UserService {
@@ -11,18 +12,16 @@ export class UserService {
     });
   }
 
-  async findOrCreateByEmail(
+  async findOrCreateUserByEmail(
     email: string,
-    keycloakId: string,
-  ): Promise<User | null> {
+    keycloakId?: string,
+  ): Promise<User> {
     return this.prisma.user.upsert({
-      where: {
-        email: email,
-      },
+      where: { email },
       update: {},
       create: {
-        email: email,
-        keycloakId: keycloakId,
+        email,
+        keycloakId: keycloakId ?? null,
       },
     });
   }

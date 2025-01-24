@@ -1,4 +1,5 @@
-// src/application/application.service.ts
+import { UserService } from 'src/user/user.service';
+
 import {
   Injectable,
   BadRequestException,
@@ -17,7 +18,10 @@ import { Prisma, Application } from '@prisma/client';
 @Injectable()
 export class ApplicationService {
   applications: any;
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private userService: UserService,
+  ) {}
 
   /**
    * Crée une nouvelle application.
@@ -32,18 +36,6 @@ export class ApplicationService {
     ownerId: string,
     createApplicationDto: CreateApplicationDto,
   ) {
-    for (const actor of createApplicationDto.actors) {
-      const userExists = await this.prisma.user.findUnique({
-        where: { keycloakId: actor.userId },
-      });
-
-      if (!userExists) {
-        throw new BadRequestException(
-          `User with ID ${actor.userId} does not exist.`,
-        );
-      }
-    }
-
     const applicationMetadata = await this.createApplicationMetadata(ownerId);
     const application = await this.persistApplication(
       ownerId,
@@ -215,6 +207,57 @@ export class ApplicationService {
     applicationMetadataId: string,
     createApplicationDto,
   ) {
+    const actorsToCreate: Prisma.ActorCreateWithoutApplicationInput[] = [
+      {
+        role: 'Creator',
+        user: { connect: { id: ownerId } },
+      },
+    ];
+    if (
+      Array.isArray(createApplicationDto.actors) &&
+      createApplicationDto.actors.length > 0
+    ) {
+      for (const actorDto of createApplicationDto.actors) {
+        if (actorDto.userId) {
+          const user = await this.prisma.user.findUnique({
+            where: { id: actorDto.userId },
+          });
+
+          if (!user) {
+            throw new BadRequestException(
+              `User with ID ${actorDto.userId} does not exist.`,
+            );
+          }
+
+          actorsToCreate.push({
+            role: actorDto.role,
+            user: { connect: { id: user.id } },
+            ...(actorDto.organizationId && {
+              externalOrganization: {
+                connect: { id: actorDto.organizationId },
+              },
+            }),
+          });
+        } else if (actorDto.email) {
+          const user = await this.userService.findOrCreateUserByEmail(
+            actorDto.email,
+          );
+          actorsToCreate.push({
+            role: actorDto.role,
+            user: { connect: { id: user.id } },
+            ...(actorDto.organizationId && {
+              externalOrganization: {
+                connect: { id: actorDto.organizationId },
+              },
+            }),
+          });
+        } else {
+          throw new BadRequestException(
+            'Actor must have at least a userId or an email.',
+          );
+        }
+      }
+    }
     const application = await this.prisma.application.create({
       data: {
         label: createApplicationDto.label,
@@ -224,7 +267,7 @@ export class ApplicationService {
         purposes: createApplicationDto.purposes,
         tags: createApplicationDto.tags,
         metadata: { connect: { id: applicationMetadataId } },
-        owner: { connect: { keycloakId: ownerId } },
+        owner: { connect: { id: ownerId } },
         lifecycle: {
           create: {
             status: createApplicationDto.lifecycle.status,
@@ -241,15 +284,7 @@ export class ApplicationService {
           },
         },
         actors: {
-          create: Array.isArray(createApplicationDto.actors)
-            ? createApplicationDto.actors.map((actorDto) => ({
-                role: actorDto.role,
-                user: { connect: { keycloakId: actorDto.userId } },
-                externalOrganization: actorDto.organizationId
-                  ? { connect: { id: actorDto.organizationId } }
-                  : undefined,
-              }))
-            : [],
+          create: actorsToCreate,
         },
         compliances: {
           create: createApplicationDto.compliances.map((compliance) => ({
@@ -497,15 +532,15 @@ export class ApplicationService {
     applicationId: string,
   ): Prisma.ActorCreateWithoutApplicationInput[] {
     return dtos.map((dto) => {
-      if (!dto.user || !dto.user.keycloakId) {
-        throw new Error('Missing user.keycloakId for a new Actor');
+      if (!dto.user || !dto.user.userId) {
+        throw new Error('UserId inexistant dans la base de donnée');
       }
 
       return {
         role: dto.role,
         application: { connect: { id: applicationId } },
         user: {
-          connect: { keycloakId: dto.user.keycloakId },
+          connect: { id: dto.user.userId },
         },
       };
     });

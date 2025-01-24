@@ -24,7 +24,7 @@ export class AnomalyNotificationService {
           connect: { id: data.applicationId },
         },
         notifier: {
-          connect: { keycloakId: notifierId },
+          connect: { id: data.notifierId },
         },
         description: data.description,
         status: data.status,
