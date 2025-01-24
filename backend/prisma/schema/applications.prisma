@@ -17,6 +17,7 @@ model Application {
   externals           External[]            @relation("ApplicationExternals")
   compliances         Compliance[]          @relation("ApplicationCompliances")
   anomalyNotification AnomalyNotification[] @relation("ApplicationAnomalyNotification")
+  externalRessource   ExternalRessource[]   @relation("ApplicationExternalsRessource")
 
   ownerId String
   owner   User   @relation("UserApplications", fields: [ownerId], references: [keycloakId])

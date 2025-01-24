@@ -42,3 +42,9 @@ export enum AnomalyNotificationStatus {
   INPROGRESS = 'in_progress',
   DONE = 'done',
 }
+
+export enum ExternalRessourceType {
+  documentation,
+  supervision,
+  service,
+}
