@@ -25,18 +25,12 @@ export class AuthMiddleware implements NestMiddleware {
       );
 
       const userExists = await this.prisma.user.findUnique({
-        where: { keycloakId: userFromDb.keycloakId },
+        where: { id: userFromDb.id },
       });
 
       if (userExists) {
         req.user = userFromDb;
         next();
-
-        Logger.log({
-          message: 'Passage dans le middleware',
-          userId: userFromDb.sub,
-          action: 'AuthMiddleware',
-        });
       } else {
         throw new UnauthorizedException("L'utilisateur n'existe pas");
       }

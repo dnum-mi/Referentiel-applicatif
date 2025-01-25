@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import type { Application } from "@/models/Application";
+import type { User } from "@/model/User";
 import useToaster from "@/composables/use-toaster";
 import Applications from "@/api/application";
 import AppDate from "./AppDate.vue";
+import Users from "@/api/user";
 
-const props = defineProps<{ application: Application }>();
+const props = defineProps<{
+  application: Application;
+  user: User;
+}>();
 const application = props.application;
 const loading = ref(false);
 const toaster = useToaster();
+const ownerEmail = ref("");
 
 const isAddingTag = ref(false);
 const newTag = ref("");
@@ -39,6 +45,22 @@ function cancelTag() {
   isAddingTag.value = false;
 }
 
+const getApplicationUserbyId = async (): Promise<void> => {
+  const ownerId = application.ownerId;
+  if (!ownerId) {
+    toaster.addErrorMessage("message");
+    return;
+  }
+  try {
+    const user = await Users.getUserById(ownerId);
+    ownerEmail.value = user.email;
+    console.log(ownerEmail);
+  } catch (error) {
+    toaster.addErrorMessage("message");
+    console.error(error);
+  }
+};
+
 async function patchApplication() {
   loading.value = true;
   try {
@@ -50,6 +72,10 @@ async function patchApplication() {
     loading.value = false;
   }
 }
+
+onMounted(() => {
+  getApplicationUserbyId();
+});
 </script>
 
 <template>
@@ -67,6 +93,10 @@ async function patchApplication() {
       </div>
       <div class="input-group">
         <DsfrInput v-model="application.shortName" label="Nom abrégé" label-visible required />
+      </div>
+      <div class="input-group">
+        <DsfrInput v-model="ownerEmail" label="Responsable" label-visible />
+        {{ ownerEmail }}
       </div>
       <div class="input-group">
         <DsfrInput v-model="application.description" label="Description" label-visible required isTextarea :rows="10" />

@@ -6,14 +6,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 describe('Applications', () => {
   const getApp = setupTestSuite();
   const keycloakId = uuidv4();
-  const id = uuidv4();
 
   beforeAll(async () => {
     const prismaService = new PrismaService();
     await prismaService.user.create({
       data: {
         email: `${keycloakId}@test.fr`,
-        id: id,
         keycloakId: keycloakId ?? null,
       },
     });
@@ -62,7 +60,7 @@ describe('Applications', () => {
         actors: [
           {
             role: 'dev',
-            userId: keycloakId,
+            email: `${keycloakId}@test.fr`,
           },
         ],
         compliances: [],

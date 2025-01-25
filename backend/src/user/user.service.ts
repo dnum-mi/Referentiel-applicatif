@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '@prisma/client';
@@ -24,5 +24,13 @@ export class UserService {
         keycloakId: keycloakId ?? null,
       },
     });
+  }
+
+  async getUserById(id: string): Promise<User> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`Utilisateur avec l'ID ${id} non trouvé.`);
+    }
+    return user;
   }
 }

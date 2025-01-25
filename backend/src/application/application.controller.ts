@@ -65,12 +65,6 @@ export class ApplicationController {
   ) {
     const user = req.user;
 
-    Logger.log({
-      message: "Début de la création de l'application",
-      userId: user.keycloakId,
-      action: 'create',
-    });
-
     const newApplication = await this.applicationService.createApplication(
       user.id,
       createApplicationDto,

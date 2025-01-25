@@ -12,7 +12,7 @@ describe('Anomaly Notifications', () => {
     await prismaService.user.create({
       data: {
         email: `${keycloakId}@test.fr`,
-        keycloakId: keycloakId,
+        keycloakId: keycloakId ?? null,
       },
     });
   });

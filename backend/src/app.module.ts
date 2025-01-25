@@ -1,6 +1,4 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 
 import { ApplicationModule } from './application/application.module';
@@ -34,13 +32,11 @@ import { AuthMiddleware } from './middlewares/auth.middleware';
     }),
   ],
   controllers: [
-    AppController,
     ApplicationController,
     AnomalyNotificationController,
     UserController,
   ],
   providers: [
-    AppService,
     ApplicationService,
     AnomalyNotificationService,
     ExportService,
