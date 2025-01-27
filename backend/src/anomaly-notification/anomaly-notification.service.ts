@@ -130,6 +130,7 @@ export class AnomalyNotificationService {
       updatedAt: anomaly.updatedAt || null,
     }));
   }
+
   /**
    * Met à jour une notification d'anomalie existante.
    * @param id L'identifiant de la notification.
