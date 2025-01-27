@@ -34,7 +34,8 @@ const reportIssue = {
 
   async getReportIssueByNotifierId(): Promise<ReportIssue[]> {
     try {
-      return await requests.get<ReportIssue[]>("/anomaly-notifications/user-notifications");
+      const response = await requests.get<ReportIssue[]>("/anomaly-notifications/user-notifications");
+      return response;
     } catch (error) {
       throw error;
     }

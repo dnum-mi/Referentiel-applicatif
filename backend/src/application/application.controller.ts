@@ -1,5 +1,4 @@
 import { UserService } from '../user/user.service';
-import { AuthUtils } from '../utils/helpers';
 import {
   Controller,
   Post,
@@ -10,9 +9,9 @@ import {
   Get,
   Query,
   NotFoundException,
-  Logger,
   BadRequestException,
   Response,
+  Logger,
 } from '@nestjs/common';
 import { ApplicationService } from './application.service';
 import {
@@ -64,28 +63,18 @@ export class ApplicationController {
     @Body() createApplicationDto: CreateApplicationDto,
     @Request() req,
   ) {
-    const decodedToken = AuthUtils.getDecodedToken(req);
-    const userFromDb = await AuthUtils.findOrCreateUser(
-      decodedToken,
-      this.userService,
-    );
+    const user = req.user;
+
     Logger.log({
       message: "Début de la création de l'application",
-      userId: userFromDb.keycloakId,
+      userId: user.keycloakId,
       action: 'create',
     });
 
     const newApplication = await this.applicationService.createApplication(
-      userFromDb.keycloakId,
+      user.keycloakId,
       createApplicationDto,
     );
-
-    Logger.log({
-      message: 'Application créée avec succès',
-      applicationId: newApplication.id,
-      action: 'create',
-    });
-
     return newApplication;
   }
 
@@ -105,20 +94,8 @@ export class ApplicationController {
       'Liste des applications correspondant aux critères de recherche.',
   })
   async searchApplications(@Query() searchParams: SearchApplicationDto) {
-    Logger.log({
-      message: 'Recherche des applications',
-      searchParams: searchParams,
-      action: 'search',
-    });
-
     const applications =
       await this.applicationService.searchApplications(searchParams);
-
-    Logger.log({
-      message: `Applications récupérées`,
-      applicationsCount: applications.length,
-      action: 'search',
-    });
 
     return applications;
   }
@@ -143,11 +120,6 @@ export class ApplicationController {
     @Response() res,
   ) {
     try {
-      Logger.log({
-        message: "Début de l'exportation des applications",
-        searchParams: query,
-        action: 'export',
-      });
       const applications =
         await this.applicationService.searchApplications(query);
 
@@ -168,16 +140,7 @@ export class ApplicationController {
         'attachment; filename="applications.csv"',
       );
       res.status(200).send(csvContent);
-      Logger.log({
-        message: 'Exportation réalisée avec succès',
-        action: 'export',
-      });
     } catch (error) {
-      Logger.error({
-        message: "Erreur lors de l'exportation des applications",
-        error: error,
-        action: 'export',
-      });
       throw new BadRequestException("Erreur lors de l'exportation.");
     }
   }
@@ -193,27 +156,11 @@ export class ApplicationController {
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une application spécifique par ID' })
   async findOne(@Param('id') id: string): Promise<GetApplicationDto> {
-    Logger.log({
-      message: "Récupération de l'application avec l'ID",
-      id: id,
-      action: 'findOne',
-    });
     try {
       const application = await this.applicationService.getApplicationById(id);
-      Logger.log({
-        message: 'Application récupérée avec succès',
-        applicationId: id,
-        applicationData: application,
-      });
 
       return application;
     } catch (error) {
-      Logger.error({
-        message: `Erreur lors de la récupération de l'application avec l'ID: ${id}`,
-        error: error,
-        id: id,
-        action: 'findOne',
-      });
       throw new NotFoundException('Application non trouvée');
     }
   }
@@ -231,11 +178,6 @@ export class ApplicationController {
   @ApiOperation({ summary: 'Récupérer les applications' })
   @ApiResponse({ status: 200, description: 'Liste des applications' })
   async findAll() {
-    Logger.log({
-      message: 'Récupération de toutes les applications.',
-      action: 'findAll',
-    });
-
     return await this.applicationService.getApplications();
   }
 
@@ -253,11 +195,6 @@ export class ApplicationController {
     @Param('id') id: string,
     @Body() applicationToUpdate: PatchApplicationDto,
   ): Promise<PatchApplicationDto> {
-    Logger.log({
-      message: `Mise à jour de l'application avec l'ID: ${id}`,
-      action: 'update',
-    });
-
     return this.applicationService.update({
       where: { id: id },
       data: applicationToUpdate,

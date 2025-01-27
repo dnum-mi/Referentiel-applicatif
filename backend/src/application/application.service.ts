@@ -3,7 +3,6 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
-  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -13,7 +12,6 @@ import {
   UpdateComplianceDto,
 } from './dto/create-application.dto';
 import { SearchApplicationDto } from './dto/search-application.dto';
-import { GetApplicationDto } from './dto/get-application.dto';
 import { Prisma, Application } from '@prisma/client';
 
 @Injectable()
@@ -34,23 +32,11 @@ export class ApplicationService {
     ownerId: string,
     createApplicationDto: CreateApplicationDto,
   ) {
-    Logger.log({
-      message: "Début de la création de l'application",
-      ownerId: ownerId,
-      action: 'create',
-    });
     for (const actor of createApplicationDto.actors) {
       const userExists = await this.prisma.user.findUnique({
         where: { keycloakId: actor.userId },
       });
-      Logger.log({
-        message: "Vérification de l'existence de l'utilisateur pour l'acteur",
-        actor: actor,
-        userExists: userExists
-          ? 'Utilisateur trouvé'
-          : 'Utilisateur non trouvé',
-        action: 'create',
-      });
+
       if (!userExists) {
         throw new BadRequestException(
           `User with ID ${actor.userId} does not exist.`,
@@ -64,11 +50,7 @@ export class ApplicationService {
       applicationMetadata.id,
       createApplicationDto,
     );
-    Logger.log({
-      message: 'Application créée avec succès',
-      applicationId: application.id,
-      action: 'create',
-    });
+
     return application;
   }
 
@@ -85,13 +67,6 @@ export class ApplicationService {
     data: PatchApplicationDto;
   }): Promise<Application> {
     const { where, data } = params;
-
-    Logger.log({
-      message: "Début de la mise à jour de l'application",
-      applicationId: where.id,
-      action: 'update',
-    });
-
     const applicationUpdates: Prisma.ApplicationUpdateInput = {};
 
     this.applyScalarAndSimpleRelationUpdates(data, applicationUpdates);
@@ -113,11 +88,7 @@ export class ApplicationService {
         where,
         data: applicationUpdates,
       });
-      Logger.log({
-        message: 'Application mise à jour avec succès',
-        applicationId: updatedApplication.id,
-        action: 'update',
-      });
+
       return updatedApplication;
     } catch (error) {
       throw new NotFoundException(
@@ -136,11 +107,6 @@ export class ApplicationService {
    */
   public async searchApplications(searchParams: SearchApplicationDto) {
     const { label, page = 1, limit = 12 } = searchParams;
-    Logger.log({
-      message: 'Début de la recherche des applications',
-      searchParams: searchParams,
-      action: 'search',
-    });
 
     const whereClause: Prisma.ApplicationWhereInput = {
       ...(label
@@ -175,19 +141,8 @@ export class ApplicationService {
         },
       });
 
-      Logger.log({
-        message: `Applications récupérées avec succès`,
-        applicationsCount: applications.length,
-        action: 'search',
-      });
-
       return applications;
     } catch (error) {
-      Logger.error({
-        message: 'Erreur lors de la recherche des applications',
-        error: error,
-        action: 'search',
-      });
       throw error;
     }
   }
@@ -201,11 +156,6 @@ export class ApplicationService {
    * @throws NotFoundException Si l'application n'est pas trouvée.
    */
   public async getApplicationById(id: string) {
-    Logger.log({
-      message: "Récupération de l'application par ID",
-      applicationId: id,
-      action: 'getApplicationById',
-    });
     const application = await this.prisma.application.findUnique({
       where: { id },
       include: {
@@ -227,19 +177,9 @@ export class ApplicationService {
     });
 
     if (!application) {
-      Logger.error({
-        message: 'Application non trouvée',
-        applicationId: id,
-        action: 'getApplicationById',
-      });
       throw new NotFoundException('Application not found');
     }
 
-    Logger.log({
-      message: 'Application récupérée avec succès',
-      applicationId: id,
-      action: 'getApplicationById',
-    });
     return application;
   }
 
@@ -252,19 +192,8 @@ export class ApplicationService {
   public async getApplications() {
     try {
       const applications = await this.prisma.application.findMany();
-      Logger.log({
-        message: 'Applications récupérées avec succès',
-        applicationsCount: applications.length,
-        action: 'getApplications',
-      });
-
       return applications;
     } catch (error) {
-      Logger.error({
-        message: 'Erreur lors de la récupération des applications',
-        error: error,
-        action: 'getApplications',
-      });
       throw error;
     }
   }

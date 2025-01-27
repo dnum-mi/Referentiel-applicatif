@@ -10,7 +10,6 @@ import {
   Delete,
   Request,
   NotFoundException,
-  Logger,
   BadRequestException,
   Query,
 } from '@nestjs/common';
@@ -51,18 +50,8 @@ export class AnomalyNotificationController {
     @Request() req,
     @Body() requestData: CreateAnomalyNotificationRequestDto,
   ) {
-    Logger.log({
-      message:
-        'Réception d’une demande de modification de la fiche application.',
-      action: 'create',
-    });
     const decodedToken = AuthUtils.getDecodedToken(req);
     if (typeof decodedToken.sub !== 'string') {
-      Logger.error({
-        action: 'CREATE_NOTIFICATION',
-        description: 'Token invalide : identifiant utilisateur manquant',
-        requestId: req['requestId'] || 'non défini',
-      });
       throw new BadRequestException(
         'Token invalide : identifiant utilisateur manquant',
       );
@@ -73,14 +62,6 @@ export class AnomalyNotificationController {
       ...requestData,
       notifierId: currentNotifierId,
     };
-    Logger.log({
-      action: 'CREATE_NOTIFICATION',
-      description: 'Préparation des données de notification',
-      userId: currentNotifierId,
-      dataSummary: {
-        applicationId: data.applicationId,
-      },
-    });
     return this.anomalyNotificationService.create(req, data);
   }
 
@@ -92,10 +73,6 @@ export class AnomalyNotificationController {
   @Get()
   @ApiOperation({ summary: 'Récupérer toutes les notifications' })
   findAll() {
-    Logger.log({
-      message: 'Récupération de toutes les notifications.',
-      action: 'findAll',
-    });
     return this.anomalyNotificationService.findAll();
   }
 
@@ -119,35 +96,19 @@ export class AnomalyNotificationController {
   async getAnomalyNotificationsByUser(
     @Request() req,
   ): Promise<GetAnomalyNotificationDto[]> {
-    Logger.log({
-      message:
-        "Récupération des notifications de signalements pour l'utilisateur connecté.",
-      action: 'getAnomalyNotificationsByUser',
-    });
     try {
       const decodedToken = AuthUtils.getDecodedToken(req);
       const userFromDb = await AuthUtils.findOrCreateUser(
         decodedToken,
         this.userService,
       );
+
       const anomalyNotifications =
         await this.anomalyNotificationService.getAnomalyNotificationByNotifierId(
           userFromDb.keycloakId,
         );
-      Logger.log({
-        message: "Notifications récupérées pour l'utilisateur.",
-        notificationsCount: anomalyNotifications.length,
-        action: 'getAnomalyNotificationsByUser',
-      });
-
       return anomalyNotifications;
     } catch (error) {
-      Logger.log({
-        message:
-          'Erreur lors de la récupération des notifications utilisateur.',
-        error: error,
-        action: 'getAnomalyNotificationsByUser',
-      });
       throw new NotFoundException(
         'Erreur lors de la récupération des notifications utilisateur',
       );
@@ -179,10 +140,6 @@ export class AnomalyNotificationController {
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une notification spécifique par ID' })
   findOne(@Param('id') id: string) {
-    Logger.log({
-      message: `Récupération de la notification avec l'ID: ${id}`,
-      action: 'findOne',
-    });
     return this.anomalyNotificationService.findOne(id);
   }
 
@@ -199,10 +156,6 @@ export class AnomalyNotificationController {
     @Param('id') id: string,
     @Body() updateDto: UpdateAnomalyNotificationDto,
   ) {
-    Logger.log({
-      message: `Mise à jour de la notification avec l'ID: ${id}`,
-      action: 'update',
-    });
     return this.anomalyNotificationService.update(id, updateDto);
   }
 
@@ -216,10 +169,6 @@ export class AnomalyNotificationController {
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer une notification' })
   remove(@Param('id') id: string) {
-    Logger.log({
-      message: `Suppression de la notification avec l'ID: ${id}`,
-      action: 'remove',
-    });
     return this.anomalyNotificationService.remove(id);
   }
 }
