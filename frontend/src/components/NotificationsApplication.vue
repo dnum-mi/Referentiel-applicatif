@@ -33,26 +33,6 @@ const pages = computed(() => {
   }));
 });
 
-const rowsPerPage = ref(2); // à dynamiser
-const currentPage = ref(0);
-
-const paginatedNotifications = computed(() => {
-  const start = currentPage.value * rowsPerPage.value;
-  const end = start + rowsPerPage.value;
-  return notifications.value.slice(start, end);
-});
-
-const totalNotifications = computed(() => notifications.value.length);
-
-const pages = computed(() => {
-  const totalPages = Math.max(1, Math.ceil(totalNotifications.value / rowsPerPage.value));
-  return Array.from({ length: totalPages }, (_, i) => ({
-    title: `${i + 1}`,
-    href: `#${i + 1}`,
-    label: `${i + 1}`,
-  }));
-});
-
 const loadNotifications = async () => {
   try {
     const notificationList = await Issue.getNotificationsByApplicationId(props.application.id);
@@ -94,7 +74,19 @@ onMounted(() => {
       <p>Aucune notification disponible.</p>
     </div>
   </section>
-  <DsfrPagination v-model:current-page="currentPage" :pages="pages" :rows-per-page="rowsPerPage" />
+  <div class="fr-flex-container fr-mb-2w">
+    <div class="fr-select">
+      <label for="rowsPerPage">Résultats par page :</label>
+      <select id="rowsPerPage" v-model="rowsPerPage" @change="handleRowsPerPageChange($event.target.value)">
+        <option :value="10">10</option>
+        <option :value="30">30</option>
+        <option :value="50">50</option>
+      </select>
+    </div>
+    <div class="fr-pagination">
+      <DsfrPagination v-model:current-page="currentPage" :pages="pages" />
+    </div>
+  </div>
 </template>
 
 <style scoped>
