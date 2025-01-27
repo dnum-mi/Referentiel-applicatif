@@ -3,6 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { setupTestSuite } from './setup';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+const AUTHORIZATION =
+  'Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwYXBzYjYxQzVFa2x6d2JjRUpXYXZPeXllMk5UQ29FRHpRb2lFdWFlTjJnIn0.eyJzdWIiOiI5OWZhNDE5ZS1mNGZiLTRlZDctOGIxMS1jNzIxMGIzMDkiLCAiZW1haWwiOiJ0aG9tYXMuYmVybmFyZC1lY29ub2NvbUBpbnRlcmlldXIuZ291di5mciJ9.';
+
 describe('Applications', () => {
   const getApp = setupTestSuite();
   const keycloakId = uuidv4();
@@ -21,10 +24,7 @@ describe('Applications', () => {
     const app = getApp();
     return request(app.getHttpServer())
       .get('/applications')
-      .set(
-        'Authorization',
-        'Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwYXBzYjYxQzVFa2x6d2JjRUpXYXZPeXllMk5UQ29FRHpRb2lFdWFlTjJnIn0.eyJzdWIiOiI5OWZhNDE5ZS1mNGZiLTRlZDctOGIxMS1jNzIxMGIzMDkiLCAiZW1haWwiOiJ0aG9tYXMuYmVybmFyZC1lY29ub2NvbUBpbnRlcmlldXIuZ291di5mciJ9.',
-      )
+      .set('Authorization', AUTHORIZATION)
       .expect(200);
   });
 
@@ -32,10 +32,7 @@ describe('Applications', () => {
     const app = getApp();
     return request(app.getHttpServer())
       .get('/applications/search')
-      .set(
-        'Authorization',
-        'Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwYXBzYjYxQzVFa2x6d2JjRUpXYXZPeXllMk5UQ29FRHpRb2lFdWFlTjJnIn0.eyJzdWIiOiI5OWZhNDE5ZS1mNGZiLTRlZDctOGIxMS1jNzIxMGIzMDkiLCAiZW1haWwiOiJ0aG9tYXMuYmVybmFyZC1lY29ub2NvbUBpbnRlcmlldXIuZ291di5mciJ9.',
-      )
+      .set('Authorization', AUTHORIZATION)
       .expect(200);
   });
 
@@ -66,10 +63,7 @@ describe('Applications', () => {
         compliances: [],
         externals: [],
       })
-      .set(
-        'Authorization',
-        'Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwYXBzYjYxQzVFa2x6d2JjRUpXYXZPeXllMk5UQ29FRHpRb2lFdWFlTjJnIn0.eyJzdWIiOiI5OWZhNDE5ZS1mNGZiLTRlZDctOGIxMS1jNzIxMGIzMDkiLCAiZW1haWwiOiJ0aG9tYXMuYmVybmFyZC1lY29ub2NvbUBpbnRlcmlldXIuZ291di5mciJ9.',
-      )
+      .set('Authorization', AUTHORIZATION)
       .expect(201);
   });
 });
