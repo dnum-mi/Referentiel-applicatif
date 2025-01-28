@@ -48,3 +48,14 @@ export enum ExternalRessourceType {
   SUPERVISION = 'supervision',
   SERVICE = 'service',
 }
+
+export enum ActorType {
+  RESPONSABLE = 'Responsable',
+  EXPLOITATION = 'Exploitation',
+  RESPONSABLE_AUTRE = 'ResponsableAutre',
+  HEBERGEMENT = 'Hebergement',
+  ARCHITECTE_APPLICATIF = 'ArchitecteApplicatif',
+  ARCHITECTE_INFRA = 'ArchitecteInfra',
+  REPRESENTANT_SSI = 'RepresentantSSI',
+  AUTRE = 'Autre',
+}

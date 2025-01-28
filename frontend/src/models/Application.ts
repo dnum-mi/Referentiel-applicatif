@@ -1,3 +1,4 @@
+import { ActorType } from "./../../../backend/src/enum";
 export interface Application {
   id: string;
   label: string;
@@ -29,9 +30,11 @@ export interface Lifecycle {
   metadataId?: string;
 }
 export interface Actor {
-  id: string;
-  role: string;
-  userId: string;
+  id?: string;
+  role?: string;
+  email: string;
+  actorType: string;
+  userId?: string;
   organizationId?: string | null;
   applicationId?: string;
   user?: User;

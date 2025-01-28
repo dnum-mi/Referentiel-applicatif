@@ -1,14 +1,22 @@
 <script setup lang="ts">
-import type { Application } from "@/models/Application";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import InformationsGenerales from "./InformationsGenerales.vue";
-import Acteurs from "./Acteurs.vue";
 import NotificationsApplication from "./NotificationsApplication.vue";
 import Links from "./Links.vue";
+import ActorManager from "./ActorManager.vue";
+import type { Application } from "@/models/Application";
 
 const props = defineProps<{ application: Application }>();
-
+const emit = defineEmits(["update:application"]);
+const application = ref<Application>(props.application);
 const activeTab = ref(0);
+
+watch(
+  () => props.application,
+  (newVal) => {
+    application.value = newVal;
+  },
+);
 
 const tabListName = "Informations sur l’application";
 const tabTitles = [
@@ -36,9 +44,7 @@ const tabTitles = [
 </script>
 
 <template>
-  <!-- DsfrTabs pour les onglets avec gestion de l'onglet actif -->
   <DsfrTabs v-model="activeTab" :tab-list-name="tabListName">
-    <!-- Définir chaque onglet via DsfrTabItem -->
     <template #tab-items>
       <DsfrTabItem
         v-for="(tab, index) in tabTitles"
@@ -52,9 +58,8 @@ const tabTitles = [
       </DsfrTabItem>
     </template>
 
-    <!-- Contenu de chaque onglet -->
     <DsfrTabContent v-if="activeTab === 0" panel-id="tab-content-0" tab-id="tab-0">
-      <InformationsGenerales :application="props.application" />
+      <InformationsGenerales :application="application" />
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 1" panel-id="tab-content-1" tab-id="tab-1">
@@ -62,16 +67,15 @@ const tabTitles = [
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 2" panel-id="tab-content-2" tab-id="tab-2">
-      <Compliances :application="props.application" />
+      <Compliances :application="application" />
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 3" panel-id="tab-content-3" tab-id="tab-3">
-      <Acteurs :application="props.application" />
+      <ActorManager :application="application" @update:application="emit('update:application', $event)" />
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 4" panel-id="tab-content-4" tab-id="tab-4">
-      <NotificationsApplication :application="props.application" />
-      <!-- Composant Signalements -->
+      <NotificationsApplication :application="application" />
     </DsfrTabContent>
   </DsfrTabs>
 </template>

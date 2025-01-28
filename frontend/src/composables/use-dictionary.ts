@@ -15,3 +15,13 @@ export const statusColors = {
   in_progress: "bg-info",
   done: "bg-success",
 };
+
+export const ActorType = {
+  Responsable: "Responsable",
+  Exploitation: "Exploitation",
+  "Autre responsable": "Responsable_autre",
+  Hébergement: "Hebergement",
+  "Architecte Applicatif": "Architecte_applicatif",
+  "Architecte Infra": "Architecte_infra",
+  "Représentant SSI": "Representant_SSI",
+};

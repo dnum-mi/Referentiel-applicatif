@@ -9,7 +9,7 @@ async function exportToCsv() {
     const response = await axios.get("/applications/export", {
       responseType: "blob",
       params: {
-        label: searchLabel.value, // Inclure le filtre de recherche si défini
+        label: searchLabel.value,
       },
     });
 
