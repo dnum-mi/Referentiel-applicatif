@@ -40,6 +40,15 @@ const reportIssue = {
       throw error;
     }
   },
+  async updateStatus(id: string, status: string) {
+    try {
+      console.log(status);
+      const response = await requests.put(`/anomaly-notifications/update/${id}`, { status });
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
   async deleteReportIssue(id: string) {
     try {
       const response = await requests.del(`/anomaly-notifications/${id}`);
