@@ -79,6 +79,7 @@ export class AnomalyNotificationService {
       application: {
         id: anomaly.application?.id,
         label: anomaly.application?.label,
+        ownerId: anomaly.application?.ownerId,
       },
       notifierId: anomaly.notifierId,
       description: anomaly.description,
@@ -116,6 +117,7 @@ export class AnomalyNotificationService {
       application: {
         id: anomaly.application?.id,
         label: anomaly.application?.label,
+        ownerId: anomaly.application?.ownerId,
       },
       notifierId: anomaly.notifierId,
       notifier: {
@@ -145,6 +147,28 @@ export class AnomalyNotificationService {
 
     return updatedNotification;
   }
+
+  /**
+   * Met à jour une notification d'anomalie existante.
+   * @param id L'identifiant de la notification.
+   * @param status Le nouveau statut.
+   * @returns La notification d'anomalie mise à jour.
+   * @throws NotFoundException Si la notification n'est pas trouvée.
+   */
+  // async updateStatus(id: string, data: UpdateAnomalyNotificationDto) {
+  //   const { status } = data;
+
+  //   // Vérifiez que la notification existe
+  //   await this.findOne(id);
+
+  //   // Met à jour la notification avec le statut
+  //   const updatedNotification = await this.prisma.anomalyNotification.update({
+  //     where: { id },
+  //     data: { status },
+  //   });
+
+  //   return updatedNotification;
+  // }
 
   /**
    * Supprime une notification d'anomalie.

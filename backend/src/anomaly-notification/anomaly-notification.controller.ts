@@ -145,6 +145,22 @@ export class AnomalyNotificationController {
     return this.anomalyNotificationService.update(id, updateDto);
   }
 
+  //   /**
+  //  * Met à jour une notification d'anomalie existante.
+  //  *
+  //  * @param id L'identifiant de la notification à mettre à jour.
+  //  * @param newStatus Les nouvelles données de la notification.
+  //  * @returns La notification d'anomalie mise à jour.
+  //  */
+  //   @Patch(':id')
+  //   @ApiOperation({ summary: 'Mettre à jour le statut d\'une notification' })
+  //   updateStatus(
+  //     @Param('id') id: string,
+  //     @Body() newStatus: string,
+  //   ) {
+  //     return this.anomalyNotificationService.updateStatus(id, newStatus);
+  //   }
+
   /**
    * Supprime une notification d'anomalie spécifique.
    *
