@@ -8,7 +8,8 @@ export class ApplicationDto {
   @IsString()
   label: string;
 
-  // Ajoutez d'autres champs si nécessaire
+  @IsString()
+  ownerId: string;
 }
 
 export class GetAnomalyNotificationDto {
