@@ -96,23 +96,9 @@ export class AnomalyNotificationController {
   async getAnomalyNotificationsByUser(
     @Request() req,
   ): Promise<GetAnomalyNotificationDto[]> {
-    try {
-      const decodedToken = AuthUtils.getDecodedToken(req);
-      const userFromDb = await AuthUtils.findOrCreateUser(
-        decodedToken,
-        this.userService,
-      );
-
-      const anomalyNotifications =
-        await this.anomalyNotificationService.getAnomalyNotificationByNotifierId(
-          userFromDb.keycloakId,
-        );
-      return anomalyNotifications;
-    } catch (error) {
-      throw new NotFoundException(
-        'Erreur lors de la récupération des notifications utilisateur',
-      );
-    }
+    return await this.anomalyNotificationService.getAnomalyNotificationByNotifierId(
+      req.user.keycloakId,
+    );
   }
 
   /**
