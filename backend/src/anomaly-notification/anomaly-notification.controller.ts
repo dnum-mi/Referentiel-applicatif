@@ -12,6 +12,7 @@ import {
   NotFoundException,
   BadRequestException,
   Query,
+  ParseEnumPipe,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AnomalyNotificationService } from './anomaly-notification.service';
@@ -21,6 +22,7 @@ import {
 } from './dto/create-anomaly-notification.dto';
 import { GetAnomalyNotificationDto } from './dto/get-anomaly-notification.dto';
 import { UpdateAnomalyNotificationDto } from './dto/update-anomaly-notification.dto';
+import { AnomalyNotificationStatus } from 'src/enum';
 
 /**
  * Contrôleur pour la gestion des notifications d'anomalies.
@@ -145,21 +147,21 @@ export class AnomalyNotificationController {
     return this.anomalyNotificationService.update(id, updateDto);
   }
 
-  //   /**
-  //  * Met à jour une notification d'anomalie existante.
-  //  *
-  //  * @param id L'identifiant de la notification à mettre à jour.
-  //  * @param newStatus Les nouvelles données de la notification.
-  //  * @returns La notification d'anomalie mise à jour.
-  //  */
-  //   @Patch(':id')
-  //   @ApiOperation({ summary: 'Mettre à jour le statut d\'une notification' })
-  //   updateStatus(
-  //     @Param('id') id: string,
-  //     @Body() newStatus: string,
-  //   ) {
-  //     return this.anomalyNotificationService.updateStatus(id, newStatus);
-  //   }
+  /**
+   * Met à jour une notification d'anomalie existante.
+   *
+   * @param id L'identifiant de la notification à mettre à jour.
+   * @param newStatus Les nouvelles données de la notification.
+   * @returns La notification d'anomalie mise à jour.
+   */
+  @Patch('update/:id')
+  @ApiOperation({ summary: "Mettre à jour le statut d'une notification" })
+  updateStatus(
+    @Param('id') id: string,
+    @Body() newStatus: UpdateAnomalyNotificationDto, // Utilisez le DTO complet ici
+  ) {
+    return this.anomalyNotificationService.updateStatus(id, newStatus);
+  }
 
   /**
    * Supprime une notification d'anomalie spécifique.
