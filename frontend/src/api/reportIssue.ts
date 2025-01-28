@@ -43,7 +43,7 @@ const reportIssue = {
   async updateStatus(id: string, status: string) {
     try {
       console.log(status);
-      const response = await requests.put(`/anomaly-notifications/update/${id}`, { status });
+      const response = await requests.patch(`/anomaly-notifications/update/${id}`, { status });
       return response;
     } catch (error) {
       throw error;
