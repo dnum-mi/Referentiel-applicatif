@@ -68,6 +68,10 @@ const loadNotifications = async () => {
     const notificationList = await Issue.getNotificationsByApplicationId(props.application.id);
     console.log("Notifications récupérées:", notificationList);
     notifications.value = notificationList;
+
+    notifications.value.forEach((notification) => {
+      notification.statu = statuses[0];
+    });
   } catch (error) {
     console.error("Une erreur est survenue lors du chargement des notifications :", error);
   }
