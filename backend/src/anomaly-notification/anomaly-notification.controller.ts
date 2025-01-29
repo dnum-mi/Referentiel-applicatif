@@ -158,7 +158,7 @@ export class AnomalyNotificationController {
   @ApiOperation({ summary: "Mettre à jour le statut d'une notification" })
   updateStatus(
     @Param('id') id: string,
-    @Body() newStatus: UpdateAnomalyNotificationDto, // Utilisez le DTO complet ici
+    @Body() newStatus: UpdateAnomalyNotificationDto,
   ) {
     return this.anomalyNotificationService.updateStatus(id, newStatus);
   }

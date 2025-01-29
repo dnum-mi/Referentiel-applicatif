@@ -11,8 +11,8 @@ export class UpdateAnomalyNotificationDto extends PartialType(
   @IsEnum(AnomalyNotificationStatus)
   @ApiProperty({
     description: "Le nouveau statut de la notification d'anomalie",
-    enum: AnomalyNotificationStatus, // Ceci permet d’afficher l’enum dans Swagger
-    required: true, // Le statut est optionnel
+    enum: AnomalyNotificationStatus,
+    required: true,
   })
   status?: AnomalyNotificationStatus;
 }
