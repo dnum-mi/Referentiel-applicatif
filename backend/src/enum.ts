@@ -47,4 +47,5 @@ export enum ExternalRessourceType {
   documentation,
   supervision,
   service,
+  autre,
 }

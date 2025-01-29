@@ -10,7 +10,12 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { ComplianceStatus, ComplianceType, LifecycleStatus } from '../../enum';
+import {
+  ComplianceStatus,
+  ComplianceType,
+  ExternalRessourceType,
+  LifecycleStatus,
+} from '../../enum';
 
 export class CreateActorDto {
   @ApiProperty({
@@ -221,6 +226,57 @@ export class CreateLifecycleDto {
   metadataId?: string;
 }
 
+export class UpdateExternalRessourceDto {
+  @ApiProperty({
+    description: 'ID de la externalRessource (uniquement pour les existantes)',
+    required: false,
+  })
+  @IsOptional()
+  id?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  link?: string | null;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsDateString()
+  description?: string | null;
+
+  @ApiProperty({ enum: ExternalRessourceType, required: false })
+  @IsOptional()
+  @IsEnum(ExternalRessourceType)
+  type?: ExternalRessourceType;
+}
+export class CreateExternalRessourceDto {
+  @ApiProperty({
+    example: 'https://doc.fr',
+    description: 'Link of the external ressource',
+  })
+  @IsString()
+  @IsOptional()
+  name: string | null;
+
+  @ApiProperty({
+    example: "documentation de l'application",
+    description: 'Description of the external ressource',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  description: string | null;
+
+  @ApiProperty({
+    enum: ExternalRessourceType,
+    description:
+      'Type of external ressource (service, documentation, supervision, autre)',
+  })
+  @IsEnum(ExternalRessourceType)
+  @IsOptional()
+  type: ExternalRessourceType;
+}
+
 export class CreateApplicationDto {
   @ApiProperty({
     example: 'My Application',
@@ -326,6 +382,17 @@ export class CreateApplicationDto {
   @ValidateNested({ each: true })
   @Type(() => CreateExternalDto)
   externals: CreateExternalDto[] = [];
+
+  @ApiProperty({
+    type: [CreateExternalRessourceDto],
+    description:
+      'External ressources references (links) associated with the application',
+    required: false,
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateExternalRessourceDto)
+  externalRessource: CreateExternalRessourceDto[] = [];
 }
 
 export class PatchApplicationDto extends PickType(
@@ -349,4 +416,9 @@ export class PatchApplicationDto extends PickType(
   @ValidateNested({ each: true })
   @Type(() => UpdateActorDto)
   actors?: UpdateActorDto[];
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateExternalRessourceDto)
+  externalRessource?: UpdateExternalRessourceDto[];
 }
