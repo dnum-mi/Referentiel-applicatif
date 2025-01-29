@@ -3,20 +3,10 @@ import requests from "./xhr-client";
 
 const reportIssue = {
   async createReportIssue(data: Promise<ReportIssue[]>) {
-    try {
-      const response = await requests.post<ReportIssue[]>("/anomaly-notifications", data);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    return await requests.post<ReportIssue[]>("/anomaly-notifications", data);
   },
   async getReportIssue() {
-    try {
-      const response = await requests.get<ReportIssue[]>("/anomaly-notifications");
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    return await requests.get<ReportIssue[]>("/anomaly-notifications");
   },
 
   // Dans le fichier reportIssue.ts
@@ -33,20 +23,10 @@ const reportIssue = {
   },
 
   async getReportIssueByNotifierId(): Promise<ReportIssue[]> {
-    try {
-      const response = await requests.get<ReportIssue[]>("/anomaly-notifications/user-notifications");
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    return await requests.get<ReportIssue[]>("/anomaly-notifications/user-notifications");
   },
   async deleteReportIssue(id: string) {
-    try {
-      const response = await requests.del(`/anomaly-notifications/${id}`);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    return await requests.del(`/anomaly-notifications/${id}`);
   },
 };
 
