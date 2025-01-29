@@ -6,6 +6,7 @@ import { formatDate } from "@/composables/use-date";
 import { statusDictionary, statusIconClasses, statusColors } from "@/composables/use-dictionary";
 import useToaster from "@/composables/use-toaster";
 
+
 const props = defineProps<{ application: Application }>();
 
 const notifications = ref<any[]>([]);
@@ -25,6 +26,7 @@ const handleRowsPerPageChange = (value: number) => {
   rowsPerPage.value = value;
   currentPage.value = 0;
 };
+
 const handleEditClick = (rowId: number) => {
   editingRow.value = rowId;
 };
