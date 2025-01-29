@@ -158,10 +158,8 @@ export class AnomalyNotificationService {
   async updateStatus(id: string, data: UpdateAnomalyNotificationDto) {
     const { status } = data;
 
-    // Vérifiez que la notification existe
     await this.findOne(id);
 
-    // Met à jour la notification avec le statut
     const updatedNotification = await this.prisma.anomalyNotification.update({
       where: { id },
       data: { status },
