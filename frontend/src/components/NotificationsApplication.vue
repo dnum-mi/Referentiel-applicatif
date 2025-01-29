@@ -26,11 +26,11 @@ const handleRowsPerPageChange = (value: number) => {
   currentPage.value = 0;
 };
 const handleEditClick = (rowId: number) => {
-  editingRow.value = rowId; // Active le mode édition pour la ligne sélectionnée
+  editingRow.value = rowId;
 };
 
 const handleCancelClick = () => {
-  editingRow.value = null; // Annule le mode édition
+  editingRow.value = null;
 };
 
 const handleValidateClick = async (notificationId: string, newStatus: string) => {
@@ -103,11 +103,7 @@ onMounted(() => {
               <DsfrButton @click="handleCancelClick">Annuler</DsfrButton>
             </template>
             <template v-else>
-              <DsfrButton
-                v-if="notification.application?.ownerId === 'f15d1c13-8198-4ca5-a180-94656e20d568'"
-                @click="handleEditClick(notification.id)"
-                >Modifier</DsfrButton
-              >
+              <DsfrButton @click="handleEditClick(notification.id)">Modifier</DsfrButton>
             </template>
           </header>
           <div class="description-content">
