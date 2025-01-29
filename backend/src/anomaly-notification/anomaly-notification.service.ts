@@ -73,9 +73,6 @@ export class AnomalyNotificationService {
         include: { history: true, application: true },
       },
     );
-    if (!anomalyNotifications || anomalyNotifications.length === 0) {
-      throw new NotFoundException('Aucune notification de signalement trouvée');
-    }
     const anomalyNotificationDtos = anomalyNotifications.map((anomaly) => ({
       id: anomaly.id,
       applicationId: anomaly.applicationId,
