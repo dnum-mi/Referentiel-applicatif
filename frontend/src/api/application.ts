@@ -3,9 +3,22 @@ import requests from "./xhr-client";
 import axios from "axios";
 
 const Applications = {
-  async getAllApplicationBySearch(label?: string): Promise<Application[]> {
+  async getAllApplicationBySearch(searchParams?: string): Promise<Application[]> {
+    let label = searchParams;
+    let tag = [];
+    let regex = /tag:([A-Za-z0-9]+)/gi;
+    let match = null;
+
+    while ((match = regex.exec(searchParams)) != null) {
+      tag.push(match[1]);
+      label = label.replace(match[0], "").trim();
+    }
+
     return await requests.get<Application[]>("/applications/search", {
-      params: label ? { label } : undefined,
+      params: {
+        label: label ? label : undefined,
+        tag: tag.length > 0 ? tag : [],
+      },
     });
   },
 
