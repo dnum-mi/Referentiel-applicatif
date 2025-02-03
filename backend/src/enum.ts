@@ -44,8 +44,7 @@ export enum AnomalyNotificationStatus {
 }
 
 export enum ExternalRessourceType {
-  documentation,
-  supervision,
-  service,
-  autre,
+  DOCUMENTATION = 'documentation',
+  SUPERVISION = 'supervision',
+  SERVICE = 'service',
 }

@@ -256,7 +256,7 @@ export class CreateExternalRessourceDto {
   })
   @IsString()
   @IsOptional()
-  name: string | null;
+  link: string | null;
 
   @ApiProperty({
     example: "documentation de l'application",
@@ -270,7 +270,7 @@ export class CreateExternalRessourceDto {
   @ApiProperty({
     enum: ExternalRessourceType,
     description:
-      'Type of external ressource (service, documentation, supervision, autre)',
+      'Type of external ressource (service, documentation, supervision)',
   })
   @IsEnum(ExternalRessourceType)
   @IsOptional()

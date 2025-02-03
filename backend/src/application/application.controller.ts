@@ -70,7 +70,6 @@ export class ApplicationController {
       userId: user.keycloakId,
       action: 'create',
     });
-
     const newApplication = await this.applicationService.createApplication(
       user.keycloakId,
       createApplicationDto,
