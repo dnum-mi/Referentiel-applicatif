@@ -241,7 +241,7 @@ export class UpdateExternalRessourceDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @IsDateString()
+  @IsString()
   description?: string | null;
 
   @ApiProperty({ enum: ExternalRessourceType, required: false })

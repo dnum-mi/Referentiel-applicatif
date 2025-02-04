@@ -194,6 +194,11 @@ export class ApplicationController {
     @Param('id') id: string,
     @Body() applicationToUpdate: PatchApplicationDto,
   ): Promise<PatchApplicationDto> {
+    Logger.log({
+      message: "Début de la modification de l'application",
+      applicationToUpdate: applicationToUpdate,
+      action: 'patch',
+    });
     return this.applicationService.update({
       where: { id: id },
       data: applicationToUpdate,

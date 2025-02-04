@@ -4,6 +4,7 @@ import { ref } from "vue";
 import InformationsGenerales from "./InformationsGenerales.vue";
 import Acteurs from "./Acteurs.vue";
 import NotificationsApplication from "./NotificationsApplication.vue";
+import Links from "./Links.vue";
 
 const props = defineProps<{ application: Application }>();
 
@@ -13,10 +14,16 @@ const tabListName = "Informations sur l’application";
 const tabTitles = [
   { title: "Informations générales", icon: "ri-checkbox-circle-line", tabId: "tab-0", panelId: "tab-content-0" },
   {
-    title: "Conformité",
-    icon: "ri-shield-check-line",
+    title: "Liens",
+    icon: "ri-links-line",
     tabId: "tab-1",
     panelId: "tab-content-1",
+  },
+  {
+    title: "Conformité",
+    icon: "ri-shield-check-line",
+    tabId: "tab-2",
+    panelId: "tab-content-2",
   },
   {
     title: "Acteurs",
@@ -51,14 +58,18 @@ const tabTitles = [
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 1" panel-id="tab-content-1" tab-id="tab-1">
-      <Compliances :application="props.application" />
+      <Links :application="props.application" />
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 2" panel-id="tab-content-2" tab-id="tab-2">
-      <Acteurs :application="props.application" />
+      <Compliances :application="props.application" />
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 3" panel-id="tab-content-3" tab-id="tab-3">
+      <Acteurs :application="props.application" />
+    </DsfrTabContent>
+
+    <DsfrTabContent v-if="activeTab === 4" panel-id="tab-content-4" tab-id="tab-4">
       <NotificationsApplication :application="props.application" />
       <!-- Composant Signalements -->
     </DsfrTabContent>

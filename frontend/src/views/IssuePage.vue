@@ -4,7 +4,7 @@ import type { Application } from "@/models/Application";
 import { onMounted, ref } from "vue";
 import { routeNames } from "@/router/route-names";
 import { formatDate } from "@/composables/use-date";
-import { statusDictionary, statusIconClasses } from "@/composables/use-dictionnary";
+import { statusDictionary, statusIconClasses } from "@/composables/use-dictionary";
 
 const title = "Liste de mes signalements";
 const headers = ["Application", "Description", "Date", "Statut"];

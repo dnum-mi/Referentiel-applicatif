@@ -18,6 +18,7 @@ export interface Application {
   actors?: Actor[];
   compliances?: Compliance[];
   externals?: External[];
+  externalRessource?: ExternalRessource[];
   parent?: Application;
 }
 export interface Lifecycle {
@@ -66,6 +67,12 @@ export interface ExternalSource {
   uri?: string;
   valueType?: string;
   metadataId?: string;
+}
+export interface ExternalRessource {
+  id: string;
+  link: string;
+  description: string;
+  type: string;
 }
 export interface User {
   keycloakId: string;

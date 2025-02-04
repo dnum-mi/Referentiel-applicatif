@@ -65,6 +65,14 @@ const Applications = {
               : null,
           }))
         : [],
+      externalRessource: app.externalRessource
+        ? app.externalRessource.map((externalRessource) => ({
+            id: externalRessource.id,
+            link: externalRessource.link,
+            description: externalRessource.description,
+            type: externalRessource.type,
+          }))
+        : [],
     };
 
     const response = await axios.patch<Application>(`/applications/${app.id}`, payload);
