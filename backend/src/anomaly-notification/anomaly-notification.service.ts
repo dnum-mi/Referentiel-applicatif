@@ -7,7 +7,7 @@ import { AuthUtils } from '../utils/helpers';
 
 @Injectable()
 export class AnomalyNotificationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
   /**
    * Crée une nouvelle notification d'anomalie.
    * @param req La requête HTTP de l'utilisateur.
@@ -79,6 +79,7 @@ export class AnomalyNotificationService {
       application: {
         id: anomaly.application?.id,
         label: anomaly.application?.label,
+        ownerId: anomaly.application?.ownerId,
       },
       notifierId: anomaly.notifierId,
       description: anomaly.description,
@@ -116,6 +117,7 @@ export class AnomalyNotificationService {
       application: {
         id: anomaly.application?.id,
         label: anomaly.application?.label,
+        ownerId: anomaly.application?.ownerId,
       },
       notifierId: anomaly.notifierId,
       notifier: {
@@ -144,6 +146,24 @@ export class AnomalyNotificationService {
     });
 
     return updatedNotification;
+  }
+
+  /**
+   * Met à jour une notification d'anomalie existante.
+   * @param id L'identifiant de la notification.
+   * @param status Le nouveau statut.
+   * @returns La notification d'anomalie mise à jour.
+   * @throws NotFoundException Si la notification n'est pas trouvée.
+   */
+  async updateStatus(id: string, data: UpdateAnomalyNotificationDto) {
+    const { status } = data;
+
+    await this.findOne(id);
+
+    return await this.prisma.anomalyNotification.update({
+      where: { id },
+      data: { status },
+    });
   }
 
   /**
