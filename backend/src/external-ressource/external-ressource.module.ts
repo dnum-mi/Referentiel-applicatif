@@ -1,12 +1,12 @@
 import { PrismaModule } from '../prisma/prisma.module';
 import { Module } from '@nestjs/common';
-import { ExternalSourceService } from './external-source.service';
-import { ExternalSourceController } from './external-source.controller';
+import { ExternalRessourceService } from './external-ressource.service';
+import { ExternalRessourceController } from './external-ressource.controller';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [PrismaModule, UserModule],
-  controllers: [ExternalSourceController],
-  providers: [ExternalSourceService],
+  controllers: [ExternalRessourceController],
+  providers: [ExternalRessourceService],
 })
 export class ExternalSourceModule {}
