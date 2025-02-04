@@ -28,10 +28,10 @@ const tabTitles = [
   {
     title: "Acteurs",
     icon: "ri-team-line",
-    tabId: "tab-2",
-    panelId: "tab-content-2",
+    tabId: "tab-3",
+    panelId: "tab-content-3",
   },
-  { title: "Signalements", icon: "ri-alert-line", tabId: "tab-3", panelId: "tab-content-3" },
+  { title: "Signalements", icon: "ri-alert-line", tabId: "tab-4", panelId: "tab-content-4" },
 ];
 </script>
 
