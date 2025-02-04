@@ -10,42 +10,11 @@ const props = defineProps<{ application: Application }>();
 
 const notifications = ref<any[]>([]);
 
-const toaster = useToaster();
-
-const statusText = ref("");
-const opened = ref(false);
 const statuses = Object.keys(statusDictionary);
-const editingRow = ref<number | null>(null);
 
 const rowsPerPage = ref(10);
 const currentPage = ref(0);
 const totalNotifications = computed(() => notifications.value.length);
-
-const handleRowsPerPageChange = (value: number) => {
-  rowsPerPage.value = value;
-  currentPage.value = 0;
-};
-const handleEditClick = (rowId: number) => {
-  editingRow.value = rowId;
-};
-
-const handleCancelClick = () => {
-  editingRow.value = null;
-};
-
-const handleValidateClick = async (notificationId: string, newStatus: string) => {
-  try {
-    const response = await Issue.updateStatus(notificationId, newStatus);
-    console.log(response);
-    opened.value = false;
-    editingRow.value = null;
-    toaster.addSuccessMessage("Votre modification du statut à été enregistrée. ");
-  } catch (error) {
-    toaster.addErrorMessage(
-      "Oops! Une erreur, veuillez contactez l'administrateur du référentiel des applications, si le problème persiste",
-    );
-  }
-};
 
 const paginatedNotifications = computed(() => {
   const start = currentPage.value * rowsPerPage.value;
@@ -98,20 +67,6 @@ onMounted(() => {
               />
             </p>
             <p class="fr-text--sm"><strong>Date de création:</strong> {{ formatDate(notification.createdAt) }}</p>
-            <template v-if="editingRow === notification.id">
-              <select v-model="notification.statu" class="fr-select">
-                <option v-for="statu in statuses" :key="statu" :value="statu">
-                  {{ statusDictionary[statu] }}
-                </option>
-              </select>
-            </template>
-            <template v-if="editingRow === notification.id">
-              <DsfrButton @click="handleValidateClick(notification.id, notification.statu)">Valider</DsfrButton>
-              <DsfrButton @click="handleCancelClick">Annuler</DsfrButton>
-            </template>
-            <template v-else>
-              <DsfrButton @click="handleEditClick(notification.id)">Modifier</DsfrButton>
-            </template>
           </header>
           <div class="description-content">
             <p class="">{{ notification.description }}</p>
@@ -124,18 +79,8 @@ onMounted(() => {
       <p>Aucune notification disponible.</p>
     </div>
   </section>
-  <div class="fr-flex-container fr-mb-2w">
-    <div class="fr-select">
-      <label for="rowsPerPage">Résultats par page :</label>
-      <select id="rowsPerPage" v-model="rowsPerPage" @change="handleRowsPerPageChange($event.target.value)">
-        <option :value="10">10</option>
-        <option :value="30">30</option>
-        <option :value="50">50</option>
-      </select>
-    </div>
-    <div class="fr-pagination">
-      <DsfrPagination v-model:current-page="currentPage" :pages="pages" />
-    </div>
+  <div class="fr-flex-container">
+    <DsfrPagination v-model:current-page="currentPage" :pages="pages" />
   </div>
 </template>
 
@@ -159,25 +104,33 @@ onMounted(() => {
   padding: 1em;
   margin: 1em;
   background-color: #f9f9f9;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.fr-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.fr-flex-container {
+  display: flex;
+  justify-content: center;
+  position: sticky;
+  bottom: 0;
+  padding: 1rem;
+  z-index: 10;
+  width: 100%;
 }
 
 .bg-contrast-grey {
   background-color: #f0f0f0;
+  border-radius: 8px;
+  padding: 1rem;
 }
 
 .fr-text--sm {
   font-size: 0.875rem;
-}
-
-.fr-grid-row--middle {
-  display: flex;
-  align-items: center;
-  justify-content: start;
-  margin-bottom: -2em;
-}
-
-.fr-col-auto {
-  flex: 0 0 auto;
 }
 
 .text-grey-380 {
@@ -193,58 +146,35 @@ onMounted(() => {
   font-weight: bold;
 }
 
-.text-align-right {
-  text-align: right;
-}
-
 .description-content {
-  margin: 1em 0em 1em 2em;
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  border-left: 3px solid #dcdcdc;
 }
 
-.fr-flex-container {
+.fr-actions-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 0.5rem;
 }
 
-.fr-select {
-  max-width: 200px;
-}
-
-.fr-select {
+.fr-buttons-container {
   display: flex;
-  flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1rem;
-  max-width: 200px;
+  min-height: 40px;
 }
 
-.fr-select label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #4a4a4a;
+.fr-select {
+  min-width: 150px;
 }
 
-.fr-select select {
-  padding: 0.5rem;
-  font-size: 0.9rem;
-  color: #333;
-  border: 1px solid #dcdcdc;
-  border-radius: 0.375rem;
-  background-color: #fff;
-  transition:
-    border-color 0.2s ease-in-out,
-    box-shadow 0.2s ease-in-out;
-}
-
-.fr-select select:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.fr-select select:hover {
-  border-color: #007bff;
-  cursor: pointer;
+.fr-grid-row--middle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 </style>
