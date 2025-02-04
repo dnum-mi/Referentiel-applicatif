@@ -54,33 +54,24 @@ services:
     ports:
       - 8082:8080
     healthcheck:
-      test:
-        "exec 3<>/dev/tcp/127.0.0.1/9000; echo -e 'GET /health/ready HTTP/1.1\r
-
-        Host: localhost:9000\r
-
-        Connection: close\r
-
-        \r
-
-        ' >&3;cat <&3 | grep -q '\"status\": \"UP\"' && exit 0 || exit 1"
+      test: "exec 3<>/dev/tcp/127.0.0.1/9000; echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost:9000\r\nConnection: close\r\n\r\n' >&3;cat <&3 | grep -q '\"status\": \"UP\"' && exit 0 || exit 1"
       interval: 5s
       timeout: 10s
       retries: 5
     depends_on:
       - postgres
 
-   client:
-     image: node:22
-     working_dir: /app
-     volumes:
-       - ./frontend:/app
-       - /app/node_modules
-     ports:
-       - "5173:5173"
-     command: sh -c "npm install -g pnpm && pnpm install && pnpm dev"
-     depends_on:
-       - backend
+  client:
+    image: node:22
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install -g pnpm && pnpm install && pnpm dev"
+    depends_on:
+      - backend
 
   krakend:
     image: devopsfaith/krakend
