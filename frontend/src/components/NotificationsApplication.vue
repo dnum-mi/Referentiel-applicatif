@@ -4,10 +4,18 @@ import type { Application } from "@/models/Application";
 import { onMounted, ref } from "vue";
 import { formatDate } from "@/composables/use-date";
 import { statusDictionary, statusIconClasses, statusColors } from "@/composables/use-dictionary";
+import useToaster from "@/composables/use-toaster";
 
 const props = defineProps<{ application: Application }>();
 
 const notifications = ref<any[]>([]);
+
+const toaster = useToaster();
+
+const statusText = ref("");
+const opened = ref(false);
+const statuses = Object.keys(statusDictionary);
+const editingRow = ref<number | null>(null);
 
 const rowsPerPage = ref(10);
 const currentPage = ref(0);
@@ -16,6 +24,27 @@ const totalNotifications = computed(() => notifications.value.length);
 const handleRowsPerPageChange = (value: number) => {
   rowsPerPage.value = value;
   currentPage.value = 0;
+};
+const handleEditClick = (rowId: number) => {
+  editingRow.value = rowId;
+};
+
+const handleCancelClick = () => {
+  editingRow.value = null;
+};
+
+const handleValidateClick = async (notificationId: string, newStatus: string) => {
+  try {
+    const response = await Issue.updateStatus(notificationId, newStatus);
+    console.log(response);
+    opened.value = false;
+    editingRow.value = null;
+    toaster.addSuccessMessage("Votre modification du statut à été enregistrée. ");
+  } catch (error) {
+    toaster.addErrorMessage(
+      "Oops! Une erreur, veuillez contactez l'administrateur du référentiel des applications, si le problème persiste",
+    );
+  }
 };
 
 const paginatedNotifications = computed(() => {
@@ -38,6 +67,10 @@ const loadNotifications = async () => {
     const notificationList = await Issue.getNotificationsByApplicationId(props.application.id);
     console.log("Notifications récupérées:", notificationList);
     notifications.value = notificationList;
+
+    notifications.value.forEach((notification) => {
+      notification.statu = statuses[0];
+    });
   } catch (error) {
     console.error("Une erreur est survenue lors du chargement des notifications :", error);
   }
@@ -65,6 +98,20 @@ onMounted(() => {
               />
             </p>
             <p class="fr-text--sm"><strong>Date de création:</strong> {{ formatDate(notification.createdAt) }}</p>
+            <template v-if="editingRow === notification.id">
+              <select v-model="notification.statu" class="fr-select">
+                <option v-for="statu in statuses" :key="statu" :value="statu">
+                  {{ statusDictionary[statu] }}
+                </option>
+              </select>
+            </template>
+            <template v-if="editingRow === notification.id">
+              <DsfrButton @click="handleValidateClick(notification.id, notification.statu)">Valider</DsfrButton>
+              <DsfrButton @click="handleCancelClick">Annuler</DsfrButton>
+            </template>
+            <template v-else>
+              <DsfrButton @click="handleEditClick(notification.id)">Modifier</DsfrButton>
+            </template>
           </header>
           <div class="description-content">
             <p class="">{{ notification.description }}</p>

@@ -8,8 +8,6 @@ const reportIssue = {
   async getReportIssue() {
     return await requests.get<ReportIssue[]>("/anomaly-notifications");
   },
-
-  // Dans le fichier reportIssue.ts
   async getNotificationsByApplicationId(applicationId: string) {
     try {
       console.log("Requesting notifications for applicationId:", applicationId);
@@ -21,9 +19,17 @@ const reportIssue = {
       throw error;
     }
   },
-
   async getReportIssueByNotifierId(): Promise<ReportIssue[]> {
     return await requests.get<ReportIssue[]>("/anomaly-notifications/user-notifications");
+  },
+  async updateStatus(id: string, status: string) {
+    try {
+      console.log(status);
+      const response = await requests.patch(`/anomaly-notifications/update/${id}`, { status });
+      return response;
+    } catch (error) {
+      throw error;
+    }
   },
   async deleteReportIssue(id: string) {
     return await requests.del(`/anomaly-notifications/${id}`);
