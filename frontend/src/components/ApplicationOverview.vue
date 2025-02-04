@@ -15,7 +15,7 @@ const tabTitles = [
   { title: "Informations générales", icon: "ri-checkbox-circle-line", tabId: "tab-0", panelId: "tab-content-0" },
   {
     title: "Liens",
-    icon: "ri-link-line",
+    icon: "ri-links-line",
     tabId: "tab-1",
     panelId: "tab-content-1",
   },
