@@ -7,7 +7,7 @@ import { AuthUtils } from '../utils/helpers';
 
 @Injectable()
 export class AnomalyNotificationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
   /**
    * Crée une nouvelle notification d'anomalie.
    * @param req La requête HTTP de l'utilisateur.
@@ -160,12 +160,10 @@ export class AnomalyNotificationService {
 
     await this.findOne(id);
 
-    const updatedNotification = await this.prisma.anomalyNotification.update({
+    return await this.prisma.anomalyNotification.update({
       where: { id },
       data: { status },
     });
-
-    return updatedNotification;
   }
 
   /**

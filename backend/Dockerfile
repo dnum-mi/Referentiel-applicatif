@@ -14,4 +14,4 @@ RUN pnpm run build
 
 ENV PORT=3500
 
-CMD ["node" , "dist/main.js"]
+CMD ["node" , "dist/src/main.js"]

@@ -1,7 +1,7 @@
 // src/application/dto/search-application.dto.ts
 
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsArray, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SearchApplicationDto {
@@ -12,6 +12,14 @@ export class SearchApplicationDto {
   @IsOptional()
   @IsString()
   label?: string;
+
+  @ApiPropertyOptional({
+    description: "Filtrer par tag d'application",
+    example: 'tag:ref',
+  })
+  @IsOptional()
+  @IsArray()
+  tag?: string[];
 
   @ApiPropertyOptional({
     description: 'Numéro de la page pour la pagination',

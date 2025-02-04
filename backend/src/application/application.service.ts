@@ -106,17 +106,20 @@ export class ApplicationService {
    * @throws Error Si une erreur survient pendant la recherche.
    */
   public async searchApplications(searchParams: SearchApplicationDto) {
-    const { label, page = 1, limit = 12 } = searchParams;
+    const { label, tag, page = 1, limit = 12 } = searchParams;
 
     const whereClause: Prisma.ApplicationWhereInput = {
-      ...(label
-        ? {
-            label: {
-              contains: label,
-              mode: Prisma.QueryMode.insensitive,
-            },
-          }
-        : {}),
+      ...(label !== undefined && {
+        label: {
+          contains: label,
+          mode: Prisma.QueryMode.insensitive,
+        },
+      }),
+      ...(tag && {
+        tags: {
+          hasEvery: tag,
+        },
+      }),
     };
 
     const orderByClause: Prisma.Enumerable<Prisma.ApplicationOrderByWithRelationInput> =

@@ -25,6 +25,27 @@ const handleRowsPerPageChange = (value: number) => {
   rowsPerPage.value = value;
   currentPage.value = 0;
 };
+const handleEditClick = (rowId: number) => {
+  editingRow.value = rowId;
+};
+
+const handleCancelClick = () => {
+  editingRow.value = null;
+};
+
+const handleValidateClick = async (notificationId: string, newStatus: string) => {
+  try {
+    const response = await Issue.updateStatus(notificationId, newStatus);
+    console.log(response);
+    opened.value = false;
+    editingRow.value = null;
+    toaster.addSuccessMessage("Votre modification du statut à été enregistrée. ");
+  } catch (error) {
+    toaster.addErrorMessage(
+      "Oops! Une erreur, veuillez contactez l'administrateur du référentiel des applications, si le problème persiste",
+    );
+  }
+};
 
 const handleEditClick = (rowId: number) => {
   editingRow.value = rowId;
