@@ -91,8 +91,11 @@ onMounted(() => {
               <strong>Notifié par:</strong> <span class="fr-text--bold">{{ notification.notifier.email }}</span>
             </div>
             <p class="fr-text--sm text-grey-380">
-              <DsfrTag :label="statusDictionary[notification.status]" :icon="statusIconClasses[notification.status]"
-                :class="statusColors[notification.status]" />
+              <DsfrTag
+                :label="statusDictionary[notification.status]"
+                :icon="statusIconClasses[notification.status]"
+                :class="statusColors[notification.status]"
+              />
             </p>
             <p class="fr-text--sm"><strong>Date de création:</strong> {{ formatDate(notification.createdAt) }}</p>
             <template v-if="editingRow === notification.id">
