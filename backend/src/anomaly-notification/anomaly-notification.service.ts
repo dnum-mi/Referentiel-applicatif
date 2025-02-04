@@ -160,12 +160,10 @@ export class AnomalyNotificationService {
 
     await this.findOne(id);
 
-    const updatedNotification = await this.prisma.anomalyNotification.update({
+    return await this.prisma.anomalyNotification.update({
       where: { id },
       data: { status },
     });
-
-    return updatedNotification;
   }
 
   /**
