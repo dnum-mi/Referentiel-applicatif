@@ -27,57 +27,49 @@ const Applications = {
   },
 
   async patchApplication(app: Application): Promise<Application> {
-    const payload = {
-      label: app.label,
-      shortName: app.shortName,
-      description: app.description,
-      purposes: app.purposes,
-      tags: app.tags,
-      lifecycle: app.lifecycle
-        ? {
-            status: app.lifecycle.status,
-            firstProductionDate: app.lifecycle.firstProductionDate,
-            plannedDecommissioningDate: app.lifecycle.plannedDecommissioningDate,
-          }
-        : null,
-      compliances: app.compliances
-        ? app.compliances.map((compliance) => ({
-            id: compliance.id,
-            type: compliance.type,
-            name: compliance.name,
-            status: compliance.status,
-            validityStart: compliance.validityStart,
-            validityEnd: compliance.validityEnd,
-            scoreValue: compliance.scoreValue,
-            scoreUnit: compliance.scoreUnit,
-            notes: compliance.notes,
-          }))
-        : [],
-      actors: app.actors
-        ? app.actors.map((actor) => ({
-            id: actor.id,
-            role: actor.role,
-            user: actor.user
-              ? {
-                  keycloakId: actor.user.keycloakId,
-                  email: actor.user.email,
-                }
-              : null,
-          }))
-        : [],
-      externalRessource: app.externalRessource
-        ? app.externalRessource.map((externalRessource) => ({
-            id: externalRessource.id,
-            link: externalRessource.link,
-            description: externalRessource.description,
-            type: externalRessource.type,
-          }))
-        : [],
-    };
+    try {
+      const payload = {
+        label: app.label,
+        shortName: app.shortName,
+        description: app.description,
+        purposes: app.purposes,
+        tags: app.tags,
+        lifecycle: app.lifecycle
+          ? {
+              status: app.lifecycle.status,
+              firstProductionDate: app.lifecycle.firstProductionDate,
+              plannedDecommissioningDate: app.lifecycle.plannedDecommissioningDate,
+            }
+          : null,
+        compliances: app.compliances
+          ? app.compliances.map((compliance) => ({
+              id: compliance.id,
+              type: compliance.type,
+              name: compliance.name,
+              status: compliance.status,
+              validityStart: compliance.validityStart,
+              validityEnd: compliance.validityEnd,
+              scoreValue: compliance.scoreValue,
+              scoreUnit: compliance.scoreUnit,
+              notes: compliance.notes,
+            }))
+          : [],
+        actors: app.actors
+          ? app.actors.map((actor) => ({
+              id: actor.id,
+              role: actor.role,
+              email: actor.email,
+              actorType: actor.actorType,
+            }))
+          : [],
+      };
 
-    const response = await axios.patch<Application>(`/applications/${app.id}`, payload);
-
-    return response.data;
+      const response = await axios.patch<Application>(`/applications/${app.id}`, payload);
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 };
 

@@ -8,6 +8,7 @@ export {};
 declare module 'vue' {
   export interface GlobalComponents {
     Acteurs: typeof import('./components/Acteurs.vue')['default']
+    ActorManager: typeof import('./components/ActorManager.vue')['default']
     AppDate: typeof import('./components/AppDate.vue')['default']
     ApplicationList: typeof import('./components/ApplicationList.vue')['default']
     ApplicationOverview: typeof import('./components/ApplicationOverview.vue')['default']
@@ -27,6 +28,7 @@ declare module 'vue' {
     DsfrSelect: typeof import('@gouvminint/vue-dsfr')['DsfrSelect']
     DsfrTabContent: typeof import('@gouvminint/vue-dsfr')['DsfrTabContent']
     DsfrTabItem: typeof import('@gouvminint/vue-dsfr')['DsfrTabItem']
+    DsfrTable: typeof import('@gouvminint/vue-dsfr')['DsfrTable']
     DsfrTabs: typeof import('@gouvminint/vue-dsfr')['DsfrTabs']
     DsfrTag: typeof import('@gouvminint/vue-dsfr')['DsfrTag']
     ExportApplications: typeof import('./components/ExportApplications.vue')['default']

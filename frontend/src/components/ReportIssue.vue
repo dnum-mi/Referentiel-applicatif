@@ -15,14 +15,15 @@ const toaster = useToaster();
 const title = "Proposer une correction";
 const opened = ref(false);
 
-const hint = `Veuillez renseigner votre signalement détecté pour l'application "${props.application.data.label}"`;
+const hint = `Veuillez renseigner votre signalement détectées pour l'application "${props.application?.data?.label || ""}"`;
 const label = "Proposition";
 
 const useReportIssue = useReportIssueStore();
 
 const submitCorrection = async () => {
   try {
-    const applicationId = props.application.data.id;
+    const applicationId = props.application?.data?.id;
+    if (!applicationId) throw new Error("Application ID is undefined");
     const response = await useReportIssue.proposeCorrection(applicationId, correctionText.value);
     console.log(response);
     opened.value = false;

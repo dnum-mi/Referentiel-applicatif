@@ -7,6 +7,7 @@ import {
   IsEnum,
   IsDateString,
   ValidateNested,
+  IsEmail,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -15,25 +16,44 @@ import {
   ComplianceType,
   ExternalRessourceType,
   LifecycleStatus,
+  ActorType,
 } from '../../enum';
 
 export class CreateActorDto {
   @ApiProperty({
-    example: 'admin',
-    description: 'Role of the actor in the application',
+    example: '',
+    description: '',
   })
   @IsString()
   @IsOptional()
   role: string;
 
-  @ApiProperty({ example: 'user123', description: 'ID of the user' })
+  @ApiProperty({
+    example: 'user123',
+    description: '',
+    required: false,
+  })
   @IsString()
   @IsOptional()
-  userId: string;
+  userId?: string; // Rendre `userId` facultatif
+
+  @ApiProperty({
+    example: 'example@example.com',
+    description: 'Email of the actor (optional)',
+    required: false,
+  })
+  @IsEmail()
+  @IsOptional()
+  email?: string;
+
+  @ApiProperty({ enum: ActorType, required: false })
+  @IsOptional()
+  @IsEnum(ActorType)
+  type?: ActorType;
 
   @ApiProperty({
     example: 'orgSource123',
-    description: 'ID of the organization source',
+    description: 'ID of the organization source (optional)',
     required: false,
   })
   @IsOptional()
@@ -42,7 +62,7 @@ export class CreateActorDto {
 
   @ApiProperty({
     example: 'app789',
-    description: 'ID of the associated application',
+    description: 'ID of the associated application (optional)',
     required: false,
   })
   @IsOptional()
@@ -67,6 +87,29 @@ export class UpdateActorDto {
   @IsOptional()
   @IsString()
   role?: string;
+
+  @ApiProperty({
+    example: 'example@example.com',
+    description: 'Email of the actor (optional)',
+    required: false,
+  })
+  @IsEmail()
+  @IsOptional()
+  email?: string;
+
+  @ApiProperty({
+    example: '',
+    description: '',
+    required: false,
+  })
+  @IsEmail()
+  @IsOptional()
+  organizationId?: string;
+
+  @ApiProperty({ enum: ActorType, required: false })
+  @IsOptional()
+  @IsEnum(ActorType)
+  actorType?: ActorType;
 
   @IsOptional()
   @ValidateNested()

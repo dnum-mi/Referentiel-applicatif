@@ -15,9 +15,11 @@ model User {
 
 model Actor {
   id                   String       @id @default(uuid())
-  role                 String
-  userId               String
-  user                 User         @relation("UserActors", fields: [userId], references: [keycloakId])
+  role                 String?
+  actorType            ActorType?
+  email                String?
+  userId               String?
+  user                 User?         @relation("UserActors", fields: [userId], references: [keycloakId])
   organizationId       String?
   externalOrganization External?    @relation("ActorOrganization", fields: [organizationId], references: [id])
   applicationId        String?
@@ -26,4 +28,15 @@ model Actor {
   @@index([userId])
   @@index([applicationId])
   @@map("actors")
+}
+
+enum ActorType {
+  Responsable
+  Exploitation
+  ResponsableAutre
+  Hebergement
+  ArchitecteApplicatif
+  ArchitecteInfra
+  RepresentantSSI
+  Autre
 }

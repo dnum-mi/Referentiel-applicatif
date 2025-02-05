@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
+  CreateActorDto,
   CreateApplicationDto,
   PatchApplicationDto,
   UpdateActorDto,
@@ -14,7 +15,7 @@ import {
   CreateExternalRessourceDto,
 } from './dto/create-application.dto';
 import { SearchApplicationDto } from './dto/search-application.dto';
-import { Prisma, Application } from '@prisma/client';
+import { Prisma, ActorType, Application } from '@prisma/client';
 import { ExternalRessourceType } from 'src/enum';
 
 @Injectable()
@@ -35,18 +36,6 @@ export class ApplicationService {
     ownerId: string,
     createApplicationDto: CreateApplicationDto,
   ) {
-    for (const actor of createApplicationDto.actors) {
-      const userExists = await this.prisma.user.findUnique({
-        where: { keycloakId: actor.userId },
-      });
-
-      if (!userExists) {
-        throw new BadRequestException(
-          `User with ID ${actor.userId} does not exist.`,
-        );
-      }
-    }
-
     const applicationMetadata = await this.createApplicationMetadata(ownerId);
     const application = await this.persistApplication(
       ownerId,
@@ -230,6 +219,20 @@ export class ApplicationService {
     applicationMetadataId: string,
     createApplicationDto,
   ) {
+    const user = await this.prisma.user.findUnique({
+      where: { keycloakId: ownerId },
+      select: { email: true, keycloakId: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User not found for keycloakId=${ownerId}`);
+    }
+    const actorsToCreate = await this.prepareActorsData(
+      ownerId,
+      user.email,
+      createApplicationDto.actors,
+    );
+
     const application = await this.prisma.application.create({
       data: {
         label: createApplicationDto.label,
@@ -256,15 +259,7 @@ export class ApplicationService {
           },
         },
         actors: {
-          create: Array.isArray(createApplicationDto.actors)
-            ? createApplicationDto.actors.map((actorDto) => ({
-                role: actorDto.role,
-                user: { connect: { keycloakId: actorDto.userId } },
-                externalOrganization: actorDto.organizationId
-                  ? { connect: { id: actorDto.organizationId } }
-                  : undefined,
-              }))
-            : [],
+          create: actorsToCreate,
         },
         compliances: {
           create: createApplicationDto.compliances.map((compliance) => ({
@@ -279,7 +274,7 @@ export class ApplicationService {
         },
         externals: {
           create: createApplicationDto.externals.map((external) => ({
-            externalSource: { connect: { id: external.externalSourceId } }, // Connexion via la relation
+            externalSource: { connect: { id: external.externalSourceId } },
             value: external.value,
             label: external.label,
             shortName: external.shortName,
@@ -305,13 +300,50 @@ export class ApplicationService {
       include: {
         lifecycle: { include: { metadata: true } },
         metadata: true,
-        actors: true,
+        actors: {
+          include: { user: true },
+        },
         compliances: true,
         externals: true,
         externalRessource: true,
       },
     });
     return application;
+  }
+
+  private async prepareActorsData(
+    ownerId: string,
+    ownerEmail: string,
+    actorsDto: CreateActorDto[],
+  ): Promise<Prisma.ActorCreateWithoutApplicationInput[]> {
+    const actorsToCreate: Prisma.ActorCreateWithoutApplicationInput[] = [
+      {
+        role: 'Owner',
+        email: ownerEmail,
+        user: {
+          connect: {
+            keycloakId: ownerId,
+          },
+        },
+        actorType: ActorType.Responsable,
+      },
+    ];
+
+    if (!Array.isArray(actorsDto) || actorsDto.length === 0) {
+      return actorsToCreate;
+    }
+
+    for (const actorDto of actorsDto) {
+      const actorToCreate: Prisma.ActorCreateWithoutApplicationInput = {
+        role: actorDto.role ?? null,
+        actorType: (actorDto.type as ActorType) ?? null,
+        email: actorDto.email ?? null,
+      };
+
+      actorsToCreate.push(actorToCreate);
+    }
+
+    return actorsToCreate;
   }
 
   private applyScalarAndSimpleRelationUpdates(
@@ -542,85 +574,60 @@ export class ApplicationService {
     incomingActorDtos: UpdateActorDto[],
     applicationUpdates: Prisma.ApplicationUpdateInput,
   ): Promise<void> {
+    // Get existing actors for the application
     const existingActors = await this.prisma.actor.findMany({
       where: { applicationId },
-      select: { id: true },
+      include: {
+        externalOrganization: true,
+      },
     });
 
+    // Extract IDs for comparison
     const existingActorIds = existingActors.map((a) => a.id);
     const incomingActorIds = incomingActorDtos
       .filter((a) => a.id)
       .map((a) => a.id as string);
 
-    const actorsToCreate = this.findActorsToCreate(incomingActorDtos);
-    const actorsToUpdate = this.findActorsToUpdate(
-      incomingActorDtos,
-      existingActorIds,
+    // Determine actors to create, update, and delete
+    const actorsToCreate = incomingActorDtos.filter((a) => !a.id);
+    const actorsToUpdate = incomingActorDtos.filter(
+      (a) => a.id && existingActorIds.includes(a.id),
     );
-    const actorIdsToDelete = this.findActorIdsToDelete(
-      existingActorIds,
-      incomingActorIds,
+    const actorIdsToDelete = existingActorIds.filter(
+      (id) => !incomingActorIds.includes(id),
     );
 
+    // Build the update object for the application's actors
     applicationUpdates.actors = {
+      // Delete actors that are no longer present
       delete: actorIdsToDelete.map((id) => ({ id })),
-      update: this.buildActorUpdateList(actorsToUpdate),
-      create: this.buildActorCreateList(actorsToCreate, applicationId),
-    };
-  }
 
-  private findActorsToCreate(dtos: UpdateActorDto[]): UpdateActorDto[] {
-    return dtos.filter((dto) => !dto.id);
-  }
-
-  private findActorsToUpdate(
-    dtos: UpdateActorDto[],
-    existingIds: string[],
-  ): UpdateActorDto[] {
-    return dtos.filter((dto) => dto.id && existingIds.includes(dto.id));
-  }
-
-  private findActorIdsToDelete(
-    existingIds: string[],
-    incomingIds: string[],
-  ): string[] {
-    return existingIds.filter((id) => !incomingIds.includes(id));
-  }
-
-  private buildActorUpdateList(
-    dtos: UpdateActorDto[],
-  ): Prisma.ActorUpdateWithWhereUniqueWithoutApplicationInput[] {
-    return dtos.map((dto) => ({
-      where: { id: dto.id },
-      data: {
-        ...(dto.role !== undefined && { role: dto.role }),
-        ...(dto.user && {
-          user: {
-            update: {
-              ...(dto.user.email !== undefined && { email: dto.user.email }),
+      // Update existing actors
+      update: actorsToUpdate.map((actor) => ({
+        where: { id: actor.id },
+        data: {
+          role: actor.role ?? null,
+          email: actor.email ?? null,
+          actorType: actor.actorType
+            ? { set: actor.actorType as ActorType }
+            : undefined,
+          ...(actor.organizationId && {
+            externalOrganization: {
+              connect: { id: actor.organizationId },
             },
+          }),
+        },
+      })),
+      create: actorsToCreate.map((actor) => ({
+        role: actor.role ?? null,
+        email: actor.email ?? null,
+        actorType: (actor.actorType as ActorType) ?? null,
+        ...(actor.organizationId && {
+          externalOrganization: {
+            connect: { id: actor.organizationId },
           },
         }),
-      },
-    }));
-  }
-
-  private buildActorCreateList(
-    dtos: UpdateActorDto[],
-    applicationId: string,
-  ): Prisma.ActorCreateWithoutApplicationInput[] {
-    return dtos.map((dto) => {
-      if (!dto.user || !dto.user.keycloakId) {
-        throw new Error('Missing user.keycloakId for a new Actor');
-      }
-
-      return {
-        role: dto.role,
-        application: { connect: { id: applicationId } },
-        user: {
-          connect: { keycloakId: dto.user.keycloakId },
-        },
-      };
-    });
+      })),
+    };
   }
 }
