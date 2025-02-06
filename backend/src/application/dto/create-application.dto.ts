@@ -10,7 +10,7 @@ import {
   IsEmail,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   ComplianceStatus,
   ComplianceType,
@@ -442,19 +442,24 @@ export class PatchApplicationDto extends PickType(
   PartialType(CreateApplicationDto),
   [
     'label',
+    'metadataId',      // Champ ajouté pour modifier les infos de l'application
     'shortName',
+    'logo',            // Champ ajouté
     'description',
     'purposes',
     'tags',
     'parentId',
     'lifecycle',
+    'externals',       // Champ ajouté
   ] as const,
 ) {
+  @ApiPropertyOptional({ type: [UpdateComplianceDto] })
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => UpdateComplianceDto)
   compliances?: UpdateComplianceDto[];
 
+  @ApiPropertyOptional({ type: [UpdateActorDto] })
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => UpdateActorDto)
