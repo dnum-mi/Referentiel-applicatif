@@ -611,22 +611,22 @@ export class ApplicationService {
           actorType: actor.actorType
             ? { set: actor.actorType as ActorType }
             : undefined,
-          ...(actor.organizationId && {
-            externalOrganization: {
-              connect: { id: actor.organizationId },
-            },
-          }),
+          // ...(actor.organizationId && {
+          //   externalOrganization: {
+          //     connect: { id: actor.organizationId },
+          //   },
+          // }),
         },
       })),
       create: actorsToCreate.map((actor) => ({
         role: actor.role ?? null,
         email: actor.email ?? null,
         actorType: (actor.actorType as ActorType) ?? null,
-        ...(actor.organizationId && {
-          externalOrganization: {
-            connect: { id: actor.organizationId },
-          },
-        }),
+        // ...(actor.organizationId && {
+        //   externalOrganization: {
+        //     connect: { id: actor.organizationId },
+        //   },
+        // }),
       })),
     };
   }

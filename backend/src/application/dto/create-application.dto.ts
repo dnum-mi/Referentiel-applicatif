@@ -1,5 +1,4 @@
 import { CreateExternalDto } from '../../external/dto/create-external.dto';
-import { PartialType, PickType } from '@nestjs/mapped-types';
 import {
   IsString,
   IsOptional,
@@ -10,7 +9,11 @@ import {
   IsEmail,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  ApiHideProperty,
+} from '@nestjs/swagger';
 import {
   ComplianceStatus,
   ComplianceType,
@@ -82,8 +85,13 @@ export class UpdateActorUserDto {
 
 export class UpdateActorDto {
   @IsOptional()
+  @ApiHideProperty()
   id?: string;
 
+  @ApiProperty({
+    example: 'admin',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   role?: string;
@@ -97,24 +105,24 @@ export class UpdateActorDto {
   @IsOptional()
   email?: string;
 
-  @ApiProperty({
-    example: '',
-    description: '',
-    required: false,
-  })
-  @IsEmail()
-  @IsOptional()
-  organizationId?: string;
+  // @ApiProperty({
+  //   example: '',
+  //   description: '',
+  //   required: false,
+  // })
+  // @IsEmail()
+  // @IsOptional()
+  // organizationId?: string;
 
   @ApiProperty({ enum: ActorType, required: false })
   @IsOptional()
   @IsEnum(ActorType)
   actorType?: ActorType;
 
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => UpdateActorUserDto)
-  user?: UpdateActorUserDto;
+  // @IsOptional()
+  // @ValidateNested()
+  // @Type(() => UpdateActorUserDto)
+  // user?: UpdateActorUserDto;
 }
 
 export class CreateComplianceDto {
@@ -184,13 +192,9 @@ export class CreateComplianceDto {
   @IsString()
   notes?: string | null;
 }
-
 export class UpdateComplianceDto {
-  @ApiProperty({
-    description: 'ID de la compliance (uniquement pour les existantes)',
-    required: false,
-  })
   @IsOptional()
+  @ApiHideProperty()
   id?: string;
 
   @ApiProperty({ enum: ComplianceType, required: false })
@@ -198,7 +202,10 @@ export class UpdateComplianceDto {
   @IsEnum(ComplianceType)
   type?: ComplianceType;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    example: 'Regulation',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   name?: string | null;
@@ -208,30 +215,79 @@ export class UpdateComplianceDto {
   @IsEnum(ComplianceStatus)
   status?: ComplianceStatus;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    example: '2023-01-01',
+    required: false,
+  })
   @IsOptional()
   @IsDateString()
   validityStart?: string | null;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    example: '2029-12-31',
+    required: false,
+  })
   @IsOptional()
   @IsDateString()
   validityEnd?: string | null;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    example: '42',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   scoreValue?: string | null;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    example: '%',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   scoreUnit?: string | null;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    example: 'Renseignements sur la conformité',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   notes?: string | null;
+}
+
+export class UpdateLifecycleDto {
+  @ApiProperty({
+    enum: LifecycleStatus,
+    required: false,
+  })
+  @IsEnum(LifecycleStatus)
+  @IsOptional()
+  status?: LifecycleStatus;
+
+  @ApiProperty({
+    example: '2023-11-22',
+    required: false,
+  })
+  @IsDateString()
+  @IsOptional()
+  firstProductionDate?: string;
+
+  @ApiProperty({
+    example: '2025-12-31',
+    required: false,
+  })
+  @IsOptional()
+  @IsDateString()
+  plannedDecommissioningDate?: string;
+
+  @ApiProperty({
+    example: 'metadata123',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  metadataId?: string;
 }
 export class CreateLifecycleDto {
   @ApiProperty({
@@ -270,19 +326,22 @@ export class CreateLifecycleDto {
 }
 
 export class UpdateExternalRessourceDto {
-  @ApiProperty({
-    description: 'ID de la externalRessource (uniquement pour les existantes)',
-    required: false,
-  })
+  @ApiHideProperty()
   @IsOptional()
   id?: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    example: 'https://example.com/document.pdf',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   link?: string | null;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({
+    example: 'Document example',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   description?: string | null;
@@ -438,28 +497,100 @@ export class CreateApplicationDto {
   externalRessource: CreateExternalRessourceDto[] = [];
 }
 
-export class PatchApplicationDto extends PickType(
-  PartialType(CreateApplicationDto),
-  [
-    'label',
-    'shortName',
-    'description',
-    'purposes',
-    'tags',
-    'parentId',
-    'lifecycle',
-  ] as const,
-) {
+export class PatchApplicationDto {
+  @ApiProperty({
+    example: 'My Application',
+    description: 'Label of the application',
+  })
+  @IsOptional()
+  @IsString()
+  label: string;
+
+  @ApiProperty({
+    example: 'metadata456',
+    description: 'Metadata ID',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  metadataId?: string;
+
+  @ApiProperty({
+    example: 'short-app-name',
+    description: 'Short name of the application',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  shortName: string;
+
+  @ApiProperty({
+    example: 'http://example.com/logo.png',
+    description: 'Logo URL of the application',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  logo?: string;
+
+  @ApiProperty({
+    example: 'An amazing application',
+    description: 'Description of the application',
+  })
+  @IsOptional()
+  @IsString()
+  description: string;
+
+  @ApiProperty({
+    type: [String],
+    example: ['finance', 'HR'],
+    description: 'Purposes of the application',
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  purposes?: string[];
+
+  @ApiProperty({
+    type: [String],
+    example: ['tag1', 'tag2'],
+    description: 'Tags associated with the application',
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  tags?: string[];
+
+  @ApiProperty({
+    example: 'parentApp123',
+    description: 'Parent application ID',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  parentId?: string;
+
+  @ApiPropertyOptional({ type: [UpdateLifecycleDto] })
   @IsOptional()
   @ValidateNested({ each: true })
-  @Type(() => UpdateComplianceDto)
-  compliances?: UpdateComplianceDto[];
+  @Type(() => UpdateLifecycleDto)
+  lifecycle?: UpdateLifecycleDto;
 
+  @ApiPropertyOptional({ type: [UpdateActorDto] })
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => UpdateActorDto)
   actors?: UpdateActorDto[];
 
+  @ApiPropertyOptional({ type: [UpdateComplianceDto] })
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateComplianceDto)
+  compliances?: UpdateComplianceDto[];
+
+  @ApiPropertyOptional({ type: [UpdateActorDto] })
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => UpdateExternalRessourceDto)
