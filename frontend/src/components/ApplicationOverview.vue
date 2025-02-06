@@ -73,7 +73,6 @@ const tabTitles = [
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 3" panel-id="tab-content-3" tab-id="tab-3">
-      <!-- Supprimé : prop "opened" ; ActorManager gère son propre état -->
       <ActorManager :application="application" />
     </DsfrTabContent>
 
