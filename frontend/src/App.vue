@@ -1,12 +1,47 @@
 <script setup lang="ts">
+import { ref, computed } from "vue";
 import { useRegisterSW } from "virtual:pwa-register/vue";
-import { ref } from "vue";
 import useToaster from "./composables/use-toaster";
 import { routeNames } from "./router/route-names";
 import { authentication } from "./services/authentication";
 
 const authenticated = ref(false);
-authentication.init({ onLoad: "check-sso" }).then((answer) => (authenticated.value = answer));
+const unauthenticatedQuickLinks = ref<QuickLink[]>([]);
+const authenticatedQuickLinks = ref<QuickLink[]>([]);
+
+interface QuickLink {
+  label: string;
+  to: { name: string } | string;
+  icon?: string;
+  iconAttrs?: Record<string, string>;
+}
+
+(async () => {
+  authenticated.value = await authentication.init({ onLoad: "check-sso" });
+  const loginUrlLink = await authentication.createLoginUrl({ redirectUri: window.location.href });
+  unauthenticatedQuickLinks.value = [
+    {
+      label: "Se connecter",
+      to: loginUrlLink,
+      icon: "ri-lock-line",
+      iconAttrs: { title: "Se connecter" },
+    },
+  ];
+  if (authenticated.value) {
+    authenticatedQuickLinks.value = [
+      { label: "Rechercher une application", to: { name: routeNames.SEARCHAPP } },
+      { label: "Mes signalements", to: { name: routeNames.ISSUELIST } },
+      {
+        label: "Déconnexion",
+        to: authentication.createLogoutUrl(),
+        icon: "ri-logout-box-r-line",
+        iconAttrs: { title: "Déconnexion" },
+      },
+    ];
+  }
+})();
+
+const quickLinks = computed(() => (authenticated.value ? authenticatedQuickLinks.value : unauthenticatedQuickLinks.value));
 
 const toaster = useToaster();
 
@@ -29,52 +64,14 @@ const mandatoryLinks = [
   },
 ];
 
-interface QuickLink {
-  label: string;
-  to: { name: string } | string;
-  icon?: string;
-  iconAttrs?: Record<string, string>;
-}
-
-const unauthenticatedQuickLinks = ref([]);
-
-authentication.createLoginUrl({ redirectUri: window.location.href }).then((loginUrlLink) => {
-  unauthenticatedQuickLinks.value = [
-    {
-      label: "Se connecter",
-      to: loginUrlLink,
-      icon: "ri-lock-line",
-      iconAttrs: { title: "Se connecter" },
-    },
-  ];
-});
-
-const authenticatedQuickLinks: QuickLink[] = [
-  {
-    label: "Rechercher une application",
-    to: { name: routeNames.SEARCHAPP },
-  },
-  {
-    label: "Mes signalements",
-    to: { name: routeNames.ISSUELIST },
-  },
-  {
-    label: "Déconnexion",
-    to: authentication.createLogoutUrl(),
-    icon: "ri-logout-box-r-line",
-    iconAttrs: { title: "Déconnexion" },
-  },
-];
 const searchQuery = ref("");
 
 const { setScheme, theme } = useScheme();
-
 function changeTheme() {
   setScheme(theme.value === "light" ? "dark" : "light");
 }
 
 const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW();
-
 function close() {
   offlineReady.value = false;
   needRefresh.value = false;
@@ -87,7 +84,7 @@ function close() {
     :service-description="serviceDescription"
     :service-title="serviceTitle"
     :logo-text="logoText"
-    :quick-links="authenticated ? authenticatedQuickLinks : unauthenticatedQuickLinks"
+    :quick-links="quickLinks"
     show-beta
   />
 
