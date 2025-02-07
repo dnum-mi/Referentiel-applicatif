@@ -6,6 +6,9 @@ import useToaster from "@/composables/use-toaster";
 import AppDate from "./AppDate.vue";
 
 const props = defineProps<{ application: Application }>();
+if (!props.application.compliances) {
+  props.application.compliances = [];
+}
 const loading = ref(false);
 const toaster = useToaster();
 
@@ -42,33 +45,99 @@ async function patchApplication() {
     loading.value = false;
   }
 }
+
+// Ajout de la fonction pour ajouter une conformité
+function addCompliance() {
+  // Création d'une nouvelle conformité avec des valeurs par défaut
+  props.application.compliances.push({
+    id: Date.now(), // id temporaire
+    type: "",
+    name: "",
+    status: "",
+    notes: "",
+    validityStart: "",
+    validityEnd: "",
+    scoreValue: "",
+    scoreUnit: "",
+  });
+}
+
+// Nouvelle variable réactive pour la sélection des conformités
+const selectedComplianceIds = ref<number[]>([]);
+
+// Fonction pour supprimer les conformités sélectionnées
+function removeSelectedCompliances() {
+  props.application.compliances = props.application.compliances.filter(
+    (compliance) => !selectedComplianceIds.value.includes(compliance.id),
+  );
+  selectedComplianceIds.value = [];
+}
 </script>
 
 <template>
   <div class="application-compliances">
     <h2 class="title">Conformités de l’application</h2>
 
-    <div v-if="props.application.compliances && props.application.compliances.length" class="compliances-list">
-      <div v-for="(compliance, index) in props.application.compliances" :key="compliance.id" class="compliance-card">
-        <header class="compliance-header">
-          <h3>Conformité #{{ index + 1 }}</h3>
-          <p v-if="compliance.name" class="compliance-name">{{ compliance.name }}</p>
-        </header>
-        <div class="compliance-content">
-          <!-- Sélecteur pour le Type de conformité -->
-          <DsfrSelect v-model="compliance.type" label="Type de conformité" :options="complianceTypes" />
-          <!-- Input pour le Nom -->
-          <DsfrInput v-model="compliance.name" label="Nom" label-visible />
-          <!-- Sélecteur pour le Statut -->
-          <DsfrSelect v-model="compliance.status" label="Statut" :options="complianceStatuses" />
-          <!-- Autres champs -->
-          <DsfrInput v-model="compliance.notes" label="Notes" label-visible isTextarea />
-          <AppDate v-model="compliance.validityStart" label="Date de début" />
-          <AppDate v-model="compliance.validityEnd" label="Date de fin" />
-          <DsfrInput v-model="compliance.scoreValue" label="Score" label-visible />
-          <DsfrInput v-model="compliance.scoreUnit" label="Unité de score" label-visible />
-        </div>
-      </div>
+    <!-- Bouton pour ajouter une nouvelle conformité -->
+    <div class="actions-add">
+      <DsfrButton label="Ajouter une conformité" @click="addCompliance" />
+    </div>
+
+    <!-- Bouton de suppression globale -->
+    <div class="global-delete">
+      <DsfrButton tertiary type="button" @click="removeSelectedCompliances" :disabled="selectedComplianceIds.length === 0">
+        Supprimer la sélection
+      </DsfrButton>
+    </div>
+
+    <!-- Affichage conditionnel du tableau ou d'un message -->
+    <div v-if="props.application.compliances && props.application.compliances.length">
+      <table class="compliance-table">
+        <thead>
+          <tr>
+            <th>Sélection</th>
+            <th>Type</th>
+            <th>Nom</th>
+            <th>Statut</th>
+            <th>Notes</th>
+            <th>Date de début</th>
+            <th>Date de fin</th>
+            <th>Score</th>
+            <th>Unité</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="compliance in props.application.compliances" :key="compliance.id">
+            <td>
+              <input type="checkbox" :value="compliance.id" v-model="selectedComplianceIds" />
+            </td>
+            <td>
+              <DsfrSelect v-model="compliance.type" :options="complianceTypes" />
+            </td>
+            <td>
+              <DsfrInput v-model="compliance.name" placeholder="Nom" />
+            </td>
+            <td>
+              <DsfrSelect v-model="compliance.status" :options="complianceStatuses" />
+            </td>
+            <td>
+              <DsfrInput v-model="compliance.notes" placeholder="Notes" isTextarea />
+            </td>
+            <td>
+              <AppDate v-model="compliance.validityStart" label="Date de début" />
+            </td>
+            <td>
+              <AppDate v-model="compliance.validityEnd" label="Date de fin" />
+            </td>
+            <td>
+              <DsfrInput v-model="compliance.scoreValue" placeholder="Score" />
+            </td>
+            <td>
+              <DsfrInput v-model="compliance.scoreUnit" placeholder="Unité" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div v-else class="no-compliances">
       <p>Aucune conformité n'est disponible pour cette application.</p>
@@ -139,5 +208,45 @@ async function patchApplication() {
 .actions {
   text-align: center;
   margin-top: 1rem;
+}
+
+.actions-add {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.global-delete {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.compliance-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  margin-bottom: 1.5rem;
+}
+
+.compliance-table thead {
+  background-color: #f9f9f9;
+  color: #5a5959;
+}
+
+.compliance-table th,
+.compliance-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+}
+
+.compliance-table tbody tr:nth-child(even) {
+  background-color: #fbfbfb;
+}
+
+.compliance-table tbody tr:hover {
+  background-color: #f7f7f7;
 }
 </style>
