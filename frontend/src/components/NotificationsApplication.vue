@@ -3,8 +3,7 @@ import Issue from "@/api/reportIssue";
 import type { Application } from "@/models/Application";
 import { onMounted, ref } from "vue";
 import { formatDate } from "@/composables/use-date";
-import { statusDictionary, statusIconClasses, statusColors } from "@/composables/use-dictionary";
-import useToaster from "@/composables/use-toaster";
+import { statusDictionary, statusIconClasses } from "@/composables/use-dictionary";
 
 const props = defineProps<{ application: Application }>();
 
@@ -63,7 +62,7 @@ onMounted(() => {
               <DsfrTag
                 :label="statusDictionary[notification.status]"
                 :icon="statusIconClasses[notification.status]"
-                :class="statusColors[notification.status]"
+                :class="notification.status"
               />
             </p>
             <p class="fr-text--sm"><strong>Date de création:</strong> {{ formatDate(notification.createdAt) }}</p>

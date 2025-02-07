@@ -4,6 +4,7 @@ import InformationsGenerales from "./InformationsGenerales.vue";
 import NotificationsApplication from "./NotificationsApplication.vue";
 import Links from "./Links.vue";
 import ActorManager from "./ActorManager.vue";
+import Compliances from "./Compliances.vue";
 import type { Application } from "@/models/Application";
 
 const props = defineProps<{ application: Application }>();
@@ -18,7 +19,7 @@ watch(
   },
 );
 
-const tabListName = "Informations sur l’application";
+const applicationTabListName = "Informations sur l’application";
 const tabTitles = [
   { title: "Informations générales", icon: "ri-checkbox-circle-line", tabId: "tab-0", panelId: "tab-content-0" },
   {
@@ -44,7 +45,7 @@ const tabTitles = [
 </script>
 
 <template>
-  <DsfrTabs v-model="activeTab" :tab-list-name="tabListName">
+  <DsfrTabs v-model="activeTab" :tab-list-name="applicationTabListName">
     <template #tab-items>
       <DsfrTabItem
         v-for="(tab, index) in tabTitles"
@@ -63,7 +64,8 @@ const tabTitles = [
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 1" panel-id="tab-content-1" tab-id="tab-1">
-      <Links :application="props.application" />
+      <!-- Utilisation de la variable réactive "application" pour la cohérence -->
+      <Links :application="application" />
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 2" panel-id="tab-content-2" tab-id="tab-2">
@@ -71,7 +73,7 @@ const tabTitles = [
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 3" panel-id="tab-content-3" tab-id="tab-3">
-      <ActorManager :application="application" @update:application="emit('update:application', $event)" />
+      <ActorManager :application="application" />
     </DsfrTabContent>
 
     <DsfrTabContent v-if="activeTab === 4" panel-id="tab-content-4" tab-id="tab-4">

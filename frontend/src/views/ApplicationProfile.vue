@@ -16,7 +16,7 @@ function handleApplicationUpdate(updatedApplication: Application) {
   application.value = updatedApplication;
 }
 
-onMounted(async () => {
+async function loadApplication() {
   isLoading.value = true;
   try {
     application.value = await Applications.getApplicationById(id);
@@ -25,7 +25,9 @@ onMounted(async () => {
   } finally {
     isLoading.value = false;
   }
-});
+}
+
+onMounted(loadApplication);
 </script>
 
 <template>
