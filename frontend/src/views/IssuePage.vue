@@ -32,8 +32,6 @@ const loadReports = async () => {
       errorMessage.value = "";
       dataLoaded.value = false;
 
-      //      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       const reportList = await Issues.getReportIssueByNotifierId();
       rows.value = reportList.map((report: any) => [
         {
@@ -74,7 +72,9 @@ onMounted(() => {
       <p>Aucun signalement recensé.</p>
     </div>
 
+    <!-- Condition pour afficher le tableau uniquement s'il y a des données -->
     <DsfrDataTable
+      v-if="isLoading || rows.length > 0"
       v-model:selection="selection"
       v-model:current-page="currentPage"
       :headers-row="headers"
