@@ -61,7 +61,6 @@ onMounted(() => {
   loadReports();
 });
 </script>
-
 <template>
   <div class="fr-container fr-my-2v w-[800px]">
     <div v-if="errorMessage" class="error-message">
@@ -72,7 +71,6 @@ onMounted(() => {
       <p>Aucun signalement recensé.</p>
     </div>
 
-    <!-- Condition pour afficher le tableau uniquement s'il y a des données -->
     <DsfrDataTable
       v-if="isLoading || rows.length > 0"
       v-model:selection="selection"
@@ -125,6 +123,7 @@ onMounted(() => {
   color: var(--success-425-625);
   background-color: var(--success-950-100);
 }
+
 .text-center {
   display: flex;
   justify-content: center;
@@ -147,28 +146,71 @@ onMounted(() => {
   text-align: center;
 }
 
+@keyframes skeleton-wave {
+  0% {
+    background-position: -200% 0;
+    opacity: 0.6;
+  }
+  50% {
+    background-position: 200% 0;
+    opacity: 1;
+  }
+  100% {
+    background-position: -200% 0;
+    opacity: 0.6;
+  }
+}
+
+@keyframes skeleton-offset {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
+  }
+}
+
 .skeleton-cell {
   height: 20px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, #f6f6f6 25%, #eaeaea 50%, #f6f6f6 75%);
   background-size: 200% 100%;
-  animation: skeleton-loading 1.5s infinite;
+  animation:
+    skeleton-wave 1.8s infinite,
+    skeleton-offset 1.8s infinite alternate;
   border-radius: 4px;
+  margin-bottom: 10px;
 }
 
 .skeleton-tag {
   display: inline-block;
-  width: 60px;
+  width: 80px;
   height: 20px;
-  background: #e0e0e0;
+  background: linear-gradient(90deg, #f6f6f6 25%, #eaeaea 50%, #f6f6f6 75%);
+  background-size: 200% 100%;
+  animation:
+    skeleton-wave 1.8s infinite,
+    skeleton-offset 1.8s infinite alternate;
   border-radius: 4px;
 }
 
-@keyframes skeleton-loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+.skeleton-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  animation: skeleton-offset 1.5s infinite alternate ease-in-out;
+}
+
+.skeleton-row div {
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(90deg, #f6f6f6 25%, #eaeaea 50%, #f6f6f6 75%);
+  background-size: 200% 100%;
+  animation:
+    skeleton-wave 1.8s infinite,
+    skeleton-offset 1.8s infinite alternate;
+  border-radius: 4px;
+  margin-bottom: 10px;
 }
 </style>
