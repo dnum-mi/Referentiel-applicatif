@@ -13,50 +13,70 @@ const rows = ref<(string | { component: string; [k: string]: unknown })[][]>([])
 const selection = ref<string[]>([]);
 const currentPage = ref<number>(0);
 
-const loadReports = async () => {
-  try {
-    const reportList = await Issues.getReportIssueByNotifierId();
+const dataLoaded = ref(false);
+const isLoading = ref(false);
+const errorMessage = ref("");
+const debounceTimeout = ref<NodeJS.Timeout | null>(null);
 
-    rows.value = reportList.map((report: any) => [
-      {
-        label: report.application?.label,
-        to: { name: routeNames.PROFILEAPP, params: { id: report.application?.id } },
-      },
-      report.description,
-      formatDate(report.createdAt),
-      {
-        component: "DsfrTag",
-        icon: statusIconClasses[report.status],
-        label: statusDictionary[report.status],
-        class: report.status,
-      },
-    ]);
-  } catch (error) {
-    if (error.response?.status === 404) {
-      console.warn("Aucune notification trouvée.");
-      return [];
-    }
-    console.error("Une erreur est survenue lors du chargement des signalements :", error);
-    throw error;
+const skeletonRows = ref<Array<Array<any>>>(
+  Array(5).fill([{ label: " ", to: "#" }, " ", " ", { component: "DsfrTag", label: " ", class: "skeleton-tag" }]),
+);
+
+const loadReports = async () => {
+  if (debounceTimeout.value) {
+    clearTimeout(debounceTimeout.value);
   }
+  debounceTimeout.value = setTimeout(async () => {
+    try {
+      isLoading.value = true;
+      errorMessage.value = "";
+      dataLoaded.value = false;
+
+      const reportList = await Issues.getReportIssueByNotifierId();
+      rows.value = reportList.map((report: any) => [
+        {
+          label: report.application?.label,
+          to: { name: routeNames.PROFILEAPP, params: { id: report.application?.id } },
+        },
+        report.description,
+        formatDate(report.createdAt),
+        {
+          component: "DsfrTag",
+          icon: statusIconClasses[report.status],
+          label: statusDictionary[report.status],
+          class: report.status,
+        },
+      ]);
+    } catch (error) {
+      errorMessage.value = "Une erreur est survenue lors du chargement des anomalies.";
+      return [];
+    } finally {
+      isLoading.value = false;
+      dataLoaded.value = true;
+    }
+  }, 300);
 };
 
 onMounted(() => {
   loadReports();
 });
 </script>
-
 <template>
   <div class="fr-container fr-my-2v w-[800px]">
-    <div v-if="rows.length === 0" class="text-center">
+    <div v-if="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <div v-if="dataLoaded && rows.length === 0" class="text-center">
       <p>Aucun signalement recensé.</p>
     </div>
+
     <DsfrDataTable
-      v-else
+      v-if="isLoading || rows.length > 0"
       v-model:selection="selection"
       v-model:current-page="currentPage"
       :headers-row="headers"
-      :rows="rows"
+      :rows="isLoading ? skeletonRows : rows"
       selectable-rows
       row-key="id"
       :title="title"
@@ -69,7 +89,10 @@ onMounted(() => {
       :sortable-rows="['id']"
     >
       <template #cell="{ colKey, cell }">
-        <template v-if="colKey === 'Application'">
+        <template v-if="isLoading">
+          <div class="skeleton-cell"></div>
+        </template>
+        <template v-else-if="colKey === 'Application'">
           <router-link :to="cell.to">
             {{ cell.label }}
           </router-link>
@@ -100,6 +123,7 @@ onMounted(() => {
   color: var(--success-425-625);
   background-color: var(--success-950-100);
 }
+
 .text-center {
   display: flex;
   justify-content: center;
@@ -120,5 +144,73 @@ onMounted(() => {
 .text-center p {
   margin: 0;
   text-align: center;
+}
+
+@keyframes skeleton-wave {
+  0% {
+    background-position: -200% 0;
+    opacity: 0.6;
+  }
+  50% {
+    background-position: 200% 0;
+    opacity: 1;
+  }
+  100% {
+    background-position: -200% 0;
+    opacity: 0.6;
+  }
+}
+
+@keyframes skeleton-offset {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
+  }
+}
+
+.skeleton-cell {
+  height: 20px;
+  background: linear-gradient(90deg, #f6f6f6 25%, #eaeaea 50%, #f6f6f6 75%);
+  background-size: 200% 100%;
+  animation:
+    skeleton-wave 1.8s infinite,
+    skeleton-offset 1.8s infinite alternate;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.skeleton-tag {
+  display: inline-block;
+  width: 80px;
+  height: 20px;
+  background: linear-gradient(90deg, #f6f6f6 25%, #eaeaea 50%, #f6f6f6 75%);
+  background-size: 200% 100%;
+  animation:
+    skeleton-wave 1.8s infinite,
+    skeleton-offset 1.8s infinite alternate;
+  border-radius: 4px;
+}
+
+.skeleton-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  animation: skeleton-offset 1.5s infinite alternate ease-in-out;
+}
+
+.skeleton-row div {
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(90deg, #f6f6f6 25%, #eaeaea 50%, #f6f6f6 75%);
+  background-size: 200% 100%;
+  animation:
+    skeleton-wave 1.8s infinite,
+    skeleton-offset 1.8s infinite alternate;
+  border-radius: 4px;
+  margin-bottom: 10px;
 }
 </style>
