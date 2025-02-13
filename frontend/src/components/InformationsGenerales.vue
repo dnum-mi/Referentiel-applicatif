@@ -64,7 +64,6 @@ async function patchApplication() {
   <div class="general-info">
     <h2 class="general-info-title">Informations générales</h2>
 
-    <!-- Carte Informations de base -->
     <div class="info-card">
       <!-- Champs de base -->
       <div class="input-group">
@@ -112,12 +111,15 @@ async function patchApplication() {
     <div class="section">
       <h3 class="section-title">Finalités</h3>
       <div class="objectives-list">
-        <div v-for="(purpose, index) in application.purposes" :key="index" class="input-group">
-          <DsfrInput v-model="application.purposes[index]" :label="`Finalités #${index + 1}`" label-visible />
+        <div v-for="(purpose, index) in application.purposes" :key="index" class="purpose-item">
+          <div class="purpose-item-wrapper">
+            <DsfrInput v-model="application.purposes[index]" label-visible />
+            <DsfrButton secondary label="Supprimer" @click="removePurpose(index)" />
+          </div>
         </div>
       </div>
       <div class="actions-inline">
-        <DsfrButton secondary label="Ajouter une finalités" @click="application.purposes.push('Nouvel Finalités')" />
+        <DsfrButton secondary label="Ajouter une finalités" @click="application.purposes.push('')" />
       </div>
     </div>
 
@@ -229,6 +231,12 @@ async function patchApplication() {
 
 .tags-container {
   padding: 0.5rem 0;
+}
+
+.purpose-item-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .tag-item {
