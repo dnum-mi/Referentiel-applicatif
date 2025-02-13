@@ -39,6 +39,14 @@ function cancelTag() {
   isAddingTag.value = false;
 }
 
+function removeTag(index: number) {
+  application.tags.splice(index, 1);
+}
+
+function removePurpose(index: number) {
+  application.purposes.splice(index, 1);
+}
+
 async function patchApplication() {
   loading.value = true;
   try {
@@ -115,9 +123,18 @@ async function patchApplication() {
 
     <div class="section">
       <h3 class="section-title">Tags</h3>
+      <div class="tags-info">
+        <small>Survolez un tag pour voir l'option de suppression</small>
+      </div>
       <div class="tags-container">
         <div class="tags-list">
-          <DsfrTag v-for="(tag, index) in application.tags" :key="index" :label="tag" />
+          <div v-for="(tag, index) in application.tags" :key="index" class="tag-item">
+            <DsfrTag :label="tag" />
+
+            <span class="delete-icon" title="Cliquez pour supprimer ce tag" @click.stop="removeTag(index)">
+              <v-icon name="ri-delete-bin-line" />
+            </span>
+          </div>
         </div>
       </div>
       <div class="actions-inline">
@@ -212,6 +229,28 @@ async function patchApplication() {
 
 .tags-container {
   padding: 0.5rem 0;
+}
+
+.tag-item {
+  position: relative;
+  display: inline-block;
+}
+
+.delete-icon {
+  display: none;
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  padding: 2px;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.tag-item:hover .delete-icon {
+  display: block;
 }
 
 .tags-list {
