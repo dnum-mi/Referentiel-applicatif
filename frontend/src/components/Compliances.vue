@@ -1,15 +1,33 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import Applications from "@/api/application";
-import type { Application } from "@/models/Application";
+import type { Application, Compliance } from "@/models/Application";
 import useToaster from "@/composables/use-toaster";
 import AppDate from "./AppDate.vue";
+import { defineProps, defineEmits } from "vue";
 
-const props = defineProps<{ application: Application }>();
-const loading = ref(false);
 const toaster = useToaster();
 
-// Dictionnaires pour les options
+const props = defineProps({
+  application: {
+    type: Object,
+    required: true,
+  },
+  title: { type: String, default: "" },
+  icon: { type: String, default: "" },
+});
+
+const emit = defineEmits(["update:application"]);
+
+const localCompliances = ref<Compliance[]>(Array.isArray(props.application.compliances) ? [...props.application.compliances] : []);
+
+watch(
+  () => props.application.compliances,
+  (newVal) => {
+    localCompliances.value = Array.isArray(newVal) ? [...newVal] : [];
+  },
+);
+
 const complianceTypesDict = {
   regulation: "Réglementation",
   standard: "Standard",
@@ -26,118 +44,138 @@ const complianceStatusesDict = {
   not_concerned: "Non concerné",
 };
 
-// Transformation des dictionnaires en tableau d'options adapté à DsfrSelect
-const complianceTypes = computed(() => Object.entries(complianceTypesDict).map(([value, text]) => ({ value, text })));
+const complianceTypes = computed(() => [
+  { value: "", text: "Choisir un type de conformité" },
+  ...Object.entries(complianceTypesDict).map(([value, text]) => ({ value, text })),
+]);
 
-const complianceStatuses = computed(() => Object.entries(complianceStatusesDict).map(([value, text]) => ({ value, text })));
+const complianceStatuses = computed(() => [
+  { value: "", text: "Choisir un statut" },
+  ...Object.entries(complianceStatusesDict).map(([value, text]) => ({ value, text })),
+]);
 
-async function patchApplication() {
+const loading = ref(false);
+const selectedComplianceIds = ref<string[]>([]);
+const hasChanges = computed(() => JSON.stringify(localCompliances.value) !== JSON.stringify(props.application.compliances));
+
+function addCompliance() {
+  localCompliances.value.push({
+    id: Date.now().toString(),
+    name: "",
+    status: "",
+    validityStart: "",
+    validityEnd: "",
+    scoreValue: "",
+    scoreUnit: "",
+    notes: "",
+    applicationId: props.application.id,
+  });
+}
+
+function removeCompliance(complianceId: string) {
+  localCompliances.value = localCompliances.value.filter((compliance) => compliance.id !== complianceId);
+}
+
+function removeSelectedCompliances() {
+  localCompliances.value = localCompliances.value.filter((compliance) => !selectedComplianceIds.value.includes(compliance.id));
+  selectedComplianceIds.value = [];
+}
+
+function cancelChanges() {
+  localCompliances.value = Array.isArray(props.application.compliances) ? [...props.application.compliances] : [];
+}
+
+async function saveAll() {
+  for (const compliance of localCompliances.value) {
+    if (!compliance.name.trim()) {
+      toaster.addErrorMessage("Le nom de la conformité est requis.");
+      return;
+    }
+  }
+
+  const existingIds = new Set((props.application.compliances || []).map((c: Compliance) => c.id));
+  const compliancesToSave = localCompliances.value.map((compliance) =>
+    existingIds.has(compliance.id) ? compliance : { ...compliance, id: undefined },
+  );
+
   loading.value = true;
   try {
-    await Applications.patchApplication(props.application);
-    toaster.addSuccessMessage("Application mise à jour avec succès");
+    const updatedApplication = await Applications.patchApplication({
+      ...props.application,
+      compliances: compliancesToSave,
+    });
+    emit("update:application", updatedApplication);
+    toaster.addSuccessMessage("Conformités sauvegardées avec succès !");
   } catch (error) {
-    toaster.addErrorMessage("Erreur lors de la mise à jour de l'application");
+    toaster.addErrorMessage("Erreur lors de la sauvegarde des conformités.");
   } finally {
     loading.value = false;
   }
 }
 </script>
-
 <template>
-  <div class="application-compliances">
-    <h2 class="title">Conformités de l’application</h2>
+  <div>
+    <div class="header">
+      <h2>Gestion des Conformités</h2>
+    </div>
 
-    <div v-if="props.application.compliances && props.application.compliances.length" class="compliances-list">
-      <div v-for="(compliance, index) in props.application.compliances" :key="compliance.id" class="compliance-card">
-        <header class="compliance-header">
-          <h3>Conformité #{{ index + 1 }}</h3>
-          <p v-if="compliance.name" class="compliance-name">{{ compliance.name }}</p>
-        </header>
-        <div class="compliance-content">
-          <!-- Sélecteur pour le Type de conformité -->
-          <DsfrSelect v-model="compliance.type" label="Type de conformité" :options="complianceTypes" />
-          <!-- Input pour le Nom -->
-          <DsfrInput v-model="compliance.name" label="Nom" label-visible />
-          <!-- Sélecteur pour le Statut -->
-          <DsfrSelect v-model="compliance.status" label="Statut" :options="complianceStatuses" />
-          <!-- Autres champs -->
-          <DsfrInput v-model="compliance.notes" label="Notes" label-visible isTextarea />
+    <div class="global-delete">
+      <DsfrButton type="button" tertiary @click="removeSelectedCompliances" :disabled="selectedComplianceIds.length === 0">
+        Supprimer la sélection
+      </DsfrButton>
+    </div>
+
+    <div class="compliance-cards">
+      <div v-for="compliance in localCompliances" :key="compliance.id" class="compliance-card">
+        <input type="checkbox" :value="compliance.id" v-model="selectedComplianceIds" class="select-checkbox" />
+        <div class="card-content">
+          <DsfrInput v-model="compliance.name" placeholder="Nom de la conformité" />
+          <DsfrSelect v-model="compliance.type" :options="complianceTypes" />
+          <DsfrSelect v-model="compliance.status" :options="complianceStatuses" />
+          <DsfrInput v-model="compliance.notes" placeholder="Notes" isTextarea />
           <AppDate v-model="compliance.validityStart" label="Date de début" />
           <AppDate v-model="compliance.validityEnd" label="Date de fin" />
-          <DsfrInput v-model="compliance.scoreValue" label="Score" label-visible />
-          <DsfrInput v-model="compliance.scoreUnit" label="Unité de score" label-visible />
+          <DsfrInput v-model="compliance.scoreValue" placeholder="Score" />
+          <DsfrInput v-model="compliance.scoreUnit" placeholder="Unité" />
         </div>
       </div>
     </div>
-    <div v-else class="no-compliances">
-      <p>Aucune conformité n'est disponible pour cette application.</p>
-    </div>
 
     <div class="actions">
-      <DsfrButton label="Sauvegarder les conformités" :disabled="loading" @click="patchApplication" />
+      <DsfrButton type="button" class="add-btn" @click="addCompliance">Ajouter une conformité</DsfrButton>
+      <DsfrButton type="button" class="cancel-btn" @click="cancelChanges" :disabled="!hasChanges">Annuler</DsfrButton>
+      <DsfrButton type="button" class="save-btn" @click="saveAll" :loading="loading">Sauvegarder</DsfrButton>
     </div>
   </div>
 </template>
 
 <style scoped>
-.application-compliances {
-  padding: 1rem;
-  background-color: #fefefe;
-}
-
-.title {
-  font-size: 1.75rem;
-  margin-bottom: 1rem;
-  text-align: center;
-  color: #333;
-}
-
-.compliances-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.compliance-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  background-color: #fff;
-}
-
-.compliance-header {
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-}
-
-.compliance-header h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: #005ea8;
-}
-
-.compliance-name {
-  font-style: italic;
-  color: #333;
-}
-
-.compliance-content {
-  display: grid;
+.compliance-cards {
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
-.no-compliances {
-  text-align: center;
-  font-style: italic;
-  color: #777;
+.compliance-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  width: calc(33.333% - 1rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.select-checkbox {
+  align-self: flex-start;
+  margin-bottom: 0.5rem;
 }
 
 .actions {
-  text-align: center;
-  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  gap: 1rem;
 }
 </style>
