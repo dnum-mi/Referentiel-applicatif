@@ -56,9 +56,6 @@ export const applicationMap = (
             )
           : [],
       },
-      parent: createApplicationDto.parentId
-        ? { connect: { id: createApplicationDto.parentId } }
-        : undefined,
     },
     include: {
       lifecycle: { include: { metadata: true } },
